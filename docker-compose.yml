@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    # depends_on:
+    #   - db
+    #   - ollama_litellm
+
+  # ollama_litellm:
+  #   image: ollama/litellm:latest
+  #   ports:
+  #     - "5000:5000"
+
+#   db:
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_DB: yourdbname
+#       POSTGRES_USER: yourdbuser
+#       POSTGRES_PASSWORD: yourdbpassword
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:

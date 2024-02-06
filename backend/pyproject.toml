@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["Kaveh <kaveh.razavi@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^2.6.1"
+langchain-core = "^0.1.18"
+langchain-community = "^0.0.17"
+langchain-openai = "^0.0.5"
+uvicorn = "^0.27.0.post1"
+sqlalchemy = "^2.0.25"
+fastapi = "^0.109.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
