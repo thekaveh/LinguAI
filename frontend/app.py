@@ -13,7 +13,7 @@ def get_hello_world():
     else:
         return {"Error": "Failed to fetch data from backend"}
 
-st.title('Hello World Streamlit Frontend XXX')
+st.title('Hello World Streamlit Frontend')
 
 # Fetch and display data from the backend
 data = get_hello_world()
