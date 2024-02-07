@@ -29,8 +29,8 @@ For development, Docker Compose is used to orchestrate the application's service
 
 2. Accessing the Application
 
-   - Streamlit frontend will be accessible at: http://localhost:8501
-   - FastAPI backend (Swagger UI) at: http://localhost:8000/docs
+   - Streamlit frontend will be accessible at: `http://localhost:{FRONTEND_PORT}`
+   - FastAPI backend (Swagger UI) at: `http://localhost:{BACKEND_PORT}/docs`
 
 ### Code Changes
 
