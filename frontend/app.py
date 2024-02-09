@@ -1,20 +1,7 @@
-import os
-import requests
-import streamlit as st
+from components.sidebar import fetch_sidebar_selection
 
-BACKEND_ENDPOINT = os.environ.get("BACKEND_ENDPOINT", "http://backend:8000/")
+def main():
+    fetch_sidebar_selection().render()
 
-st.write(os.environ.get("BACKEND_ENDPOINT"))
-
-def get_hello_world():
-    response = requests.get(BACKEND_ENDPOINT)
-    if response.ok:
-        return response.json()
-    else:
-        return {"Error": "Failed to fetch data from backend"}
-
-st.title('Hello World Streamlit Frontend')
-
-# Fetch and display data from the backend
-data = get_hello_world()
-st.write(data)
+if __name__ == "__main__":
+    main()

@@ -16,4 +16,4 @@ RUN pip install poetry && \
 COPY . /app
 
 # Command to run the app, ensuring reload is available for development
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

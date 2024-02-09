@@ -1,5 +1,24 @@
 version: '3.8'
 services:
+  llm:
+    image: litellm/ollama:latest
+    entrypoint: ["/bin/bash", "-c", "ollama serve & litellm --model ollama/${LOCAL_LLM_MODEL} --host 0.0.0.0 --port 5001"]
+    ports:
+      - "${LOCAL_LLM_PORT}:5001"
+
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - llm
+    environment:
+      - LOCAL_LLM_API_ENDPOINT=http://llm:5001
+      - OPENAI_LLM_API_KEY=${OPENAI_LLM_API_KEY}
+      - OPENAI_LLM_API_ENDPOINT=${OPENAI_LLM_API_ENDPOINT}
+
   frontend:
     build: ./frontend
     ports:
@@ -9,22 +28,7 @@ services:
     depends_on:
       - backend
     environment:
-      - BACKEND_ENDPOINT=http://backend:8000/
-
-  backend:
-    build: ./backend
-    ports:
-      - "${BACKEND_PORT}:8000"
-    volumes:
-      - ./backend:/app
-    # depends_on:
-    #   - db
-    #   - ollama_litellm
-
-  # ollama_litellm:
-  #   image: ollama/litellm:latest
-  #   ports:
-  #     - "5000:5000"
+      - BACKEND_ENDPOINT=http://backend:8000
 
 #   db:
 #     image: postgres:latest
