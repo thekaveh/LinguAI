@@ -1,7 +1,11 @@
-from components.sidebar import fetch_sidebar_selection
+import streamlit as st
+
+from streamlit_option_menu import option_menu
+
+import components.sidebar
 
 def main():
-    fetch_sidebar_selection().render()
+    components.sidebar.show()
 
 if __name__ == "__main__":
     main()

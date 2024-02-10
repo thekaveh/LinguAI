@@ -1,10 +1,15 @@
 version: '3.8'
 services:
-  llm:
-    image: litellm/ollama:latest
-    entrypoint: ["/bin/bash", "-c", "ollama serve & litellm --model ollama/${LOCAL_LLM_MODEL} --host 0.0.0.0 --port 5001"]
+  ollama:
+    image: ollama/ollama:latest
     ports:
-      - "${LOCAL_LLM_PORT}:5001"
+      - "${OLLAMA_PORT}:11434"
+
+  litellm:
+    image: litellm/ollama:latest
+    entrypoint: ["/bin/bash", "-c", "ollama serve && litellm --model ollama/${LITELLM_MODEL} --host 0.0.0.0 --port 5001"]
+    ports:
+      - "${LITELLM_PORT}:5001"
 
   backend:
     build: ./backend
@@ -13,11 +18,13 @@ services:
     volumes:
       - ./backend:/app
     depends_on:
-      - llm
+      - litellm
+      - ollama
     environment:
-      - LOCAL_LLM_API_ENDPOINT=http://llm:5001
-      - OPENAI_LLM_API_KEY=${OPENAI_LLM_API_KEY}
-      - OPENAI_LLM_API_ENDPOINT=${OPENAI_LLM_API_ENDPOINT}
+      - LITELLM_API_ENDPOINT=http://litellm:5001
+      - OLLAMA_API_ENDPOINT=http://ollama:11434
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
 
   frontend:
     build: ./frontend
@@ -29,6 +36,7 @@ services:
       - backend
     environment:
       - BACKEND_ENDPOINT=http://backend:8000
+    command: ["streamlit", "run", "app.py"]
 
 #   db:
 #     image: postgres:latest

@@ -1,0 +1,18 @@
+# .streamlit/config.toml
+
+[theme]
+primaryColor = "#4682B4"  # Steel Blue for accents
+backgroundColor = "#1E1E1E"  # Dark background similar to VS Code
+secondaryBackgroundColor = "#2C2C2C"  # Slightly lighter dark shade for secondary backgrounds
+textColor = "#FFFFFF"  # White text for readability
+font = "sans serif"
+
+[server]
+# Your server configuration here (if needed)
+
+[browser]
+# Any browser-specific configurations
+
+# Attempt to minimize the menu (Note: This does not disable the auto-generated sidebar for pages)
+[deprecation]
+showMenu = false  # This attempts to hide the hamburger menu, not the sidebar for pages
