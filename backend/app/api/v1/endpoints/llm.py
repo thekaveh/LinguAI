@@ -4,8 +4,8 @@ from app.services.llm_service import LlmService
 
 router = APIRouter()
 
-@router.get("/llms/get")
-async def get_llms():
+@router.get("/llm/list")
+async def list_llms():
     service = LlmService()
     
     try:

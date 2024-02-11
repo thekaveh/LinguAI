@@ -14,5 +14,5 @@ class APIClient:
 
 	@staticmethod
 	def get_llms():
-		response = requests.get(url=f"{Config.BACKEND_ENDPOINT}/v1/llms/get")
+		response = requests.get(url=f"{Config.BACKEND_ENDPOINT}/v1/llm/list")
 		return response.json().get("result", "") if response.status_code == 200 else "Error"

@@ -15,6 +15,7 @@ uvicorn = "^0.27.0.post1"
 sqlalchemy = "^2.0.25"
 fastapi = "^0.109.2"
 ollama = "^0.1.6"
+langserve = {extras = ["all"], version = "^0.0.41"}
 
 
 [build-system]

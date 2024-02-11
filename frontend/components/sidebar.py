@@ -1,17 +1,15 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 
-from components import home, settings
+from components import home, settings, chat
 
 def show():
     pages = {
-        "Home": {"icon": "house", "page": home},
-        # "Search": {"icon": "search"},
-        # "Files": {"icon": "folder"},
-        "Settings": {"icon": "gear", "page": settings},
-        # Add more menu items as needed
-    }
-    
+		"Home": {"icon": "house", "page": home},
+		"Chat": {"icon": "chat", "page": chat},
+		"Settings": {"icon": "gear", "page": settings}
+	}
+
     with st.sidebar:
         # st.markdown(f"""
 		# 	<a href="/" style="color:black;text-decoration: none;">
