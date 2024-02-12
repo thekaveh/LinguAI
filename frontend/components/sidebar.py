@@ -1,4 +1,5 @@
 import streamlit as st
+
 from streamlit_option_menu import option_menu
 
 from components import home, settings, chat
@@ -37,5 +38,5 @@ def show():
             #     "nav-link-selected": {"background-color": "#4682B4"},
             # }
         )
-        
+
     pages[selected]["page"].render()

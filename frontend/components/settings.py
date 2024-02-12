@@ -1,18 +1,16 @@
 import streamlit as st
 
-from utils.api_client import APIClient
+from services.state_service import StateService
 
 def render():
     st.title("Settings")
     
-    llms = APIClient.get_llms()
-    if 'llm_type' not in st.session_state:    
-        st.session_state['llm_type'] = llms[0]
+    state_service = StateService.instance()
 
-    selected_llm_type = st.selectbox(
-        "Select LLM Engine:"
-        , llms
-        , index=llms.index(st.session_state['llm_type'])
+    selected_llm = st.selectbox(
+        "Select LLM:"
+        , state_service.get_llms()
+        , index=state_service.get_llms().index(state_service.get_selected_llm())
     )
     
-    st.session_state['llm_type'] = selected_llm_type
+    state_service.set_selected_llm(selected_llm)
