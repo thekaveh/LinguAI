@@ -6,17 +6,17 @@ from app.services.llm_service import LLMService
 router = APIRouter()
 
 @router.get("/llm/list")
-async def list_llms():
+async def list():
     try:
-        result = LLMService().list_llms()
+        result = LLMService().list()
         return {"result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-for llm in LLMService().list_llms():
+for model in LLMService().list():
 	add_routes(
 		app=router
-		, path=f"/llm/chat/{llm}"
+		, path=f"/llm/chat/{model}"
 		, enabled_endpoints=["stream"]
-		, runnable=LLMService().get_llm(name=llm)
+		, runnable=LLMService().get(model=model)
 	)

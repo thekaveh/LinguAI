@@ -9,22 +9,24 @@ from app.core.config import Config
 
 class LLMService:
     def __init__(self):
+        # for model in ["llama2:latest", "mistral:latest"]:
+        #     Client(host=Config.OLLAMA_API_ENDPOINT).pull(model)
         pass
     
-    def get_llm(self, name: str):
-        if name.startswith("ollama-"):
+    def get(self, model: str):
+        if model.startswith("ollama-"):
             return ChatOpenAI(
-                model=name[len("ollama-"):]
+                model=model[len("ollama-"):]
 				, openai_api_key="ollama"
 				, base_url=Config.OLLAMA_API_ENDPOINT + "/v1"
 			)
-        elif name.startswith("openai-"):
+        elif model.startswith("openai-"):
             return ChatOpenAI(
-                model=name[len("openai-"):]
+                model=model[len("openai-"):]
 				, base_url=Config.OPENAI_API_ENDPOINT
 				, openai_api_key=Config.OPENAI_API_KEY
 			)
-        elif name == "litellm":
+        elif model == "litellm":
             return ChatOpenAI(
 				base_url=Config.LITELLM_API_ENDPOINT
 				, openai_api_key=Config.LITELLM_API_KEY
@@ -32,5 +34,7 @@ class LLMService:
         else:
             return None
     
-    def list_llms(self):
-        return [f"ollama-{model['model']}" for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()['models']] + ["openai-gpt-3.5-turbo", "openai-gpt-4", "litellm"]
+    def list(self):
+        # return [f"ollama-{model['model']}" for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()['models']] + ["openai-gpt-3.5-turbo", "openai-gpt-4"]
+        return ["ollama-llama2:latest", "openai-gpt-3.5-turbo", "openai-gpt-4"]
+    

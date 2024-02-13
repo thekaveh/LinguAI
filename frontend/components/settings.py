@@ -1,5 +1,6 @@
 import streamlit as st
 
+from services.llm_service import LLMService
 from services.state_service import StateService
 
 def render():
@@ -13,4 +14,3 @@ def render():
         , index=state_service.get_llms().index(state_service.get_selected_llm())
     )
     
-    state_service.set_selected_llm(selected_llm)

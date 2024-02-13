@@ -1,15 +1,16 @@
 version: '3.8'
 services:
   ollama:
-    image: ollama/ollama:latest
+    # image: ollama/ollama:latest
+    build: ./ollama
     ports:
       - "${OLLAMA_PORT}:11434"
 
-  litellm:
-    image: litellm/ollama:latest
-    entrypoint: ["/bin/bash", "-c", "ollama serve && litellm --model ollama/${LITELLM_MODEL} --host 0.0.0.0 --port 5001"]
-    ports:
-      - "${LITELLM_PORT}:5001"
+  # litellm:
+  #   image: litellm/ollama:latest
+  #   entrypoint: ["/bin/bash", "-c", "ollama serve && litellm --model ollama/${LITELLM_MODEL} --host 0.0.0.0 --port 5001"]
+  #   ports:
+  #     - "${LITELLM_PORT}:5001"
 
   backend:
     build: ./backend
@@ -18,10 +19,10 @@ services:
     volumes:
       - ./backend:/app
     depends_on:
-      - litellm
+      # - litellm
       - ollama
     environment:
-      - LITELLM_API_ENDPOINT=http://litellm:5001
+      # - LITELLM_API_ENDPOINT=http://litellm:5001
       - OLLAMA_API_ENDPOINT=http://ollama:11434
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
