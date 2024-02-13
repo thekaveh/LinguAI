@@ -36,5 +36,5 @@ class LLMService:
     
     def list(self):
         # return [f"ollama-{model['model']}" for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()['models']] + ["openai-gpt-3.5-turbo", "openai-gpt-4"]
-        return ["ollama-llama2:latest", "openai-gpt-3.5-turbo", "openai-gpt-4"]
+        return ["ollama-llama2:latest", "ollama-mistral:latest", "openai-gpt-3.5-turbo", "openai-gpt-4"]
     

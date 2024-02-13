@@ -14,3 +14,4 @@ def render():
         , index=state_service.get_llms().index(state_service.get_selected_llm())
     )
     
+    state_service.set_selected_llm(selected_llm)
