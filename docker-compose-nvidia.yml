@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  ollama:
+    # image: ollama/ollama:latest
+    build: ./ollama
+    ports:
+      - "${OLLAMA_PORT}:11434"
+    environment:
+      NVIDIA_VISIBLE_DEVICES: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            capabilities: [gpu]
+    cpus: '8'
+    mem_limit: '20g'
+
+  # litellm:
+  #   image: litellm/ollama:latest
+  #   entrypoint: ["/bin/bash", "-c", "ollama serve && litellm --model ollama/${LITELLM_MODEL} --host 0.0.0.0 --port 5001"]
+  #   ports:
+  #     - "${LITELLM_PORT}:5001"
+
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      # - litellm
+      - ollama
+    environment:
+      # - LITELLM_API_ENDPOINT=http://litellm:5001
+      - OLLAMA_API_ENDPOINT=http://ollama:11434
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT}:8501"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_ENDPOINT=http://backend:8000
+    command: ["streamlit", "run", "app.py"]
+
+#   db:
+#     image: postgres:latest
+#     environment:
+#       POSTGRES_DB: yourdbname
+#       POSTGRES_USER: yourdbuser
+#       POSTGRES_PASSWORD: yourdbpassword
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:
