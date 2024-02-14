@@ -39,8 +39,3 @@ class LLMService:
     def list():
         response = requests.get(url=Config.LLM_SERVICE_LIST_ENDPOINT)
         return response.json().get("result", "") if response.status_code == 200 else "Error"
-    
-    @staticmethod
-    def pull(model: str):
-        response = requests.post(url=Config.LLM_SERVICE_PULL_ENDPOINT, json={"model": model})
-        return response.json().get("result", "") if response.status_code == 200 else "Error"
