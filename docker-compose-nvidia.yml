@@ -13,7 +13,7 @@ services:
           devices:
           - driver: nvidia
             capabilities: [gpu]
-    cpus: '8'
+    cpus: '8.0'
     mem_limit: '20g'
 
   # litellm:
