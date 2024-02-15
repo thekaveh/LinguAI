@@ -1,9 +1,7 @@
-import asyncio
 import requests
 
-from typing import List, Tuple
 from langserve import RemoteRunnable
-from streamlit.delta_generator import DeltaGenerator
+from typing import List, Tuple, Callable
 from langchain.prompts.chat import ChatPromptTemplate
 
 from config import Config
@@ -11,25 +9,22 @@ from config import Config
 class LLMService:
     @staticmethod
     async def achat(
-		messages                : List[Tuple[str, str]]
-		, message_placeholder   : DeltaGenerator
-		, llm					: str
-	) -> List[Tuple[str, str]]:
-        chat_remote_runnable = RemoteRunnable(f"{Config.LLM_SERVICE_CHAT_BASE_ENDPOINT}/{llm}")
+        model: str
+        , messages: List[Tuple[str, str]]
+        , on_next_chunk: Callable[[str], None]
+        , indicator: str = "▌"
+    ) -> List[Tuple[str, str]]:
+        chat_remote_runnable = RemoteRunnable(f"{Config.LLM_SERVICE_CHAT_BASE_ENDPOINT}/{model}")
         
         full_response = ""
+        on_next_chunk(indicator)
         
-        if message_placeholder is not None:
-            message_placeholder.markdown("Hmmmm...")
-            
         async for chunk in chat_remote_runnable.astream(ChatPromptTemplate.from_messages(messages).format_messages()):
-            full_response = full_response + chunk.content
-            
-            if message_placeholder is not None:
-                message_placeholder.markdown(full_response + "▌")
-                
-        if message_placeholder is not None:
-            message_placeholder.markdown(full_response)
+            full_response += chunk.content
+
+            on_next_chunk(full_response + indicator)
+
+        on_next_chunk(full_response)
 
         messages.append(("ai", full_response))
         

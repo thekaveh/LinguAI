@@ -1,11 +1,16 @@
 import streamlit as st
 
-from streamlit_option_menu import option_menu
-
-import components.sidebar
+from components import sidebar, home, settings, chat
 
 def main():
-    components.sidebar.show()
+    components_info = {
+        "Home"		: {"icon": "house", "page": home}
+        , "Chat"	: {"icon": "chat", "page": chat}
+        , "Settings": {"icon": "gear", "page": settings}
+    }
+    
+    
+    sidebar.show(components_info).render()
 
 if __name__ == "__main__":
     main()
