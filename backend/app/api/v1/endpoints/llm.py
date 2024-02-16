@@ -1,7 +1,10 @@
 from langserve import add_routes
 from fastapi import APIRouter, HTTPException
+from typing import AsyncIterable, List, Tuple
+from fastapi.responses import StreamingResponse
 
 from app.services.llm_service import LLMService
+from app.models.shared.request_models.ChatRequest import ChatRequest
 
 router = APIRouter()
 
@@ -13,10 +16,14 @@ async def list():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-for model in LLMService.list_models():
-	add_routes(
-		app=router
-		, path=f"/llm/chat/{model}"
-		, enabled_endpoints=["stream"]
-		, runnable=LLMService.get_runnable(model=model)
-	)
+@router.post("/llm/chat")
+async def chat(request: ChatRequest) -> StreamingResponse:
+	try:
+		stream = await LLMService.achat(
+      		model=request.model
+      		, messages=request.messages
+         	, temperature=request.temperature
+        )
+		return StreamingResponse(stream, media_type="text/event-stream")
+	except Exception as e:
+		raise HTTPException(status_code=500, detail=str(e))
