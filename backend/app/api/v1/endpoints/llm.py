@@ -1,6 +1,4 @@
-from langserve import add_routes
 from fastapi import APIRouter, HTTPException
-from typing import AsyncIterable, List, Tuple
 from fastapi.responses import StreamingResponse
 
 from app.services.llm_service import LLMService
@@ -20,9 +18,9 @@ async def list():
 async def chat(request: ChatRequest) -> StreamingResponse:
 	try:
 		stream = await LLMService.achat(
-      		model=request.model
-      		, messages=request.messages
-         	, temperature=request.temperature
+			model=request.model
+			, messages=request.messages
+			, temperature=request.temperature
         )
 		return StreamingResponse(stream, media_type="text/event-stream")
 	except Exception as e:
