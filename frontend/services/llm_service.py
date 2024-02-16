@@ -4,7 +4,7 @@ import requests
 from typing import List, Tuple, Callable
 # from langchain.prompts.chat import ChatPromptTemplate
 
-from config import Config
+from core.config import Config
 from utils.http_utils import HttpUtils
 from models.shared.request_models.ChatRequest import ChatRequest
 

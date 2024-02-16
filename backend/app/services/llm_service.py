@@ -1,11 +1,9 @@
+from typing import List
 from ollama import Client
-from typing import AsyncIterable, List, Tuple
 
 from langchain_openai import ChatOpenAI
 from langchain_community.llms import Ollama
 from langchain.schema.runnable import Runnable
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 
 from app.core.config import Config
 
@@ -35,13 +33,3 @@ class LLMService:
     def list_models() -> List[str]:
         # return [f"ollama-{model['model']}" for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()['models']] + ["openai-gpt-3.5-turbo", "openai-gpt-4"]
         return ["ollama-llama2:latest", "ollama-mistral:latest", "openai-gpt-3.5-turbo", "openai-gpt-4"]
-    
-    @staticmethod
-    async def achat(messages: List[Tuple[str, str]], model: str, temperature: float = 0) -> AsyncIterable[str]:
-        runnable = LLMService.get_runnable(model=model, temperature=temperature)
-        
-        async def generator():
-            async for chunk in runnable.astream(messages):
-                yield chunk.content
-        
-        return generator()
