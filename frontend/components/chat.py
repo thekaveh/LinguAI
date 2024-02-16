@@ -16,7 +16,7 @@ async def achat(messages):
         messages = await LLMService.achat(
             messages=messages
             , model=state_service.get_selected_llm()
-            , on_next_chunk=lambda chunk: response_message_placeholder.markdown(chunk)
+            , on_next_msg_chunk=lambda chunk: response_message_placeholder.markdown(chunk)
         )
 
         st.session_state.messages = messages
