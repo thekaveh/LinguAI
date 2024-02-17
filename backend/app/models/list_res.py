@@ -1,5 +1,5 @@
 from typing import List
 from pydantic import BaseModel
 
-class LLMListRes(BaseModel):
+class ListRes(BaseModel):
     result: List[str]
