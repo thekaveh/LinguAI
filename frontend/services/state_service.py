@@ -5,8 +5,8 @@ from services.llm_service import LLMService
 
 class StateService:
     def __init__(self):
-        self._initialize_llms()
-
+        st.session_state['model'] = asyncio.run(LLMService.list())[0]
+        st.session_state['temperature'] = 0.0
         st.session_state.messages = [
 			(
 				"system"
@@ -16,18 +16,22 @@ class StateService:
 				"""
 			)
 		]
-        
-    def _initialize_llms(self):
-        llms = asyncio.run(LLMService.list())
-        st.session_state['selected_llm'] = llms[0] if llms else None
 
     @property
-    def selected_llm(self):
-        return st.session_state.get('selected_llm', None)
+    def model(self):
+        return st.session_state.get('model', None)
 
-    @selected_llm.setter
-    def selected_llm(self, value):
-        st.session_state['selected_llm'] = value
+    @model.setter
+    def model(self, value):
+        st.session_state['model'] = value
+        
+    @property
+    def temperature(self):
+        return st.session_state.get('temperature', 0.0)
+    
+    @temperature.setter
+    def temperature(self, value):
+        st.session_state['temperature'] = value
     
     @property
     def messages(self):
