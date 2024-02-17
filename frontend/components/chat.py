@@ -1,7 +1,7 @@
 import asyncio
 import streamlit as st
 
-from services.llm_service import LLMService
+from services.chat_service import ChatService
 from services.state_service import StateService
 
 async def achat(messages):
@@ -13,9 +13,9 @@ async def achat(messages):
     with st.chat_message("AI"):
         response_message_placeholder = st.empty()
 
-        messages = await LLMService.achat(
+        messages = await ChatService.achat(
             messages=messages
-            , model=state_service.get_selected_llm()
+            , model=state_service.selected_llm
             , on_next_msg_chunk=lambda chunk: response_message_placeholder.markdown(chunk)
         )
 
@@ -26,7 +26,7 @@ async def achat(messages):
 def render():
     state_service = StateService.instance()
 
-    st.title(f"Chat with {state_service.get_selected_llm()}")
+    st.title(f"Chat with {state_service.selected_llm}")
     
     for message in [m for m in state_service.messages if m[0] != "system"]:
         with st.chat_message(message[0]):

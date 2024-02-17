@@ -1,3 +1,4 @@
+import asyncio
 import streamlit as st
 
 from services.llm_service import LLMService
@@ -7,11 +8,12 @@ def render():
     st.title("Settings")
     
     state_service = StateService.instance()
+    llms = asyncio.run(LLMService.list())
 
     selected_llm = st.selectbox(
-        "Select LLM:"
-        , state_service.get_llms()
-        , index=state_service.get_llms().index(state_service.get_selected_llm())
+        "Select Large Language Model:"
+        , llms
+        , index=llms.index(state_service.selected_llm)
     )
     
-    state_service.set_selected_llm(selected_llm)
+    state_service.selected_llm = selected_llm

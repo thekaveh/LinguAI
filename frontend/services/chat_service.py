@@ -1,0 +1,32 @@
+from typing import List, Tuple, Callable
+
+from core.config import Config
+from models.chat_req import ChatReq
+from utils.http_utils import HttpUtils
+
+class ChatService:
+    @staticmethod
+    async def achat(
+        model				: str
+        , messages			: List[Tuple[str, str]]
+        , on_next_msg_chunk	: Callable[[str], None]
+        , indicator			: str = "▌"
+    ) -> List[Tuple[str, str]]:
+        full_msg = ""
+        on_next_msg_chunk(indicator)
+
+        async for msg_chunk in HttpUtils.apost_stream(
+            url=Config.LLM_SERVICE_CHAT_ENDPOINT
+            , request=ChatReq(
+				model=model
+				, temperature=0
+				, messages=messages
+			)
+        ):
+            full_msg += msg_chunk
+            on_next_msg_chunk(full_msg + indicator)
+
+        on_next_msg_chunk(full_msg)
+        messages.append(("ai", full_msg))
+        
+        return messages
