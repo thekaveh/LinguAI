@@ -16,6 +16,7 @@ async def achat(messages):
         messages = await ChatService.achat(
             messages=messages
             , model=state_service.model
+            , persona=state_service.persona
             , temperature=state_service.temperature
             , on_next_msg_chunk=lambda chunk: response_message_placeholder.markdown(chunk)
         )
@@ -27,9 +28,10 @@ async def achat(messages):
 def render():
     state_service = StateService.instance()
 
-    st.title(f"Chat with {state_service.model}")
+    st.title(f"Chat")
+    st.write(f"Persona: {state_service.persona} - Model: {state_service.model}")
     
-    for message in [m for m in state_service.messages if m[0] != "system"]:
+    for message in state_service.messages:
         with st.chat_message(message[0]):
             st.markdown(message[1])
         

@@ -11,6 +11,7 @@ async def chat(request: ChatReq) -> StreamingResponse:
 	try:
 		stream = await ChatService.achat(
 			model=request.model
+   			, persona=request.persona
 			, messages=request.messages
 			, temperature=request.temperature
         )

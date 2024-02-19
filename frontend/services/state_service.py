@@ -2,20 +2,16 @@ import asyncio
 import streamlit as st
 
 from services.llm_service import LLMService
+from services.persona_service import PersonaService
 
 class StateService:
     def __init__(self):
         st.session_state['model'] = asyncio.run(LLMService.list())[0]
         st.session_state['temperature'] = 0.0
-        st.session_state.messages = [
-			(
-				"system"
-				, """
-					You are a highly educated, sharp tongued linguaphile and a helpful, sharp witted assistant called LinguAI who loves to use big, sarcastic words and yet strives to be concise, precise, and to the point.
-					Do try and use emojis to convey your emotions instead of stating them explicitly.
-				"""
-			)
-		]
+        
+        st.session_state['persona'] = asyncio.run(PersonaService.list())[0]
+        
+        st.session_state['messages'] = []
 
     @property
     def model(self):
@@ -32,10 +28,18 @@ class StateService:
     @temperature.setter
     def temperature(self, value):
         st.session_state['temperature'] = value
+        
+    @property
+    def persona(self):
+        return st.session_state.get('persona', None)
+    
+    @persona.setter
+    def persona(self, value):
+        st.session_state['persona'] = value
     
     @property
     def messages(self):
-        return st.session_state.messages
+        return st.session_state['messages']
     
     @staticmethod
     def instance():
