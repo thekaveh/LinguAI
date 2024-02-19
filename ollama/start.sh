@@ -1,3 +1,4 @@
+echo "Starting Ollama service..."
 #!/bin/bash
 # Start Ollama service in the background
 ollama serve &
