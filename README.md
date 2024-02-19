@@ -1,6 +1,9 @@
-# Project Name
+# Name
+LinguaAI, a language processing and improvement assistant!
 
-This project integrates a Streamlit frontend with a FastAPI backend, leveraging AI services such as Ollama + LiteLLM within Docker containers, alongside a PostgreSQL database. It is designed to provide a seamless development and deployment workflow for a language processing application.
+# Description
+This project integrates a Streamlit frontend with a FastAPI+LangChain backend, leveraging AI services of Ollama or OpenAI each within their respective Docker containers, alongside a prospective PostgreSQL database.
+This documentation is designed to provide a seamless development and deployment workflow for this application.
 
 ## Prerequisites
 
@@ -88,3 +91,8 @@ After updating dependencies, ensure to rebuild your Docker images to apply these
 
 ```bash
 docker-compose build
+```
+
+
+### System Architecture
+![LinguAI System Architecture](/images/linguai_system_architecture.png)
