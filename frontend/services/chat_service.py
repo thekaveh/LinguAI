@@ -11,6 +11,7 @@ class ChatService:
         , messages			: List[Tuple[str, str]]
         , on_next_msg_chunk	: Callable[[str], None]
         , indicator			: str = "▌"
+        , temperature		: float = 0
     ) -> List[Tuple[str, str]]:
         full_msg = ""
         on_next_msg_chunk(indicator)
@@ -19,8 +20,8 @@ class ChatService:
             url=Config.LLM_SERVICE_CHAT_ENDPOINT
             , request=ChatReq(
 				model=model
-				, temperature=0
 				, messages=messages
+				, temperature=temperature
 			)
         ):
             full_msg += msg_chunk
