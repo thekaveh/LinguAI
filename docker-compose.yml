@@ -4,7 +4,9 @@ services:
     build: ./ollama
     ports:
       - "${OLLAMA_PORT}:11434"
-
+    env_file:
+      - .env  # This will pass all .env variables into the container
+      
   backend:
     build: ./backend
     ports:

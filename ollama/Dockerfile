@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y curl
 
 # Copy the start.sh script
 COPY start.sh /start.sh
+# COPY ../.env /.env  # This assumes Dockerfile is in the same directory as start.sh
 
 # Make sure the script is executable
 RUN chmod +x /start.sh
