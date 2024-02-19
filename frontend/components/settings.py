@@ -19,7 +19,7 @@ def render():
         new_model = st.selectbox(
 			label="Model:"
 			, options=models
-   			, key="chat.model"
+			, key="chat.model"
 			, index=models.index(state_service.model)
 		)
         
@@ -39,11 +39,10 @@ def render():
         new_persona = st.selectbox(
 			label="Persona:"
 			, options=personas
-   			, key="chat.persona"
+			, key="chat.persona"
 			, index=personas.index(state_service.persona)
 		)
         
         state_service.model = new_model
         state_service.persona = new_persona
         state_service.temperature = new_temperature
-   
