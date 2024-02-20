@@ -29,7 +29,7 @@ done
 echo "Ollama service is ready."
 
 
-# Split DOCKER_IMAGES into an array
+# Split OLLAMA_MODELS into an array
 IFS=' ' read -r -a image_array <<< "${OLLAMA_MODELS}"
 
 # Debug: Print the entire array of models to be pulled

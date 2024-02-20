@@ -157,5 +157,3 @@ node_modules/
 *.bak
 *.tmp
 *.temp
-.env
-.env
