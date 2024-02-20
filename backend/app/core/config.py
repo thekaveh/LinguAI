@@ -1,10 +1,15 @@
 import os
 import json
+import os
 
 class Config:
-    OPENAI_API_KEY			: str 	= os.environ.get("OPENAI_API_KEY", "")
-    OLLAMA_OPENAI_API_KEY	: str 	= "ollama"
-    
-    OPENAI_API_ENDPOINT		: str 	= os.environ.get("OPENAI_API_ENDPOINT", "")
-    OLLAMA_API_ENDPOINT		: str 	= os.environ.get("OLLAMA_API_ENDPOINT", "")
-    OLLAMA_OPENAI_ENDPOINT	: str 	= OLLAMA_API_ENDPOINT + "/v1"
+    """
+    Configuration class for the application.
+    """
+
+    OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+    OPENAI_MODEL_LIST = os.environ.get("OPENAI_MODEL_LIST", "")
+    OLLAMA_OPENAI_API_KEY = "ollama"
+    OPENAI_API_ENDPOINT = os.environ.get("OPENAI_API_ENDPOINT", "")
+    OLLAMA_API_ENDPOINT = os.environ.get("OLLAMA_API_ENDPOINT", "")
+    OLLAMA_OPENAI_ENDPOINT = OLLAMA_API_ENDPOINT + "/v1"
