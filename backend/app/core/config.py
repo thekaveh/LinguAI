@@ -1,6 +1,5 @@
 import os
 import json
-import os
 
 class Config:
     """
