@@ -4,6 +4,8 @@ import streamlit as st
 from services.chat_service import ChatService
 from services.state_service import StateService
 
+# Set the page to wide mode
+st.set_page_config(layout="wide")
 
 async def achat(messages):
     state_service = StateService.instance()
