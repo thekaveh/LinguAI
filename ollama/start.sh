@@ -1,14 +1,5 @@
-# This script starts the Ollama service and pulls the specified models.
-# It loads environment variables from the .env file, starts the Ollama service in the background,
-# and waits for it to be ready. Then, it splits the DOCKER_IMAGES variable into an array and
-# pulls each image using the "ollama pull" command. Finally, it keeps the container running by
-# waiting on all background processes.
-
-echo "Starting Ollama service..."
 #!/bin/bash
 
-
-# Start Ollama service in the background
 ollama serve &
 
 # Function to check if Ollama is running
