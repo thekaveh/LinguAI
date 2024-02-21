@@ -46,6 +46,10 @@ def render():
             index=personas.index(state_service.persona) if personas else 0,
         )
 
-        state_service.model = new_model
-        state_service.persona = new_persona
+        state_service.model = (
+            new_model if new_model is not "No models available" else None
+        )
+        state_service.persona = (
+            new_persona if new_persona is not "No personas available" else None
+        )
         state_service.temperature = new_temperature
