@@ -4,58 +4,62 @@ import streamlit as st
 from services.llm_service import LLMService
 from services.persona_service import PersonaService
 
+
 class StateService:
     def __init__(self):
         self._init_model()
         self._init_persona()
-        st.session_state['messages'] = []
+
+        st.session_state["messages"] = []
+        st.session_state["temperature"] = 0.0
 
     def _init_model(self):
         models = asyncio.run(LLMService.list())
-        if models:
-            st.session_state['model'] = models[0]
+
+        if models and len(models) > 0:
+            st.session_state["model"] = models[0]
         else:
-            st.session_state['model'] = ""
-        st.session_state['temperature'] = 0.0
+            st.session_state["model"] = None
 
     def _init_persona(self):
         personas = asyncio.run(PersonaService.list())
-        if personas:
-            st.session_state['persona'] = personas[0]
+
+        if personas and len(personas) > 0:
+            st.session_state["persona"] = personas[0]
         else:
-            st.session_state['persona'] = "Neutral"
+            st.session_state["persona"] = None
 
     @property
     def model(self):
-        return st.session_state.get('model', None)
+        return st.session_state.get("model", None)
 
     @model.setter
     def model(self, value):
-        st.session_state['model'] = value
-        
+        st.session_state["model"] = value
+
     @property
     def temperature(self):
-        return st.session_state.get('temperature', 0.0)
-    
+        return st.session_state.get("temperature", 0.0)
+
     @temperature.setter
     def temperature(self, value):
-        st.session_state['temperature'] = value
-        
+        st.session_state["temperature"] = value
+
     @property
     def persona(self):
-        return st.session_state.get('persona', None)
-    
+        return st.session_state.get("persona", None)
+
     @persona.setter
     def persona(self, value):
-        st.session_state['persona'] = value
-    
+        st.session_state["persona"] = value
+
     @property
     def messages(self):
-        return st.session_state['messages']
-    
+        return st.session_state["messages"]
+
     @staticmethod
     def instance():
-        if 'state_service' not in st.session_state:
-            st.session_state['state_service'] = StateService()
-        
-        return st.session_state['state_service']
+        if "state_service" not in st.session_state:
+            st.session_state["state_service"] = StateService()
+
+        return st.session_state["state_service"]

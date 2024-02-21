@@ -4,6 +4,7 @@ import streamlit as st
 from services.chat_service import ChatService
 from services.state_service import StateService
 
+
 async def achat(messages):
     state_service = StateService.instance()
 
@@ -14,28 +15,34 @@ async def achat(messages):
         response_message_placeholder = st.empty()
 
         messages = await ChatService.achat(
-            messages=messages
-            , model=state_service.model
-            , persona=state_service.persona
-            , temperature=state_service.temperature
-            , on_next_msg_chunk=lambda chunk: response_message_placeholder.markdown(chunk)
+            messages=messages,
+            model=state_service.model,
+            persona=state_service.persona,
+            temperature=state_service.temperature,
+            on_next_msg_chunk=lambda chunk: response_message_placeholder.markdown(
+                chunk
+            ),
         )
 
         st.session_state.messages = messages
 
     return messages
 
+
 def render():
     state_service = StateService.instance()
 
     st.title(f"Chat")
     st.write(f"Persona: {state_service.persona} - Model: {state_service.model}")
-    
+
     for message in state_service.messages:
         with st.chat_message(message[0]):
             st.markdown(message[1])
-        
-    if prompt := st.chat_input("Ask a question..."):
+
+    if prompt := st.chat_input(
+        "Ask a question...",
+        disabled=(state_service.persona is None) or (state_service.model is None),
+    ):
         state_service.messages.append(("user", prompt))
-        
+
         asyncio.run(achat(state_service.messages))
