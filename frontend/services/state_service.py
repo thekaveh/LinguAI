@@ -6,12 +6,24 @@ from services.persona_service import PersonaService
 
 class StateService:
     def __init__(self):
-        st.session_state['model'] = asyncio.run(LLMService.list())[0]
-        st.session_state['temperature'] = 0.0
-        
-        st.session_state['persona'] = asyncio.run(PersonaService.list())[0]
-        
+        self._init_model()
+        self._init_persona()
         st.session_state['messages'] = []
+
+    def _init_model(self):
+        models = asyncio.run(LLMService.list())
+        if models:
+            st.session_state['model'] = models[0]
+        else:
+            st.session_state['model'] = ""
+        st.session_state['temperature'] = 0.0
+
+    def _init_persona(self):
+        personas = asyncio.run(PersonaService.list())
+        if personas:
+            st.session_state['persona'] = personas[0]
+        else:
+            st.session_state['persona'] = "Neutral"
 
     @property
     def model(self):

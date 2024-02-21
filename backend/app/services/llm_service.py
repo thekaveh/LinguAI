@@ -31,7 +31,22 @@ class LLMService:
 
     @staticmethod
     def list_models() -> List[str]:
+        """
+        A static method to list models and return a list of strings.
+        
+        """
         try:
-            return [f"{model['model']}" for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()['models']] + ["gpt-3.5-turbo", "gpt-4"]
-        except:
-            raise Exception("Error fetching models")
+            # Fetch models from OLLAMA_API_ENDPOINT
+            models = [f"{model['model']}" for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()['models']]
+            # Check if OPENAI_API_KEY is not empty
+            if Config.OPENAI_API_KEY:
+                # If OPENAI_API_KEY is not empty, split the OPENAI_API_MODEL_LIST string
+                openai_models = Config.OPENAI_MODEL_LIST.split()
+                # Add the models specified in OPENAI_MODEL_LIST to the list
+                models.extend(openai_models)
+            else:
+                # If OPENAI_API_KEY is empty, add an empty string to the list
+                models.append("")
+            return models
+        except Exception as e:
+            raise Exception("Error fetching models") from e

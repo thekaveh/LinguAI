@@ -4,6 +4,8 @@ services:
     build: ./ollama
     ports:
       - "${OLLAMA_PORT}:11434"
+    env_file:
+      - .env  # This will pass all .env variables into the container
 
   backend:
     build: ./backend
@@ -17,6 +19,8 @@ services:
       - OLLAMA_API_ENDPOINT=http://ollama:11434
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
+      - OPENAI_MODEL_LIST=${OPENAI_MODEL_LIST}
+      - OLLAMA_MODELS=${OLLAMA_MODELS}      
 
   frontend:
     build: ./frontend
