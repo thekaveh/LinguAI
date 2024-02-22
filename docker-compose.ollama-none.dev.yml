@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT}:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - OPENAI_MODELS=${OPENAI_MODELS}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT}:8501"
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - backend
+    environment:
+      - BACKEND_ENDPOINT=http://backend:8000
+    command: ["streamlit", "run", "app.py"]

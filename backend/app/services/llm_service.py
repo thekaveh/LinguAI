@@ -24,7 +24,7 @@ class LLMService:
                     model=model,
                     streaming=True,
                     temperature=temperature,
-                    base_url=Config.OLLAMA_OPENAI_ENDPOINT,
+                    base_url=Config.OLLAMA_OPENAI_API_ENDPOINT,
                     openai_api_key=Config.OLLAMA_OPENAI_API_KEY,
                 )
         except:
@@ -39,11 +39,14 @@ class LLMService:
         try:
             models = []
 
-            ollama_models = [
-                f"{model['model']}"
-                for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()["models"]
-            ]
-            models.extend(ollama_models)
+            if Config.OLLAMA_API_ENDPOINT:
+                ollama_models = [
+                    f"{model['model']}"
+                    for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()[
+                        "models"
+                    ]
+                ]
+                models.extend(ollama_models)
 
             if Config.OPENAI_API_KEY:
                 openai_models = Config.OPENAI_MODELS.split()
