@@ -10,34 +10,41 @@ This documentation is designed to provide a seamless development and deployment 
 
 Ensure you have Git, Docker, Docker Compose, installed on your machine. Python 3.10 and Poetry are optional for local setups but recommended for managing dependencies and running the application outside of Docker.
 
-## Getting Started
+## Setup
 
-First, clone the project repository:
+This section provides a step-by-step guide for getting started and setting up the project.
 
-`git clone https://github.com/thekaveh/LinguAI.git && cd LinguAI`
+For both development and deployment, `Docker Compose` is used to orchestrate the application's services, enabling live code reloading for rapid development.
 
-## Development Setup
+1. Clone the project repository: `git clone https://github.com/thekaveh/LinguAI.git && cd LinguAI`
 
-For development, Docker Compose is used to orchestrate the application's services, enabling live code reloading for rapid development. Optioanlly Use VSCode's Remote Container extension to develop inside a container.
+2. Copy the vanilla `.env.example` file as `.env`
 
-### Environment Setup
+3. If you intend to use OpenAI's LLMs, fill in the optional `OPENAI_API_KEY` environment variable entry in the `.env` file with your own OpenAI API key.
 
-1. Copy the `.env.example` file to `.env`
+4. If you intend to use Ollama's LLMs Modify the optional `OLLAMA_MODELS` environment variable entry in the `.env` to specify the models you expect to use via Ollama.
 
-2. Fill in the optional `OPENAI_API_KEY` environment variable entry in the `.env` with your own OpenAI API key.
+5.1. First choose the relevant docker-compose.yml file based on the information in the table below.
 
-3. Modify the optional `OLLAMA_MODELS` environment variable entry in the `.env` to specify the models you would like pulled by Ollama at startup time.
+|     **docker-compose-file-name**    | **environment** | **Ollama Source** | **Ollama processing** |
+|:-----------------------------------:|:---------------:|:-----------------:|-----------------------|
+|          docker-compose.yml         |       dev       |     dockerized    |          CPU          |
+| docker-compose.ollama-localhost.dev |       dev       |     localhost     |        depends        |
+|    docker-compose.ollama-none.dev   |       dev       |        none       |          N/A          |
+|    docker-compose-gpu-nvidia.prod   |       prod      | dockerized        |       gpu/nvidia      |
 
-4. Build and Start Services by running the following command to build and start the containers. This setup mounts your local code into the containers, enabling live reloading:
+5.2. Then run the following command to build and start the container services. This setup mounts your local code into the containers, enabling live reloading:
 
-   `docker-compose up --build`
+   `docker-compose -f {docker-compose-file-name} up --build`
 
-Please note that you can optionally start services in detached mode using `docker-compose up --build -d` but you won't be able to see the live logs any longer.
+Please note that you can optionally start services in detached mode using `docker-compose -f {docker-compose-file-name} up --build -d` but you won't be able to see the live logs any longer.
 
-5. Accessing the Application
+6. Accessing the Application
 
    - Streamlit frontend will be accessible at: `http://localhost:{FRONTEND_PORT}`
    - FastAPI backend (Swagger UI) at: `http://localhost:{BACKEND_PORT}/docs`
+
+7. Optionally, Use VSCode's Remote Container extension to connect to and develop directly inside one of the backend or frontend containers.
 
 ### Code Changes
 
