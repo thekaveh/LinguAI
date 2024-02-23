@@ -1,11 +1,24 @@
 version: "3.8"
 services:
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
+
   backend:
     build: ./backend
     ports:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./backend:/app
+    depends_on:
+      - db
     environment:
       - OPENAI_MODELS=${OPENAI_MODELS}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -22,3 +35,6 @@ services:
     environment:
       - BACKEND_ENDPOINT=http://backend:8000
     command: ["streamlit", "run", "app.py"]
+
+volumes:
+  db-data:
