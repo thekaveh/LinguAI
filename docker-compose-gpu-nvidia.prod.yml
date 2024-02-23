@@ -1,11 +1,22 @@
 version: "3.8"
 services:
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
+
   ollama:
     build: ./ollama
     ports:
       - "${OLLAMA_PORT}:11434"
     env_file:
-      - .env # This will pass all .env variables into the container
+      - .env
     environment:
       NVIDIA_VISIBLE_DEVICES: all
     deploy:
@@ -24,14 +35,15 @@ services:
     volumes:
       - ./backend:/app
     depends_on:
+      - db
       - ollama
-
     environment:
+      - OLLAMA_MODELS=${OLLAMA_MODELS}
       - OLLAMA_API_ENDPOINT=http://ollama:11434
+
+      - OPENAI_MODELS=${OPENAI_MODELS}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
-      - OPENAI_MODELS=${OPENAI_MODELS}
-      - OLLAMA_MODELS=${OLLAMA_MODELS}
 
   frontend:
     build: ./frontend
@@ -44,17 +56,6 @@ services:
     environment:
       - BACKEND_ENDPOINT=http://backend:8000
     command: ["streamlit", "run", "app.py"]
-    
-  db:
-    build:
-      context: ./db
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"  # Publish container's port 5432 to host's port 5432
 
 volumes:
   db-data:
