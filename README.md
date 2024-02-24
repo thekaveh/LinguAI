@@ -43,12 +43,15 @@ Please note that you can optionally start services in detached mode using `docke
 
    - Streamlit frontend will be accessible at: `http://localhost:{FRONTEND_PORT}`
    - FastAPI backend (Swagger UI) at: `http://localhost:{BACKEND_PORT}/docs`
+   - pgAdmin DB-dashboard will be accessible at: `http://localhost:{DB_DASHBOARD_PORT}`
 
-7. Optionally, Use VSCode's Remote Container extension to connect to and develop directly inside one of the backend or frontend containers.
+7. Optionally, Use VSCode's Remote Container extension to connect to and develop directly inside one of the backend or frontend containers. To do this, find the `Remote Explorer` from VSCode's tools pane on the left, select `Dev Containers`, locate either the `linguai backend` or `linguai frontend` running container, and then `Attach in New Window`
+
+8. To bring down the LinguAI services: `docker-compose down --remove-orphans`
 
 ### Code Changes
 
-Thanks to Docker volumes that mount the code inside the containers, changes made to the codebase will automatically reflect in the running containers and will, in turn, show up on both the running frontend and backend services. Once happy with your changes, you can simply commit them to Got branch you're working on regardless of whether you applied the changes from inside the running containers or outside.
+Thanks to Docker volumes that mount the code inside the containers, changes made to the codebase will automatically reflect in the running containers and will, in turn, show up on both the running frontend and backend services. Once happy with your changes, you can simply commit them to Git branch you're working on regardless of whether you applied the changes from inside the running containers or outside.
 
 ## Production Deployment
 
@@ -56,7 +59,7 @@ For production, the application should be deployed with Docker, ensuring that th
 
 For now the only supported and tested deployment scenario is to setup an EC2 instance, select the Ubuntu-Nvidia-PyTorch2 image, SSH into the newly deployed and running instance, and run the same environment setup steps as above before running the slightly modified docker compose command below:
 
-`docker-compose -f docker-compose-nvidia.yml up --build`
+`docker-compose -f docker-compose-gpu-nvidia.prod.yml up --build`
 
 ## Dependency Management
 
@@ -73,6 +76,8 @@ This project uses Poetry for Python dependency management in both the frontend a
      ```
    - This command updates `pyproject.toml` and `poetry.lock`. Commit these changes to your repository.
 
+Please, note that you can also optionally attach to the running container and then run the `poetry add <package-name>` command.
+
 2. **Removing a Dependency**:
    - Navigate to the respective directory (`frontend` or `backend`):
      ```bash
@@ -84,11 +89,15 @@ This project uses Poetry for Python dependency management in both the frontend a
      ```
    - This command updates `pyproject.toml` and `poetry.lock`. Commit these changes to your repository.
 
+Please, note that you can also optionally attach to the running container and then run the `poetry remove <package-name>` command.
+
 3. **Running Commands with Poetry**:
    - Use `poetry run` to execute commands within the virtual environment created by Poetry, for example:
      ```bash
      poetry run pytest
      ```
+
+Please, note that you can also optionally attach to the running container and then run the `poetry run` command.
 
 **Note**: While developing within Docker containers, you typically won't need to run Poetry commands directly, as dependencies are installed during the Docker build process. However, these steps are essential for local development, adding/updating dependencies, or when setting up CI/CD pipelines.
 
