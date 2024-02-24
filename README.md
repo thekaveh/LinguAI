@@ -110,4 +110,4 @@ docker-compose build
 ```
 
 ### System Architecture
-![LinguAI System Architecture](/images/linguai_system_architecture.png)
+![LinguAI System Architecture](/images/linguai_system_architecture.jpg)
