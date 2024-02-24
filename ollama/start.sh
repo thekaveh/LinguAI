@@ -32,5 +32,6 @@ for image in "${image_array[@]}"; do
     fi
 done
 
+
 # Keep the container running by waiting on all background processes
 wait
