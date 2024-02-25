@@ -9,11 +9,11 @@ COPY ./pyproject.toml ./poetry.lock* /app/
 
 # Install Poetry and dependencies
 RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-dev
+	poetry config virtualenvs.create false && \
+	poetry install --no-dev
 
 # Copy the rest of the application code
 COPY . /app
 
 # Command to run the app, ensuring reload is available for development
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
