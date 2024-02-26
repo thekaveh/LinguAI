@@ -4,6 +4,11 @@ FROM python:3.10-slim
 # Set the working directory in the container to /app
 WORKDIR /app
 
+# Install tzdata package and set the timezone
+RUN apt-get install -y tzdata && \
+    ln -snf /usr/share/zoneinfo/America/New_York /etc/localtime && \
+    echo America/New_York > /etc/timezone
+
 # Copy only the dependency management files initially to leverage Docker cache
 COPY ./pyproject.toml ./poetry.lock* /app/
 
