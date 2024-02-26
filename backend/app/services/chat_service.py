@@ -16,23 +16,26 @@ class ChatService:
         assert message.messages is not None, "messages is required"
         assert len(message.messages) > 0, "messages must not be empty"
 
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                SystemMessage(
-                    content=PersonaService.get_persona(message.persona).description
-                )
+        chat_messages = [
+            SystemMessage(
+                content=PersonaService.get_persona(message.persona).description
+            )
+        ] + message.messages[:-1]
+
+        latest_message_content = [{"type": "text", "text": message.messages[-1][1]}]
+        if message.images and len(message.images) > 0:
+            latest_message_content += [
+                {"type": "image_url", "image_url": f"data:image/png;base64,{image}"}
+                for image in message.images
             ]
-            + message.messages[:-1]
-        )
+        chat_messages.append(HumanMessage(content=latest_message_content))
 
-        prompt.append(HumanMessage(content=message.messages[-1][1]))
-
-        llm = LLMService.get_chat_runnable(
+        prompt = ChatPromptTemplate.from_messages(chat_messages)
+        chat_runnable = LLMService.get_chat_runnable(
             model=message.model, temperature=message.temperature
         )
-
         parser = StrOutputParser()
 
-        chain = prompt | llm | parser
+        chain = prompt | chat_runnable | parser
 
         return chain.astream(input={})
