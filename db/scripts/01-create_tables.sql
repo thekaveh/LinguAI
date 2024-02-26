@@ -77,7 +77,7 @@ CREATE TABLE user_prompt (
 );
 
 -- Create a new database user
-CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_db_pass';
+CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';
 
 -- Grant permissions to the newly created user
 GRANT USAGE ON SCHEMA public TO linguai_app;
