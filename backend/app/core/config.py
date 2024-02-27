@@ -15,3 +15,5 @@ class Config:
     OLLAMA_OPENAI_API_KEY = "ollama"
     OLLAMA_API_ENDPOINT = os.environ.get("OLLAMA_API_ENDPOINT", "")
     OLLAMA_OPENAI_API_ENDPOINT = OLLAMA_API_ENDPOINT + "/v1"
+    
+    VISION_MODELS = os.environ.get("VISION_MODELS", "")
