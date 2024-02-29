@@ -22,15 +22,6 @@ class ChatService:
             )
         ] + [message.text for message in request.messages[:-1]]
 
-        # latest_message_content = [{"type": "text", "text": request.messages[-1][1]}]
-        # if request.images and (
-        #     not request.model.startswith("gpt-")
-        #     or request.model == "gpt-4-vision-preview"
-        # ):
-        #     latest_message_content += [
-        #         {"type": "image_url", "image_url": image} for image in request.images
-        #     ]
-
         chat_messages.append(HumanMessage(content=request.messages[-1].to_dict()))
 
         prompt = ChatPromptTemplate.from_messages(chat_messages)
