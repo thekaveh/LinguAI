@@ -25,7 +25,7 @@ class ChatService:
         chat_messages.append(HumanMessage(content=request.messages[-1].to_dict()))
 
         prompt = ChatPromptTemplate.from_messages(chat_messages)
-        print(prompt)
+
         chat_runnable = LLMService.get_chat_runnable(
             model=request.model, temperature=request.temperature
         )

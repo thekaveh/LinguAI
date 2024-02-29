@@ -15,8 +15,8 @@ class StateService:
         st.session_state["images"] = []
         st.session_state["messages"] = []
         st.session_state["temperature"] = 0.0
-        st.session_state["file_upload_key"] = 0
         st.session_state["chat_messages"] = []
+        st.session_state["file_upload_key"] = 0
 
     def _init_model(self):
         models = asyncio.run(LLMService.list_models())
