@@ -2,5 +2,5 @@ from typing import List
 from pydantic import BaseModel
 
 
-class ListMessage(BaseModel):
+class ListResponse(BaseModel):
     result: List[str]

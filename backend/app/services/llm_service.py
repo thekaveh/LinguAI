@@ -62,3 +62,16 @@ class LLMService:
             return models
         except Exception as e:
             raise Exception("Error fetching models") from e
+
+    @staticmethod
+    def list_vision_models() -> List[str]:
+        try:
+            vision_models = []
+
+            for model in LLMService.list_models():
+                if model in Config.VISION_MODELS.split():
+                    vision_models.append(model)
+
+            return vision_models
+        except Exception as e:
+            raise Exception("Error fetching models") from e

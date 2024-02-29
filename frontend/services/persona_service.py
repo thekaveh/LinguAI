@@ -2,7 +2,7 @@ from typing import List
 
 from core.config import Config
 from utils.http_utils import HttpUtils
-from models.messages.list_message import ListMessage
+from models.common.list_response import ListResponse
 
 
 class PersonaService:
@@ -11,7 +11,7 @@ class PersonaService:
         try:
             return (
                 await HttpUtils.get(
-                    Config.PERSONA_SERVICE_LIST_ENDPOINT, response_model=ListMessage
+                    Config.PERSONA_SERVICE_LIST_ENDPOINT, response_model=ListResponse
                 )
             ).result
         except Exception as e:

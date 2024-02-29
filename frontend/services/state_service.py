@@ -4,17 +4,22 @@ import streamlit as st
 from services.llm_service import LLMService
 from services.persona_service import PersonaService
 
+from models.common.chat_message import ChatMessage
+
 
 class StateService:
     def __init__(self):
         self._init_model()
         self._init_persona()
 
+        st.session_state["images"] = []
         st.session_state["messages"] = []
         st.session_state["temperature"] = 0.0
+        st.session_state["file_upload_key"] = 0
+        st.session_state["chat_messages"] = []
 
     def _init_model(self):
-        models = asyncio.run(LLMService.list())
+        models = asyncio.run(LLMService.list_models())
 
         if models and len(models) > 0:
             st.session_state["model"] = models[0]
@@ -54,8 +59,18 @@ class StateService:
         st.session_state["persona"] = value
 
     @property
-    def messages(self):
-        return st.session_state["messages"]
+    def file_upload_key(self):
+        return st.session_state["file_upload_key"]
+
+    def increment_file_upload_key(self):
+        st.session_state["file_upload_key"] += 1
+
+    @property
+    def chat_messages(self):
+        return st.session_state["chat_messages"]
+
+    def append_chat_message(self, chat_message: ChatMessage) -> None:
+        st.session_state["chat_messages"].append(chat_message)
 
     @staticmethod
     def instance():

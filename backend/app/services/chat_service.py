@@ -4,35 +4,39 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain.schema.messages import HumanMessage, SystemMessage
 
 from app.services.llm_service import LLMService
+from app.models.common.chat_request import ChatRequest
 from app.services.persona_service import PersonaService
-from app.models.messages.chat_message import ChatMessage
 
 
 class ChatService:
     @staticmethod
-    async def achat(message: ChatMessage) -> AsyncIterable[str]:
-        assert message is not None, "message is required"
-        assert message.model is not None, "model is required"
-        assert message.messages is not None, "messages is required"
-        assert len(message.messages) > 0, "messages must not be empty"
+    async def achat(request: ChatRequest) -> AsyncIterable[str]:
+        assert request is not None, "message is required"
+        assert request.model is not None, "model is required"
+        assert request.messages is not None, "messages is required"
+        assert len(request.messages) > 0, "messages must not be empty"
 
         chat_messages = [
             SystemMessage(
-                content=PersonaService.get_persona(message.persona).description
+                content=PersonaService.get_persona(request.persona).description
             )
-        ] + message.messages[:-1]
+        ] + [message.text for message in request.messages[:-1]]
 
-        latest_message_content = [{"type": "text", "text": message.messages[-1][1]}]
-        if message.images and len(message.images) > 0:
-            latest_message_content += [
-                {"type": "image_url", "image_url": f"data:image/png;base64,{image}"}
-                for image in message.images
-            ]
-        chat_messages.append(HumanMessage(content=latest_message_content))
+        # latest_message_content = [{"type": "text", "text": request.messages[-1][1]}]
+        # if request.images and (
+        #     not request.model.startswith("gpt-")
+        #     or request.model == "gpt-4-vision-preview"
+        # ):
+        #     latest_message_content += [
+        #         {"type": "image_url", "image_url": image} for image in request.images
+        #     ]
+
+        chat_messages.append(HumanMessage(content=request.messages[-1].to_dict()))
 
         prompt = ChatPromptTemplate.from_messages(chat_messages)
+        print(prompt)
         chat_runnable = LLMService.get_chat_runnable(
-            model=message.model, temperature=message.temperature
+            model=request.model, temperature=request.temperature
         )
         parser = StrOutputParser()
 
