@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic = "^2.6.1"
+pydantic = {extras = ["email"], version = "^2.6.3"}
 langchain-core = "^0.1.18"
 langchain-community = "^0.0.17"
 langchain-openai = "^0.0.5"
@@ -16,6 +16,8 @@ sqlalchemy = "^2.0.25"
 fastapi = "^0.109.2"
 ollama = "^0.1.6"
 langserve = {extras = ["all"], version = "^0.0.41"}
+psycopg2-binary = "^2.9.9"
+email-validator = "^2.1.1"
 
 
 [build-system]
