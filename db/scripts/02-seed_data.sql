@@ -1,14 +1,38 @@
 -- Insert sample data into Users table
-INSERT INTO users (username, email, password_hash, user_type)
+INSERT INTO users (
+    username, 
+    email, 
+    password_hash, 
+    user_type, 
+    first_name, 
+    last_name, 
+    middle_name, 
+    mobile_phone, 
+    landline_phone, 
+    contact_preference, 
+    base_language, 
+    learning_languages
+)
 VALUES
-    ('ironman', 'ironman@example.com', 'password_hash_ironman', 'external'),
-    ('captainamerica', 'captainamerica@example.com', 'password_hash_captainamerica', 'external'),
-    ('blackwidow', 'blackwidow@example.com', 'password_hash_blackwidow', 'external'),
-    ('thor', 'thor@example.com', 'password_hash_thor', 'external'),
-    ('hulk', 'hulk@example.com', 'password_hash_hulk', 'external');
+    ('ironman123', 'ironman@example.com', 'password_hash_ironman', 'external', 'Tony', 'Stark', '', '123-456-7890', '', 'email', 'English', '{}'),
+    ('captainamerica123', 'captainamerica@example.com', 'password_hash_captainamerica', 'external', 'Steve', 'Rogers', '', '234-567-8901', '', 'mobile_phone', 'English', '{}'),
+    ('blackwidow123', 'blackwidow@example.com', 'password_hash_blackwidow', 'external', 'Natasha', 'Romanoff', '', '345-678-9012', '', 'email', 'Russian', '{}'),
+    ('thor123', 'thor@example.com', 'password_hash_thor', 'external', 'Thor', 'Odinson', '', '456-789-0123', '', 'email', 'Asgardian', '{}'),
+    ('hulk123', 'hulk@example.com', 'password_hash_hulk', 'external', 'Bruce', 'Banner', '', '567-890-1234', '', 'mobile_phone', 'English', '{}');
+
+-- Insert sample data into Addresses table
+INSERT INTO addresses (user_id, address_type, street, door_number, city, state, zip, country)
+VALUES
+    (1, 'shipping', '10880 Malibu Point', '10880', 'Malibu', 'California', '90265', 'USA'),
+    (1, 'billing', '200 Park Avenue', '200', 'New York', 'New York', '10166', 'USA'),
+    (2, 'shipping', '890 Fifth Avenue', '890', 'Manhattan', 'New York', '10021', 'USA'),
+    (3, 'shipping', 'Red Room Academy', '', 'Volgograd', '', '', 'Russia'),
+    (4, 'shipping', 'Asgard Palace', '', 'Asgard', '', '', 'Asgard'),
+    (5, 'billing', '177A Bleecker Street', '', 'New York', 'New York', '10012', 'USA');
+
 
 -- Insert sample data into UserAssessment table
-INSERT INTO user_assessment (user_id, assessment_date, skill_level)
+INSERT INTO user_assessment (user_id, assessment_date, skill_level_type)
 VALUES
     (1, '2023-01-01', 'expert'),
     (2, '2023-01-05', 'advanced'),
