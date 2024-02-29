@@ -28,6 +28,5 @@ for image in "${image_array[@]}"; do
 		exit 1
 	fi
 done
-
 # Keep the container running by waiting on all background processes
 wait

@@ -1,5 +1,5 @@
 -- Insert sample data into Users table
-INSERT INTO cs5934_app_schema.Users (username, email, password_hash, user_type)
+INSERT INTO users (username, email, password_hash, user_type)
 VALUES
     ('ironman', 'ironman@example.com', 'password_hash_ironman', 'external'),
     ('captainamerica', 'captainamerica@example.com', 'password_hash_captainamerica', 'external'),
@@ -8,7 +8,7 @@ VALUES
     ('hulk', 'hulk@example.com', 'password_hash_hulk', 'external');
 
 -- Insert sample data into UserAssessment table
-INSERT INTO cs5934_app_schema.UserAssessment (user_id, assessment_date, skill_level)
+INSERT INTO user_assessment (user_id, assessment_date, skill_level)
 VALUES
     (1, '2023-01-01', 'expert'),
     (2, '2023-01-05', 'advanced'),
@@ -17,7 +17,7 @@ VALUES
     (5, '2023-01-20', 'master');
 
 -- Insert sample data into Persona table
-INSERT INTO cs5934_app_schema.Persona (persona_name, description)
+INSERT INTO persona (persona_name, description)
 VALUES
     ('Iron Man', 'Genius, billionaire, playboy, philanthropist.'),
     ('Captain America', 'Super-soldier and leader of the Avengers.'),
@@ -26,7 +26,7 @@ VALUES
     ('Hulk', 'Gamma-irradiated scientist with immense strength.');
 
 -- Insert sample data into UserPersona table
-INSERT INTO cs5934_app_schema.UserPersona (user_id, persona_id)
+INSERT INTO user_persona (user_id, persona_id)
 VALUES
     (1, 1),  -- Iron Man
     (2, 2),  -- Captain America
@@ -35,7 +35,7 @@ VALUES
     (5, 5);  -- Hulk
 
 -- Insert sample data into LLMPrompt table (System Prompts)
-INSERT INTO cs5934_app_schema.LLMPrompt (prompt_text, prompt_type)
+INSERT INTO llm_prompt (prompt_text, prompt_type)
 VALUES
     ('Welcome to the language learning assistance app!', 'Instructional'),
     ('Congratulations! You completed today''s lesson.', 'Feedback'),
@@ -46,7 +46,7 @@ VALUES
     ('Personalized recommendations based on your progress.', 'Custom');
 
 -- Insert sample data into UserPrompt table (User-Specific Prompts)
-INSERT INTO cs5934_app_schema.UserPrompt (user_id, prompt_text, prompt_type)
+INSERT INTO user_prompt (user_id, prompt_text, prompt_type)
 VALUES
     (1, 'You''ve been doing great with your vocabulary!', 'Custom'),
     (2, 'Time for your daily practice session!', 'Reminder'),
