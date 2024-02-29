@@ -16,6 +16,8 @@ class Config:
     OLLAMA_API_ENDPOINT = os.environ.get("OLLAMA_API_ENDPOINT", "")
     OLLAMA_OPENAI_API_ENDPOINT = OLLAMA_API_ENDPOINT + "/v1"
 
+    VISION_MODELS = os.environ.get("VISION_MODELS", "")
+
     # Database configurations
     DB_PORT = os.getenv("DB_PORT", "5432")
     POSTGRES_DB = os.getenv("POSTGRES_DB", "linguai_db")
@@ -23,6 +25,3 @@ class Config:
     POSTGRES_APP_USER = os.getenv("POSTGRES_APP_USER", "linguai_app")
     POSTGRES_APP_PASSWORD = os.getenv("POSTGRES_APP_PASSWORD", "linguai_app_pass")
     DATABASE_URL = f"postgresql://{POSTGRES_APP_USER}:{POSTGRES_APP_PASSWORD}@{POSTGRES_DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
-    
-    
-
