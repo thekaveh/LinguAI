@@ -102,10 +102,10 @@ def render():
     st.sidebar.file_uploader(
         label="Attach images:",
         accept_multiple_files=True,
+        type=["png", "jpg", "jpeg"],
         on_change=_file_uploader_on_change,
         disabled=(state_service.persona is None)
         or (state_service.model is None)
         or (state_service.model not in vision_models),
-        type=["png", "jpg", "jpeg", "gif", "bmp", "webp"],
         key=f"file_uploader_{state_service.file_upload_key}",
     )
