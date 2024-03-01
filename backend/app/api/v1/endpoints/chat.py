@@ -1,20 +1,16 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app.models.chat_req import ChatReq
 from app.services.chat_service import ChatService
+from app.models.common.chat_request import ChatRequest
 
 router = APIRouter()
 
+
 @router.post("/chat")
-async def chat(request: ChatReq) -> StreamingResponse:
-	try:
-		stream = await ChatService.achat(
-			model=request.model
-   			, persona=request.persona
-			, messages=request.messages
-			, temperature=request.temperature
-        )
-		return StreamingResponse(stream, media_type="text/event-stream")
-	except Exception as e:
-		raise HTTPException(status_code=500, detail=str(e))
+async def chat(request: ChatRequest) -> StreamingResponse:
+    try:
+        stream = await ChatService.achat(request=request)
+        return StreamingResponse(content=stream, media_type="text/event-stream")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

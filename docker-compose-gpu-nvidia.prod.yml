@@ -58,13 +58,10 @@ services:
     depends_on:
       - db
       - ollama
+    env_file:
+      - .env
     environment:
-      - OLLAMA_MODELS=${OLLAMA_MODELS}
       - OLLAMA_API_ENDPOINT=http://ollama:11434
-
-      - OPENAI_MODELS=${OPENAI_MODELS}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_API_ENDPOINT=${OPENAI_API_ENDPOINT}
 
   frontend:
     build: ./frontend
@@ -76,6 +73,8 @@ services:
       - ./frontend:/app
     depends_on:
       - backend
+    env_file:
+      - .env
     environment:
       - BACKEND_ENDPOINT=http://backend:8000
     command: ["streamlit", "run", "app.py"]
