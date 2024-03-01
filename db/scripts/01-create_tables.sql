@@ -139,6 +139,15 @@ CREATE TABLE user_topics (
     FOREIGN KEY (topic_id) REFERENCES topics(topic_id)
 );
 
+-- Create the achievements table
+CREATE TABLE achievements (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
+
+--GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE achievements TO linguai_app;
+
 
 -- Create a new database user
 CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';

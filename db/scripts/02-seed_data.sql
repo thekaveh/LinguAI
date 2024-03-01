@@ -77,3 +77,21 @@ VALUES
     (3, 'Try using the new words you learned in a sentence.', 'Instructional'),
     (4, 'You''re making progress! Keep it up!', 'Feedback'),
     (5, 'Remember to take breaks during your study sessions.', 'Reminder');
+
+-- Insert sample data into Achievement table
+INSERT INTO achievements (name) VALUES 
+    ('Vocabulary Master'),
+    ('Grammar Guru'),
+    ('Conversation Conqueror'),
+    ('Listening Legend'),
+    ('Reading Rockstar'),
+    ('Writing Wizard'),
+    ('Pronunciation Pro'),
+    ('Culture Connoisseur'),
+    ('Daily Diligence'),
+    ('Weekly Warrior'),
+    ('Monthly Master'),
+    ('Level-Up Luminary'),
+    ('Completionist'),
+    ('Speedy Learner'),
+    ('Persistent Learner');
