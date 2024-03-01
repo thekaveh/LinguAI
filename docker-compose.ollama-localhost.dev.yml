@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./db/scripts:/docker-entrypoint-initdb.d
+      - ./db/snapshot:/docker-entrypoint-initdb.d     
       - db-data:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:5432"
