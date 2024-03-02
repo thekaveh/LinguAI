@@ -33,4 +33,4 @@ class ChatService:
             on_next_fn(message_text + indicator)
 
         on_next_fn(message_text)
-        on_completed_fn(ChatMessage(sender="ai", text=message_text))
+        on_completed_fn(ChatMessage(sender="ai", text=message_text, images=None))

@@ -187,6 +187,66 @@ ALTER SEQUENCE public.addresses_address_id_seq OWNED BY public.addresses.address
 
 
 --
+-- Name: content; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.content (
+    content_id integer NOT NULL,
+    content_name character varying(100) NOT NULL
+);
+
+
+--
+-- Name: content_content_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.content_content_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: content_content_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.content_content_id_seq OWNED BY public.content.content_id;
+
+
+--
+-- Name: language; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.language (
+    language_id integer NOT NULL,
+    language_name character varying(255) NOT NULL
+);
+
+
+--
+-- Name: language_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.language_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: language_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.language_id_seq OWNED BY public.language.language_id;
+
+
+--
 -- Name: llm_prompt; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -249,20 +309,20 @@ ALTER SEQUENCE public.persona_persona_id_seq OWNED BY public.persona.persona_id;
 
 
 --
--- Name: topics; Type: TABLE; Schema: public; Owner: -
+-- Name: topic; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.topics (
+CREATE TABLE public.topic (
     topic_id integer NOT NULL,
-    topic_name character varying(100) NOT NULL
+    topic_name character varying(255) NOT NULL
 );
 
 
 --
--- Name: topics_topic_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: topic_topic_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.topics_topic_id_seq
+CREATE SEQUENCE public.topic_topic_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -272,10 +332,10 @@ CREATE SEQUENCE public.topics_topic_id_seq
 
 
 --
--- Name: topics_topic_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: topic_topic_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.topics_topic_id_seq OWNED BY public.topics.topic_id;
+ALTER SEQUENCE public.topic_topic_id_seq OWNED BY public.topic.topic_id;
 
 
 --
@@ -286,7 +346,8 @@ CREATE TABLE public.user_assessment (
     assessment_id integer NOT NULL,
     user_id integer,
     assessment_date date,
-    skill_level_type character varying(100) NOT NULL
+    skill_level character varying(100) NOT NULL,
+    language_id integer
 );
 
 
@@ -390,8 +451,8 @@ ALTER SEQUENCE public.user_prompt_prompt_id_seq OWNED BY public.user_prompt.prom
 --
 
 CREATE TABLE public.user_topics (
-    user_id integer NOT NULL,
-    topic_id integer NOT NULL
+    user_id integer,
+    topic_name character varying(255)
 );
 
 
@@ -451,6 +512,20 @@ ALTER TABLE ONLY public.addresses ALTER COLUMN address_id SET DEFAULT nextval('p
 
 
 --
+-- Name: content content_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content ALTER COLUMN content_id SET DEFAULT nextval('public.content_content_id_seq'::regclass);
+
+
+--
+-- Name: language language_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.language ALTER COLUMN language_id SET DEFAULT nextval('public.language_id_seq'::regclass);
+
+
+--
 -- Name: llm_prompt prompt_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -465,10 +540,10 @@ ALTER TABLE ONLY public.persona ALTER COLUMN persona_id SET DEFAULT nextval('pub
 
 
 --
--- Name: topics topic_id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: topic topic_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.topics ALTER COLUMN topic_id SET DEFAULT nextval('public.topics_topic_id_seq'::regclass);
+ALTER TABLE ONLY public.topic ALTER COLUMN topic_id SET DEFAULT nextval('public.topic_topic_id_seq'::regclass);
 
 
 --
@@ -537,6 +612,35 @@ COPY public.addresses (address_id, user_id, address_type, street, door_number, c
 
 
 --
+-- Data for Name: content; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.content (content_id, content_name) FROM stdin;
+1	story
+2	dialogue
+3	fake article
+4	tutorial
+5	poetry
+6	news report
+7	biography
+8	essay
+\.
+
+
+--
+-- Data for Name: language; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.language (language_id, language_name) FROM stdin;
+1	English
+2	Mandarin
+3	Spanish
+4	German
+5	French
+\.
+
+
+--
 -- Data for Name: llm_prompt; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -565,10 +669,33 @@ COPY public.persona (persona_id, persona_name, description) FROM stdin;
 
 
 --
--- Data for Name: topics; Type: TABLE DATA; Schema: public; Owner: -
+-- Data for Name: topic; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.topics (topic_id, topic_name) FROM stdin;
+COPY public.topic (topic_id, topic_name) FROM stdin;
+1	sports
+2	nutrition
+3	movies
+4	education
+5	finance
+6	technology
+7	history
+8	business
+9	culture
+10	writing
+11	reading
+12	fashion
+13	politics
+14	art
+15	music
+16	travel
+17	math
+18	science
+19	health & wellness
+20	pronunciation
+21	vocabulary
+22	grammar
+23	speaking
 \.
 
 
@@ -576,12 +703,17 @@ COPY public.topics (topic_id, topic_name) FROM stdin;
 -- Data for Name: user_assessment; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.user_assessment (assessment_id, user_id, assessment_date, skill_level_type) FROM stdin;
-1	1	2023-01-01	expert
-2	2	2023-01-05	advanced
-3	3	2023-01-10	intermediate
-4	4	2023-01-15	beginner
-5	5	2023-01-20	master
+COPY public.user_assessment (assessment_id, user_id, assessment_date, skill_level, language_id) FROM stdin;
+1	1	2024-03-01	intermediate	1
+2	1	2024-03-01	intermediate	3
+3	1	2024-03-01	intermediate	5
+4	2	2024-03-01	intermediate	2
+5	2	2024-03-01	intermediate	4
+6	3	2024-03-01	intermediate	3
+7	3	2024-03-01	intermediate	4
+8	4	2024-03-01	beginner	5
+9	5	2024-03-01	intermediate	1
+10	5	2024-03-01	intermediate	2
 \.
 
 
@@ -623,7 +755,27 @@ COPY public.user_prompt (prompt_id, user_id, prompt_text, prompt_type) FROM stdi
 -- Data for Name: user_topics; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.user_topics (user_id, topic_id) FROM stdin;
+COPY public.user_topics (user_id, topic_name) FROM stdin;
+1	sports
+1	nutrition
+1	movies
+1	technology
+1	business
+2	education
+2	finance
+2	writing
+3	history
+3	culture
+3	art
+4	reading
+4	fashion
+5	politics
+5	music
+5	math
+5	science
+5	health & wellness
+5	vocabulary
+5	grammar
 \.
 
 
@@ -632,11 +784,11 @@ COPY public.user_topics (user_id, topic_id) FROM stdin;
 --
 
 COPY public.users (user_id, username, email, password_hash, first_name, last_name, middle_name, mobile_phone, landline_phone, contact_preference, user_type, base_language, learning_languages) FROM stdin;
-1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{}
-2	captainamerica123	captainamerica@example.com	password_hash_captainamerica	Steve	Rogers		234-567-8901		mobile_phone	external	English	{}
-3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{}
-4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{}
-5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{}
+1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{English,Spanish,French}
+2	captainamerica123	captainamerica@example.com	password_hash_captainamerica	Steve	Rogers		234-567-8901		mobile_phone	external	English	{Mandarin,German}
+3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
+4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
+5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
 \.
 
 
@@ -655,6 +807,20 @@ SELECT pg_catalog.setval('public.addresses_address_id_seq', 6, true);
 
 
 --
+-- Name: content_content_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.content_content_id_seq', 8, true);
+
+
+--
+-- Name: language_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.language_id_seq', 5, true);
+
+
+--
 -- Name: llm_prompt_prompt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -669,17 +835,17 @@ SELECT pg_catalog.setval('public.persona_persona_id_seq', 5, true);
 
 
 --
--- Name: topics_topic_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+-- Name: topic_topic_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.topics_topic_id_seq', 1, false);
+SELECT pg_catalog.setval('public.topic_topic_id_seq', 23, true);
 
 
 --
 -- Name: user_assessment_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 5, true);
+SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 10, true);
 
 
 --
@@ -728,6 +894,30 @@ ALTER TABLE ONLY public.addresses
 
 
 --
+-- Name: content content_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.content
+    ADD CONSTRAINT content_pkey PRIMARY KEY (content_id);
+
+
+--
+-- Name: language language_language_name_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.language
+    ADD CONSTRAINT language_language_name_key UNIQUE (language_name);
+
+
+--
+-- Name: language language_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.language
+    ADD CONSTRAINT language_pkey PRIMARY KEY (language_id);
+
+
+--
 -- Name: llm_prompt llm_prompt_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -752,19 +942,19 @@ ALTER TABLE ONLY public.persona
 
 
 --
--- Name: topics topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: topic topic_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.topics
-    ADD CONSTRAINT topics_pkey PRIMARY KEY (topic_id);
+ALTER TABLE ONLY public.topic
+    ADD CONSTRAINT topic_pkey PRIMARY KEY (topic_id);
 
 
 --
--- Name: topics topics_topic_name_key; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: topic topic_topic_name_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.topics
-    ADD CONSTRAINT topics_topic_name_key UNIQUE (topic_name);
+ALTER TABLE ONLY public.topic
+    ADD CONSTRAINT topic_topic_name_key UNIQUE (topic_name);
 
 
 --
@@ -800,14 +990,6 @@ ALTER TABLE ONLY public.user_prompt
 
 
 --
--- Name: user_topics user_topics_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_topics
-    ADD CONSTRAINT user_topics_pkey PRIMARY KEY (user_id, topic_id);
-
-
---
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -837,6 +1019,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.addresses
     ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_assessment user_assessment_language_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_assessment
+    ADD CONSTRAINT user_assessment_language_id_fkey FOREIGN KEY (language_id) REFERENCES public.language(language_id);
 
 
 --
@@ -877,14 +1067,6 @@ ALTER TABLE ONLY public.user_persona
 
 ALTER TABLE ONLY public.user_prompt
     ADD CONSTRAINT user_prompt_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
-
-
---
--- Name: user_topics user_topics_topic_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_topics
-    ADD CONSTRAINT user_topics_topic_id_fkey FOREIGN KEY (topic_id) REFERENCES public.topics(topic_id);
 
 
 --
@@ -931,6 +1113,20 @@ GRANT ALL ON SEQUENCE public.addresses_address_id_seq TO linguai_app;
 
 
 --
+-- Name: TABLE content; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.content TO linguai_app;
+
+
+--
+-- Name: TABLE language; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.language TO linguai_app;
+
+
+--
 -- Name: TABLE llm_prompt; Type: ACL; Schema: public; Owner: -
 --
 
@@ -959,17 +1155,10 @@ GRANT ALL ON SEQUENCE public.persona_persona_id_seq TO linguai_app;
 
 
 --
--- Name: TABLE topics; Type: ACL; Schema: public; Owner: -
+-- Name: TABLE topic; Type: ACL; Schema: public; Owner: -
 --
 
-GRANT ALL ON TABLE public.topics TO linguai_app;
-
-
---
--- Name: SEQUENCE topics_topic_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON SEQUENCE public.topics_topic_id_seq TO linguai_app;
+GRANT ALL ON TABLE public.topic TO linguai_app;
 
 
 --
@@ -977,13 +1166,6 @@ GRANT ALL ON SEQUENCE public.topics_topic_id_seq TO linguai_app;
 --
 
 GRANT ALL ON TABLE public.user_assessment TO linguai_app;
-
-
---
--- Name: SEQUENCE user_assessment_assessment_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON SEQUENCE public.user_assessment_assessment_id_seq TO linguai_app;
 
 
 --

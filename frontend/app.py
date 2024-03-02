@@ -7,7 +7,8 @@ def main():
         "Home"		: {"icon": "house", "page": home}, 
         "Chat"	: {"icon": "chat", "page": chat},
         "Settings": {"icon": "gear", "page": settings},
-        "User": {"icon": "person-gear", "page": user}
+        "User": {"icon": "person-gear", "page": user},
+        "Content": {"icon": "body-text", "page": user}        
     }
     
     

@@ -1,6 +1,9 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 
+class UserTopicBase(BaseModel):
+    topic_name: str
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr
@@ -13,6 +16,7 @@ class UserBase(BaseModel):
     mobile_phone: Optional[str] = None
     landline_phone: Optional[str] = None
     contact_preference: Optional[str] = None
+    user_topics: Optional[List[UserTopicBase]] = None
 
 class UserCreate(UserBase):
     password_hash: str

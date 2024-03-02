@@ -1,10 +1,13 @@
 from sqlalchemy.orm import Session
-from app.models.data_models.user import User as DBUser
+from app.models.data_models.user import User as DBUser, UserTopic
 from app.models.schema.user import User, UserCreate
+from app.models.schema.topic import Topic
+from app.repositories.user_repository import UserRepository
 
 class UserService:
     def __init__(self, db: Session):
         self.db = db
+        self.user_repo = UserRepository(db)
 
     def create_user(self, user_create: UserCreate) -> User:
         db_user = DBUser(
@@ -27,8 +30,39 @@ class UserService:
         return db_user
 
     def get_user_by_id(self, user_id: int) -> User:
-        db_user = self.db.query(DBUser).filter(DBUser.user_id == user_id).first()
+        db_user = self.user_repo.find_by_id(user_id)
         return db_user
 
     def get_users(self) -> list:
-        return self.db.query(DBUser).all()
+        return self.user_repo.get_all_users()
+    
+    def add_topic_to_user(self, user_id: int, topic_name: str) -> None:
+        db_user = self.user_repo.find_by_id(user_id)
+        if db_user:
+            topic = self.db.query(UserTopic).filter(UserTopic.user_id == user_id, UserTopic.topic_name == topic_name).first()
+            if topic:
+                db_user.user_topics.append(topic)
+                self.db.commit()
+
+    def update_user_topics(self, user_id: int, new_topics: list) -> None:
+        self.db.query(UserTopic).filter(UserTopic.user_id == user_id).delete()
+        for topic_name in new_topics:
+            topic = self.db.query(Topic).filter(Topic.topic_name == topic_name).first()
+            if topic:
+                user_topic = UserTopic(user_id=user_id, topic_id=topic.topic_id)
+                self.db.add(user_topic)
+        self.db.commit()
+
+    def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:
+        db_user = self.user_repo.find_by_id(user_id)
+        if db_user:
+            topic = self.db.query(UserTopic).filter(UserTopic.user_id == user_id, UserTopic.topic_name == topic_name).first()
+            if topic:
+                db_user.user_topics.remove(topic)
+                self.db.commit()
+
+    def get_user_topics(self, user_id: int) -> list:
+        db_user = self.user_repo.find_by_id(user_id)
+        if db_user:
+            return db_user.topics
+        return []
