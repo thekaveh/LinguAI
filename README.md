@@ -49,17 +49,11 @@ Please note that you can optionally start services in detached mode using `docke
 
 8. To bring down the LinguAI services: `docker-compose down --remove-orphans`
 
-9. When you have db changes including, new table, new data, alteration run the following command in your terminal this will take a snapshot of the database:
-    - navigate to ./db folder
-    - Windows users:
-      - execute powershell script .\db-snapshot-win.ps1
-    - Unix/Mac Os users:
-      - chmod +x db-snapshot.sh
-      - execute shell script ./db-snapshot.sh
-    - When you need the latest database from git, first remove the local volume by running  `docker-compose down --remove-orphans -v`
-    - Ensure all containers are removed, if not recycle the docker desktop, and try docker-compose down command again.
-    - Bring up the containers as usual to get the latest db changes.
+9. When you have db changes including schema or data changes, simply run the following command in your terminal to take a snapshot of the database and replace the current snapshot:
+    - `docker exec db sh ./scripts/db-snapshot.sh`
 
+10. In order to make sure recent DB schema and data changes are reflected in your DB container, make sure you bring down the docker compose using the command below (with `-v`):
+    - `docker-compose down -v --remove-orphans`
 
 ### Code Changes
 
