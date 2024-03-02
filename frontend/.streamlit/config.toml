@@ -1,10 +1,10 @@
 # .streamlit/config.toml
 
 [theme]
-primaryColor = "#4682B4"  # Steel Blue for accents
-backgroundColor = "#1E1E1E"  # Dark background similar to VS Code
-secondaryBackgroundColor = "#2C2C2C"  # Slightly lighter dark shade for secondary backgrounds
-textColor = "#FFFFFF"  # White text for readability
+primaryColor = "#83c9ff"  # Steel Blue for accents
+backgroundColor = "#daefff"  # Dark background similar to VS Code
+secondaryBackgroundColor = "#c1e4ff"  # Slightly lighter dark shade for secondary backgrounds
+textColor = "#3d404b"  # White text for readability
 font = "sans serif"
 
 [server]
