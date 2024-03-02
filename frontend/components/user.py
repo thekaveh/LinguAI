@@ -11,8 +11,9 @@ def render():
     if st.button("Fetch Users"):
         # Call fetch_users asynchronously
         st.markdown("<hr>", unsafe_allow_html=True)
-        users = asyncio.run(UserService.list())     
-
+        # Await the coroutine properly
+        # Use asyncio.run() to run the coroutine in a synchronous context
+        users = asyncio.run(UserService.list())
         # Display the user list
         # Display the user list in a table format
         if isinstance(users, list):
