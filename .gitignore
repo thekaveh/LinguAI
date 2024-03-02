@@ -157,3 +157,4 @@ node_modules/
 *.bak
 *.tmp
 *.temp
+db/snapshot/linguai_db_ss.sql
