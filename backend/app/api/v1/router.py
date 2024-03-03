@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1.endpoints import chat, llm, persona, user, address, content, topic, content_gen
+from app.api.v1.endpoints import chat, llm, persona, user, address, content, topic, content_gen, prompt
 
 router = APIRouter()
 
@@ -11,3 +11,4 @@ router.include_router(address.router, prefix="/v1", tags=["v1"])
 router.include_router(content.router, prefix="/v1", tags=["v1"])
 router.include_router(topic.router, prefix="/v1", tags=["v1"])
 router.include_router(content_gen.router, prefix="/v1", tags=["v1"])
+router.include_router(prompt.router, prefix="/v1", tags=["v1"])
