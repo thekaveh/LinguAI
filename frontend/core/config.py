@@ -3,6 +3,15 @@ import os
 
 class Config:
     BACKEND_ENDPOINT = os.environ.get("BACKEND_ENDPOINT", "")
+    
+    # Defaults for the frontend and for demo purposes
+    DEFAULT_USER_NAME = os.environ.get("DEFAULT_USER_NAME", "")
+    DEFAULT_SKILL_LEVEL = os.environ.get("DEFAULT_SKILL_LEVEL", "")
+    DEFAULT_TEMPERATURE = os.environ.get("DEFAULT_TEMPERATURE", "")
+    DEFAULT_PERSONA = os.environ.get("DEFAULT_PERSONA", "")
+    DEFAULT_LANGUAGE_TRANSLATION_MODEL = os.environ.get("DEFAULT_LANGUAGE_TRANSLATION_MODEL", "")
+    DEFAULT_LANGUAGE =  os.environ.get("DEFAULT_LANGUAGE", "")
+    
 
     LLM_SERVICE_LIST_MODELS_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llm/list_models"
     LLM_SERVICE_LIST_VISION_MODELS_ENDPOINT = (
@@ -12,4 +21,13 @@ class Config:
     CHAT_SERVICE_ENDPOINT 			= f"{BACKEND_ENDPOINT}/v1/chat"
     PERSONA_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/persona/list"
     USER_SERVICE_LIST_ENDPOINT 		= f"{BACKEND_ENDPOINT}/v1/users/list"
+    USER_SERVICE_USERNAME_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/users/username/"    
+
     ADDRESS_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/addresses/list"
+    
+    CONTENT_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/contents/list"
+    CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/content_gen/gen_by_content_topic"
+    TOPIC_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/topics/list"    
+    
+    
+
