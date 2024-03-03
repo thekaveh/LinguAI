@@ -1,4 +1,4 @@
-CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';
+﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';
 --
 -- PostgreSQL database dump
 --
@@ -247,37 +247,6 @@ ALTER SEQUENCE public.language_id_seq OWNED BY public.language.language_id;
 
 
 --
--- Name: llm_prompt; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.llm_prompt (
-    prompt_id integer NOT NULL,
-    prompt_text text NOT NULL,
-    prompt_type character varying(100) NOT NULL
-);
-
-
---
--- Name: llm_prompt_prompt_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.llm_prompt_prompt_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: llm_prompt_prompt_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.llm_prompt_prompt_id_seq OWNED BY public.llm_prompt.prompt_id;
-
-
---
 -- Name: persona; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -306,6 +275,39 @@ CREATE SEQUENCE public.persona_persona_id_seq
 --
 
 ALTER SEQUENCE public.persona_persona_id_seq OWNED BY public.persona.persona_id;
+
+
+--
+-- Name: prompts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.prompts (
+    prompt_id integer NOT NULL,
+    prompt_text text NOT NULL,
+    prompt_type character varying(100) NOT NULL,
+    prompt_category character varying(100) NOT NULL,
+    external_references text
+);
+
+
+--
+-- Name: prompts_prompt_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.prompts_prompt_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: prompts_prompt_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.prompts_prompt_id_seq OWNED BY public.prompts.prompt_id;
 
 
 --
@@ -415,38 +417,6 @@ CREATE TABLE public.user_persona (
 
 
 --
--- Name: user_prompt; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_prompt (
-    prompt_id integer NOT NULL,
-    user_id integer,
-    prompt_text text NOT NULL,
-    prompt_type character varying(100) NOT NULL
-);
-
-
---
--- Name: user_prompt_prompt_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.user_prompt_prompt_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: user_prompt_prompt_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.user_prompt_prompt_id_seq OWNED BY public.user_prompt.prompt_id;
-
-
---
 -- Name: user_topics; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -526,17 +496,17 @@ ALTER TABLE ONLY public.language ALTER COLUMN language_id SET DEFAULT nextval('p
 
 
 --
--- Name: llm_prompt prompt_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.llm_prompt ALTER COLUMN prompt_id SET DEFAULT nextval('public.llm_prompt_prompt_id_seq'::regclass);
-
-
---
 -- Name: persona persona_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.persona ALTER COLUMN persona_id SET DEFAULT nextval('public.persona_persona_id_seq'::regclass);
+
+
+--
+-- Name: prompts prompt_id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.prompts ALTER COLUMN prompt_id SET DEFAULT nextval('public.prompts_prompt_id_seq'::regclass);
 
 
 --
@@ -558,13 +528,6 @@ ALTER TABLE ONLY public.user_assessment ALTER COLUMN assessment_id SET DEFAULT n
 --
 
 ALTER TABLE ONLY public.user_performance ALTER COLUMN performance_id SET DEFAULT nextval('public.user_performance_performance_id_seq'::regclass);
-
-
---
--- Name: user_prompt prompt_id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_prompt ALTER COLUMN prompt_id SET DEFAULT nextval('public.user_prompt_prompt_id_seq'::regclass);
 
 
 --
@@ -641,21 +604,6 @@ COPY public.language (language_id, language_name) FROM stdin;
 
 
 --
--- Data for Name: llm_prompt; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public.llm_prompt (prompt_id, prompt_text, prompt_type) FROM stdin;
-1	Welcome to the language learning assistance app!	Instructional
-2	Congratulations! You completed today's lesson.	Feedback
-3	Don't forget to review your vocabulary.	Reminder
-4	Earn bonus points by participating in our language challenges!	Engagement
-5	Oops! Something went wrong. Please try again later.	Error
-6	Are you sure you want to delete this item?	Confirmation
-7	Personalized recommendations based on your progress.	Custom
-\.
-
-
---
 -- Data for Name: persona; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -665,6 +613,15 @@ COPY public.persona (persona_id, persona_name, description) FROM stdin;
 3	Black Widow	Master spy and former assassin.
 4	Thor	God of Thunder and prince of Asgard.
 5	Hulk	Gamma-irradiated scientist with immense strength.
+\.
+
+
+--
+-- Data for Name: prompts; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.prompts (prompt_id, prompt_text, prompt_type, prompt_category, external_references) FROM stdin;
+1	Generate a {content_name} for the following topics: {topics}. Content should be generated only in {language_name} language.	system	content-gen-by-topics-content	\N
 \.
 
 
@@ -739,19 +696,6 @@ COPY public.user_persona (user_id, persona_id) FROM stdin;
 
 
 --
--- Data for Name: user_prompt; Type: TABLE DATA; Schema: public; Owner: -
---
-
-COPY public.user_prompt (prompt_id, user_id, prompt_text, prompt_type) FROM stdin;
-1	1	You've been doing great with your vocabulary!	Custom
-2	2	Time for your daily practice session!	Reminder
-3	3	Try using the new words you learned in a sentence.	Instructional
-4	4	You're making progress! Keep it up!	Feedback
-5	5	Remember to take breaks during your study sessions.	Reminder
-\.
-
-
---
 -- Data for Name: user_topics; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -789,7 +733,6 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
 4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
 5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
-6	Kaveh123	kaveh@vt.edu	pass_hash	Kaveh	R	\N	\N	\N	\N	admin	\N	\N
 \.
 
 
@@ -822,17 +765,17 @@ SELECT pg_catalog.setval('public.language_id_seq', 5, true);
 
 
 --
--- Name: llm_prompt_prompt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('public.llm_prompt_prompt_id_seq', 7, true);
-
-
---
 -- Name: persona_persona_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
 SELECT pg_catalog.setval('public.persona_persona_id_seq', 5, true);
+
+
+--
+-- Name: prompts_prompt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.prompts_prompt_id_seq', 1, true);
 
 
 --
@@ -854,13 +797,6 @@ SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 10, true);
 --
 
 SELECT pg_catalog.setval('public.user_performance_performance_id_seq', 1, false);
-
-
---
--- Name: user_prompt_prompt_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
---
-
-SELECT pg_catalog.setval('public.user_prompt_prompt_id_seq', 5, true);
 
 
 --
@@ -919,14 +855,6 @@ ALTER TABLE ONLY public.language
 
 
 --
--- Name: llm_prompt llm_prompt_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.llm_prompt
-    ADD CONSTRAINT llm_prompt_pkey PRIMARY KEY (prompt_id);
-
-
---
 -- Name: persona persona_persona_name_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -940,6 +868,14 @@ ALTER TABLE ONLY public.persona
 
 ALTER TABLE ONLY public.persona
     ADD CONSTRAINT persona_pkey PRIMARY KEY (persona_id);
+
+
+--
+-- Name: prompts prompts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.prompts
+    ADD CONSTRAINT prompts_pkey PRIMARY KEY (prompt_id);
 
 
 --
@@ -980,14 +916,6 @@ ALTER TABLE ONLY public.user_performance
 
 ALTER TABLE ONLY public.user_persona
     ADD CONSTRAINT user_persona_pkey PRIMARY KEY (user_id, persona_id);
-
-
---
--- Name: user_prompt user_prompt_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_prompt
-    ADD CONSTRAINT user_prompt_pkey PRIMARY KEY (prompt_id);
 
 
 --
@@ -1063,14 +991,6 @@ ALTER TABLE ONLY public.user_persona
 
 
 --
--- Name: user_prompt user_prompt_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_prompt
-    ADD CONSTRAINT user_prompt_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
-
-
---
 -- Name: user_topics user_topics_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1128,20 +1048,6 @@ GRANT ALL ON TABLE public.language TO linguai_app;
 
 
 --
--- Name: TABLE llm_prompt; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.llm_prompt TO linguai_app;
-
-
---
--- Name: SEQUENCE llm_prompt_prompt_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON SEQUENCE public.llm_prompt_prompt_id_seq TO linguai_app;
-
-
---
 -- Name: TABLE persona; Type: ACL; Schema: public; Owner: -
 --
 
@@ -1153,6 +1059,13 @@ GRANT ALL ON TABLE public.persona TO linguai_app;
 --
 
 GRANT ALL ON SEQUENCE public.persona_persona_id_seq TO linguai_app;
+
+
+--
+-- Name: TABLE prompts; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.prompts TO linguai_app;
 
 
 --
@@ -1188,20 +1101,6 @@ GRANT ALL ON SEQUENCE public.user_performance_performance_id_seq TO linguai_app;
 --
 
 GRANT ALL ON TABLE public.user_persona TO linguai_app;
-
-
---
--- Name: TABLE user_prompt; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON TABLE public.user_prompt TO linguai_app;
-
-
---
--- Name: SEQUENCE user_prompt_prompt_id_seq; Type: ACL; Schema: public; Owner: -
---
-
-GRANT ALL ON SEQUENCE public.user_prompt_prompt_id_seq TO linguai_app;
 
 
 --

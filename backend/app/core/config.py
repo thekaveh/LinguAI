@@ -31,3 +31,7 @@ class Config:
     POSTGRES_APP_USER = os.getenv("POSTGRES_APP_USER", "linguai_app")
     POSTGRES_APP_PASSWORD = os.getenv("POSTGRES_APP_PASSWORD", "linguai_app_pass")
     DATABASE_URL = f"postgresql://{POSTGRES_APP_USER}:{POSTGRES_APP_PASSWORD}@{POSTGRES_DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
+
+    # Prompt types
+    PROMPT_TYPE_USER = os.getenv("PROMPT_TYPE_USER", "user")
+    PROMPT_TYPE_SYSTEM = os.getenv("PROMPT_TYPE_SYSTEM", "system")
