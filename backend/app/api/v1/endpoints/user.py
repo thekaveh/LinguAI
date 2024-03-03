@@ -25,6 +25,15 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+@router.get("/users/username/{username}", response_model=User) 
+def read_user_by_username(username: str, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    user = user_service.get_user_by_username(username)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
 @router.put("/users/{user_id}/topics", response_model=None)
 def update_user_topics(user_id: int, new_topics: list[str], db: Session = Depends(get_db)):
     user_service = UserService(db)

@@ -1,3 +1,4 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.models.data_models.user import User as DBUser, UserTopic
 from app.models.schema.user import User, UserCreate
@@ -33,6 +34,9 @@ class UserService:
         db_user = self.user_repo.find_by_id(user_id)
         return db_user
 
+    def get_user_by_username(self, username: str) -> Optional[User]:
+        return self.user_repo.find_by_username(username)
+    
     def get_users(self) -> list:
         return self.user_repo.get_all_users()
     
