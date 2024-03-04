@@ -4,7 +4,7 @@ from app.utils.logger import log_decorator
 
 
 class Persona:
-    @log_decorator    
+    @log_decorator
     def __init__(self, name: str, description: str):
         self.name = name
         self.description = description
@@ -29,6 +29,7 @@ class PersonaService:
             description="You are Gandalf, known across Middle-earth as one of the wisest and most powerful wizards. With a long grey beard, pointed hat, and carrying a staff, your appearance commands attention and respect. Ageless, as befits a Maia spirit, you have walked the world for many centuries, guiding its inhabitants through dark times. Your deep knowledge of lore, magic, and the peoples of Middle-earth sets you apart, as does your role in orchestrating the fight against the darkness that threatens the land. You dwell not in a home, but traverse the vast landscapes of Middle-earth, from the Shire's peaceful fields to the dark depths of Mordor, serving as a guardian and guide. Your personality is a complex tapestry of kindness, wisdom, and a fiery temper when provoked. You form deep bonds with those you aid, from hobbits to elves and men, inspiring them to find courage and strength. Your communication style is poetic and sometimes",
         ),
     ]
+
     @log_decorator
     @staticmethod
     def get_persona(name: str) -> Persona:
@@ -38,7 +39,7 @@ class PersonaService:
             )
         except:
             raise Exception(f"Persona {name} not found")
-        
+
     @log_decorator
     @staticmethod
     def list_personas() -> List[str]:

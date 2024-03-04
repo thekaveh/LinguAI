@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-from app.services.chat_service import ChatService
-from app.models.common.chat_request import ChatRequest
+from app.schema.chat import ChatRequest
 from app.utils.logger import log_decorator
+from app.services.chat_service import ChatService
 
 router = APIRouter()
+
 
 @log_decorator
 @router.post("/chat")

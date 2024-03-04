@@ -3,8 +3,7 @@ from typing import List, Callable
 from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
-from models.common.chat_message import ChatMessage
-from models.common.chat_request import ChatRequest
+from schema.chat import ChatMessage, ChatRequest
 
 
 class ChatService:

@@ -1,11 +1,10 @@
 import asyncio
-from utils.logger import log_decorator
 import streamlit as st
 
+from schema.chat import ChatMessage
+from utils.logger import log_decorator
 from services.llm_service import LLMService
 from services.persona_service import PersonaService
-
-from models.common.chat_message import ChatMessage
 
 
 class StateService:
@@ -19,7 +18,7 @@ class StateService:
         st.session_state["temperature"] = 0.0
         st.session_state["chat_messages"] = []
         st.session_state["file_upload_key"] = 0
-        
+
     @log_decorator
     def _init_model(self):
         models = asyncio.run(LLMService.list_models())
@@ -28,7 +27,7 @@ class StateService:
             st.session_state["model"] = models[0]
         else:
             st.session_state["model"] = None
-        
+
     @log_decorator
     def _init_persona(self):
         personas = asyncio.run(PersonaService.list())
@@ -38,7 +37,6 @@ class StateService:
         else:
             st.session_state["persona"] = None
 
-    
     @property
     def model(self):
         return st.session_state.get("model", None)

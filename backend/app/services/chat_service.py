@@ -3,14 +3,14 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain.schema.messages import HumanMessage, SystemMessage
 
-from app.services.llm_service import LLMService
-from app.models.common.chat_request import ChatRequest
-from app.services.persona_service import PersonaService
+from app.schema.chat import ChatRequest
 from app.utils.logger import log_decorator
+from app.services.llm_service import LLMService
+from app.services.persona_service import PersonaService
 
 
 class ChatService:
-    @log_decorator    
+    @log_decorator
     @staticmethod
     async def achat(request: ChatRequest) -> AsyncIterable[str]:
         assert request is not None, "message is required"
