@@ -1,3 +1,4 @@
+import asyncio
 from utils.logger import log_decorator
 import streamlit as st
 
