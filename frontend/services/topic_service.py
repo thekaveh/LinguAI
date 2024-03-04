@@ -1,10 +1,12 @@
 from typing import List
 from core.config import Config
+from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 # Assuming TopicSchema is defined in model.schema.topic
 from models.schema.topic import Topic as TopicSchema
 
 class TopicService:
+    @log_decorator
     @staticmethod
     async def list() -> List[TopicSchema]:
         try:

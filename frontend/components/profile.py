@@ -1,5 +1,7 @@
+from utils.logger import log_decorator
 import streamlit as st
 
+@log_decorator
 def render():
 	st.title("Profile")
 

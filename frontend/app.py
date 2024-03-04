@@ -1,7 +1,13 @@
 import streamlit as st
+import logging
 
 from components import sidebar, home, settings, chat, user, content_gen, profile
 
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename='/app/logs/backend-app.log',
+                    format='%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
 def main():
     components_info = {
         "Home"		: {"icon": "house", "page": home}, 

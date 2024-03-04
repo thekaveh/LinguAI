@@ -6,9 +6,11 @@ from langchain.schema.runnable import Runnable
 from langchain_community.chat_models import ChatOllama
 
 from app.core.config import Config
+from app.utils.logger import log_decorator
 
 
 class LLMService:
+    @log_decorator    
     @staticmethod
     def get_chat_runnable(model: str, temperature: float = 0) -> Runnable:
         try:
@@ -36,7 +38,8 @@ class LLMService:
                 )
         except:
             raise Exception(f"Model {model} not found")
-
+        
+    @log_decorator
     @staticmethod
     def list_models() -> List[str]:
         """
@@ -62,7 +65,8 @@ class LLMService:
             return models
         except Exception as e:
             raise Exception("Error fetching models") from e
-
+        
+    @log_decorator
     @staticmethod
     def list_vision_models() -> List[str]:
         try:

@@ -1,5 +1,6 @@
 
 from typing import List
+from utils.logger import log_decorator
 from services.content_gen_service import ContentGenService
 import streamlit as st
 import asyncio
@@ -13,6 +14,7 @@ from models.schema.user import User, UserTopicBase
 from models.schema.language import Language
 from models.schema.content_gen import ContentGenReq
 
+@log_decorator
 def fetch_user_by_username_sync(username):
     # Wrapper function to call the async function synchronously
     loop = asyncio.new_event_loop()
@@ -21,13 +23,14 @@ def fetch_user_by_username_sync(username):
     loop.close()
     return result
 
+@log_decorator
 def get_user():
     # TODO: Add in logged in user details here
     with ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(fetch_user_by_username_sync, Config.DEFAULT_USER_NAME)
         return future.result()
     
-    
+@log_decorator
 def fetch_content_types_sync():
     # Wrapper function to call the async function synchronously
     loop = asyncio.new_event_loop()
@@ -36,11 +39,13 @@ def fetch_content_types_sync():
     loop.close()
     return result
 
+@log_decorator
 def fetch_content_types():
     with ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(fetch_content_types_sync)
         return future.result()
 
+@log_decorator
 def render_content_types(content_types):
     st.write("#### Select Content Type")
     options = [content_type.content_name for content_type in content_types]
@@ -48,7 +53,7 @@ def render_content_types(content_types):
     global selected_content_type
     selected_content_type = next((ct for ct in content_types if ct.content_name == selected_option), None)
     
-
+@log_decorator
 def fetch_topics_sync():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -56,6 +61,7 @@ def fetch_topics_sync():
     loop.close()
     return topics
 
+@log_decorator
 def fetch_topic_combo_options():
     with ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(fetch_topics_sync)
@@ -63,13 +69,14 @@ def fetch_topic_combo_options():
     # Assuming topics is a list of Topic objects, extract the topic_name for each
     return [topic.topic_name for topic in topics]
 
+@log_decorator
 def get_user_topics(user: User) -> List[UserTopicBase]:
     if user.user_topics:
         return user.user_topics
     else:
         return []
 
-
+@log_decorator
 def render_topic_combo_options(combo_options):
     st.write("#### Topic Options")
     selected_options = []
@@ -93,11 +100,12 @@ def render_topic_combo_options(combo_options):
                         selected_options.append(option)
     return selected_options
 
-
+@log_decorator
 def get_language():
     # TODO: Add in logged in user language selection here
     return Language(language_id=3, language_name=Config.DEFAULT_LANGUAGE)
-            
+
+@log_decorator            
 def build_content_gen_request(user, selected_topic_options, selected_content_type, language) -> ContentGenReq:
     # Extract user_topics as a list of strings from selected_topic_options
     #user_topics = [topic.topic_name for topic in selected_topic_options]
@@ -112,7 +120,7 @@ def build_content_gen_request(user, selected_topic_options, selected_content_typ
     
     return content_gen_req
 
-
+@log_decorator
 def stream_content(content_gen_req):
     # Placeholder for accumulated content
     if 'content_stream' not in st.session_state:
@@ -135,7 +143,7 @@ def stream_content(content_gen_req):
         on_completed_fn=on_completed
     ))
     
-    
+@log_decorator 
 def get_welcome_message(user):
     return f"""
     ## Welcome, {user.first_name} {user.middle_name} {user.last_name}!
@@ -152,7 +160,7 @@ def get_welcome_message(user):
     Ready to dive in? receive personalized content tailored to your interests and skill level.  Let's embark on today's learning journey together!
     """
 
-        
+@log_decorator        
 def render():
     st.title("Content For You")
 

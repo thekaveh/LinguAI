@@ -1,7 +1,9 @@
+from utils.logger import log_decorator
 import streamlit as st
 
 from streamlit_option_menu import option_menu
 
+@log_decorator
 def show(pages):
     with st.sidebar:
         selected = option_menu(

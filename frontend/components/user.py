@@ -1,9 +1,11 @@
+from utils.logger import log_decorator
 import streamlit as st
 import asyncio
 from services.user_service import UserService
 from models.schema.user import User
 from services.address_service import AddressService 
 
+@log_decorator
 def render():
     st.title("User List")
 
@@ -42,5 +44,3 @@ def render():
                 st.write("No addresses found.")
         else:
             st.error("Error: Addresses data is not in the correct format.")
-# Run the render function
-#render()

@@ -1,10 +1,12 @@
 from typing import List, Optional
 
 from core.config import Config
+from utils.logger import log_decorator
 from models.schema.user import User
 from utils.http_utils import HttpUtils
 
 class UserService:
+    @log_decorator
     @staticmethod
     async def list() -> List[User]:
         try:
@@ -12,7 +14,8 @@ class UserService:
             return await HttpUtils.get(Config.USER_SERVICE_LIST_ENDPOINT, response_model=list[User])
         except Exception as e:
             raise e
-    
+        
+    @log_decorator
     @staticmethod
     async def get_user_by_username(username: str) -> Optional[User]:
         try:

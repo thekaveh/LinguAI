@@ -6,9 +6,11 @@ from langchain.schema.messages import HumanMessage, SystemMessage
 from app.services.llm_service import LLMService
 from app.models.common.chat_request import ChatRequest
 from app.services.persona_service import PersonaService
+from app.utils.logger import log_decorator
 
 
 class ChatService:
+    @log_decorator    
     @staticmethod
     async def achat(request: ChatRequest) -> AsyncIterable[str]:
         assert request is not None, "message is required"

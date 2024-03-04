@@ -4,19 +4,23 @@ from typing import List
 from app.repositories.data_access.session import get_db
 from app.models.schema.address import Address, AddressCreate, AddressUpdate
 from app.services.address_service import AddressService
+from app.utils.logger import log_decorator
 
 router = APIRouter()
 
+@log_decorator
 @router.get("/addresses/list", response_model=List[Address])
 def list_addresses(db: Session = Depends(get_db)):
     address_service = AddressService(db)
     return address_service.get_addresses()
 
+@log_decorator
 @router.post("/addresses/", response_model=Address)
 def create_address(address_create: AddressCreate, db: Session = Depends(get_db)):
     address_service = AddressService(db)
     return address_service.create_address(address_create)
 
+@log_decorator
 @router.get("/addresses/{address_id}", response_model=Address)
 def get_address(address_id: int, db: Session = Depends(get_db)):
     address_service = AddressService(db)
@@ -25,6 +29,7 @@ def get_address(address_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Address not found")
     return address
 
+@log_decorator
 @router.put("/addresses/{address_id}", response_model=Address)
 def update_address(address_id: int, address_update: AddressUpdate, db: Session = Depends(get_db)):
     address_service = AddressService(db)

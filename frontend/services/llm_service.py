@@ -1,11 +1,13 @@
 from typing import List
 
 from core.config import Config
+from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from models.common.list_response import ListResponse
 
 
 class LLMService:
+    @log_decorator
     @staticmethod
     async def list_models() -> List[str]:
         try:
@@ -17,6 +19,7 @@ class LLMService:
         except Exception as e:
             raise e
 
+    @log_decorator
     @staticmethod
     async def list_vision_models() -> List[str]:
         try:

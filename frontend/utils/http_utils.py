@@ -4,10 +4,13 @@ from httpx import HTTPStatusError, RequestError, Timeout
 from pydantic import BaseModel, parse_obj_as, ValidationError
 from typing import Any, AsyncIterable, Dict, Optional, Generic, Type, TypeVar
 
+from utils.logger import log_decorator
+
 T = TypeVar("T")
 
 
 class HttpUtils:
+    @log_decorator
     @staticmethod
     async def apost_stream(
         url: str, request: BaseModel, timeout: Optional[Timeout] = None
@@ -25,6 +28,7 @@ class HttpUtils:
         except (HTTPStatusError, RequestError) as e:
             raise Exception(f"HTTP error occurred: {e}") from e
 
+    @log_decorator
     @staticmethod
     async def get(
         url: str,
