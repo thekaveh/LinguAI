@@ -1,8 +1,9 @@
-import streamlit as st
 import asyncio
-from services.user_service import UserService
+import streamlit as st
+
 from models.schema.user import User
-from services.address_service import AddressService 
+from services.user_service import UserService
+
 
 def render():
     st.title("User List")
@@ -19,28 +20,16 @@ def render():
         if isinstance(users, list):
             if users:
                 st.write("### Users:")
-                user_data = [{"Username": user.username, "Email": user.email, "User Type": user.user_type} for user in users]
+                user_data = [
+                    {
+                        "Username": user.username,
+                        "Email": user.email,
+                        "User Type": user.user_type,
+                    }
+                    for user in users
+                ]
                 st.table(user_data)
             else:
                 st.write("No users found.")
         else:
             st.error("Error: Users data is not in the correct format.")
-    
-    # Add a button to fetch addresses
-    if st.button("Fetch Addresses"):
-        st.markdown("<hr>", unsafe_allow_html=True)
-        addresses = asyncio.run(AddressService.list())     
-
-        # Display the address list
-        # Display the address list in a table format
-        if isinstance(addresses, list):
-            if addresses:
-                st.write("### Addresses:")
-                address_data = [{"Street": address.street, "City": address.city, "State": address.state, "Country": address.country} for address in addresses]
-                st.table(address_data)
-            else:
-                st.write("No addresses found.")
-        else:
-            st.error("Error: Addresses data is not in the correct format.")
-# Run the render function
-#render()
