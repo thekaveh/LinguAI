@@ -1,9 +1,8 @@
-from typing import List
 from fastapi import APIRouter, HTTPException
 
-from app.services.persona_service import PersonaService
-from app.models.common.list_response import ListResponse
 from app.utils.logger import log_decorator
+from app.schema.list_response import ListResponse
+from app.services.persona_service import PersonaService
 
 router = APIRouter()
 

@@ -1,8 +1,7 @@
 import asyncio
-from utils.logger import log_decorator
 import streamlit as st
 
-from models.schema.user import User
+from utils.logger import log_decorator
 from services.user_service import UserService
 
 

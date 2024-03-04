@@ -1,13 +1,13 @@
 import asyncio
-from utils.logger import log_decorator
 import streamlit as st
 
+from schema.chat import ChatMessage
+from utils.logger import log_decorator
 from utils.image_utils import ImageUtils
 from services.llm_service import LLMService
 from services.chat_service import ChatService
 from services.state_service import StateService
 
-from models.common.chat_message import ChatMessage
 
 @log_decorator
 def render():

@@ -3,7 +3,7 @@ from typing import List
 from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
-from models.common.list_response import ListResponse
+from schema.list_response import ListResponse
 
 
 class PersonaService:

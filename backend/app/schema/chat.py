@@ -1,7 +1,7 @@
-from pydantic import BaseModel, Field
 from typing import List, Optional
+from pydantic import BaseModel, Field
 
-from utils.logger import log_decorator
+from app.utils.logger import log_decorator
 
 
 class ChatMessage(BaseModel):
@@ -28,3 +28,12 @@ class ChatMessage(BaseModel):
             ret.extend([{"type": "image_url", "image_url": url} for url in self.images])
 
         return ret
+
+
+class ChatRequest(BaseModel):
+    model: str
+
+    messages: List[ChatMessage]
+
+    persona: str = "Neutral"
+    temperature: float = 0.0

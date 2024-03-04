@@ -1,11 +1,10 @@
-from pydantic import BaseModel, Field
 from typing import List, Optional
+from pydantic import BaseModel, Field
 
-from app.utils.logger import log_decorator
+from utils.logger import log_decorator
 
 
 class ChatMessage(BaseModel):
-    
     sender: str = Field(..., title="Sender")
     text: str = Field("", title="Text")
     images: Optional[List[str]] = Field(None, title="Base64 Images")
@@ -20,7 +19,7 @@ class ChatMessage(BaseModel):
             self.images = []
 
         self.images.append(image)
-        
+
     @log_decorator
     def to_dict(self):
         ret = [{"type": "text", "text": self.text}]
@@ -29,3 +28,12 @@ class ChatMessage(BaseModel):
             ret.extend([{"type": "image_url", "image_url": url} for url in self.images])
 
         return ret
+
+
+class ChatRequest(BaseModel):
+    model: str
+
+    messages: List[ChatMessage]
+
+    persona: str = "Neutral"
+    temperature: float = 0.0
