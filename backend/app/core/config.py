@@ -15,12 +15,12 @@ class Config:
     OLLAMA_OPENAI_API_KEY = "ollama"
     OLLAMA_API_ENDPOINT = os.environ.get("OLLAMA_API_ENDPOINT", "")
     OLLAMA_OPENAI_API_ENDPOINT = OLLAMA_API_ENDPOINT + "/v1"
-    
-    
-    DEFAULT_LANGUAGE_TRANSLATION_MODEL= os.environ.get("DEFAULT_LANGUAGE_TRANSLATION_MODEL", "gpt-3.5-turbo")
-    DEFAULT_PERSONA=os.environ.get("DEFAULT_PERSONA", "Neutral")
-    DEFAULT_TEMPERATURE=os.environ.get("DEFAULT_TEMPERATURE", "0.0")
 
+    DEFAULT_LANGUAGE_TRANSLATION_MODEL = os.environ.get(
+        "DEFAULT_LANGUAGE_TRANSLATION_MODEL", "gpt-3.5-turbo"
+    )
+    DEFAULT_PERSONA = os.environ.get("DEFAULT_PERSONA", "Neutral")
+    DEFAULT_TEMPERATURE = os.environ.get("DEFAULT_TEMPERATURE", "0.0")
 
     VISION_MODELS = os.environ.get("VISION_MODELS", "")
 
@@ -31,7 +31,3 @@ class Config:
     POSTGRES_APP_USER = os.getenv("POSTGRES_APP_USER", "linguai_app")
     POSTGRES_APP_PASSWORD = os.getenv("POSTGRES_APP_PASSWORD", "linguai_app_pass")
     DATABASE_URL = f"postgresql://{POSTGRES_APP_USER}:{POSTGRES_APP_PASSWORD}@{POSTGRES_DB_HOST}:{DB_PORT}/{POSTGRES_DB}"
-
-    # Prompt types
-    PROMPT_TYPE_USER = os.getenv("PROMPT_TYPE_USER", "user")
-    PROMPT_TYPE_SYSTEM = os.getenv("PROMPT_TYPE_SYSTEM", "system")
