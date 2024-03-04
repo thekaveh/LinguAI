@@ -34,6 +34,7 @@ services:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./backend:/app
+      - ./logs/backend:/app/logs      
     depends_on:
       - db
     env_file:
@@ -46,7 +47,8 @@ services:
     ports:
       - "${FRONTEND_PORT}:8501"
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app.
+      - ./logs/frontend:/app/logs      
     depends_on:
       - backend
     environment:

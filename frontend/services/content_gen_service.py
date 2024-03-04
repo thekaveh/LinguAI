@@ -1,9 +1,11 @@
 from typing import Callable
 from core.config import Config
+from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from models.schema.content_gen import ContentGenReq, ContentGenRes
 
 class ContentGenService:
+    @log_decorator
     @staticmethod
     async def generate_content(
         request: ContentGenReq,

@@ -5,15 +5,18 @@ from typing import List
 from app.repositories.data_access.session import get_db
 from app.models.schema.prompt import PromptCreate, PromptUpdate, Prompt as PromptSchema, PromptSearch
 from app.services.prompt_service import PromptService
-from app.models.data_models.prompt import Prompt  
+from app.models.data_models.prompt import Prompt
+from app.utils.logger import log_decorator  
 
 router = APIRouter()
 
+@log_decorator
 @router.post("/prompts/", response_model=PromptSchema)
 def create_prompt(prompt_create: PromptCreate, db: Session = Depends(get_db)):
     prompt_service = PromptService(db)
     return prompt_service.create_prompt(prompt_create)
 
+@log_decorator
 @router.get("/prompts/{prompt_id}", response_model=PromptSchema)
 def read_prompt(prompt_id: int, db: Session = Depends(get_db)):
     prompt_service = PromptService(db)
@@ -22,11 +25,13 @@ def read_prompt(prompt_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Prompt not found")
     return prompt
 
+@log_decorator
 @router.get("/prompts/", response_model=List[PromptSchema])
 def read_prompts(db: Session = Depends(get_db)):
     prompt_service = PromptService(db)
     return prompt_service.get_all_prompts()
 
+@log_decorator
 @router.post("/prompts/search", response_model=PromptSchema)
 def search_prompt(prompt_search: PromptSearch, db: Session = Depends(get_db)):
     prompt_service = PromptService(db)
@@ -35,6 +40,7 @@ def search_prompt(prompt_search: PromptSearch, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Prompt not found based on search criteria")
     return prompt
 
+@log_decorator
 @router.put("/prompts/{prompt_id}", response_model=PromptSchema)
 def update_prompt(prompt_id: int, prompt_update: PromptUpdate, db: Session = Depends(get_db)):
     prompt_service = PromptService(db)
@@ -43,6 +49,7 @@ def update_prompt(prompt_id: int, prompt_update: PromptUpdate, db: Session = Dep
         raise HTTPException(status_code=404, detail="Prompt not found")
     return updated_prompt
 
+@log_decorator
 @router.delete("/prompts/{prompt_id}")
 def delete_prompt(prompt_id: int, db: Session = Depends(get_db)):
     prompt_service = PromptService(db)

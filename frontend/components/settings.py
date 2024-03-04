@@ -1,4 +1,5 @@
 import asyncio
+from utils.logger import log_decorator
 import streamlit as st
 
 from services.llm_service import LLMService
@@ -6,6 +7,7 @@ from services.state_service import StateService
 from services.persona_service import PersonaService
 
 
+@log_decorator
 def render():
     st.title("Settings")
 

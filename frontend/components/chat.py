@@ -1,4 +1,5 @@
 import asyncio
+from utils.logger import log_decorator
 import streamlit as st
 
 from utils.image_utils import ImageUtils
@@ -8,7 +9,7 @@ from services.state_service import StateService
 
 from models.common.chat_message import ChatMessage
 
-
+@log_decorator
 def render():
     state_service = StateService.instance()
 
@@ -78,6 +79,7 @@ def render():
                 )
             )
 
+    @log_decorator
     def _file_uploader_on_change():
         if uploaded_images := st.session_state[
             f"file_uploader_{state_service.file_upload_key}"

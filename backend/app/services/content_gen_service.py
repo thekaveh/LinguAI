@@ -9,13 +9,15 @@ from app.core.config import Config
 from app.services.prompt_service import PromptService
 from sqlalchemy.orm import Session
 from app.repositories.prompt_repository import PromptRepository
+from app.utils.logger import log_decorator
 
 
 class ContentGenService:
+    @log_decorator    
     def __init__(self, db: Session):
         self.db = db
         self.prompt_service = PromptService(db)    
-
+    @log_decorator
     async def generate_content(self,request: ContentGenReq) -> AsyncIterable[str]:
         assert request is not None, "Request is required"
         
@@ -38,7 +40,7 @@ class ContentGenService:
         async for generated_content in chain.astream(input={}):
             yield generated_content
 
-
+    @log_decorator
     def generate_prompt(self,request: ContentGenReq) -> str:
         # Define the search criteria
         search_criteria = PromptSearch(

@@ -1,10 +1,12 @@
 import asyncio
+from utils.logger import log_decorator
 import streamlit as st
 
 from models.schema.user import User
 from services.user_service import UserService
 
 
+@log_decorator
 def render():
     st.title("User List")
 
@@ -32,4 +34,5 @@ def render():
             else:
                 st.write("No users found.")
         else:
+            st.error("Error: Users data is not in the correct format.")
             st.error("Error: Users data is not in the correct format.")
