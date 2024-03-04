@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.utils.logger import log_decorator
+from app.data_access.session import get_db
 from app.services.content_service import ContentService
-from app.repositories.data_access.session import get_db
 from app.schema.content import ContentCreate, Content as ContentSchema
 
 router = APIRouter()

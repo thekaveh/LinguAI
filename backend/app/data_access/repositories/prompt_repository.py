@@ -1,9 +1,9 @@
-from app.schema.prompt import PromptCreate, PromptUpdate, PromptSearch
-from sqlalchemy.orm import Session
 from typing import List, Optional
+from sqlalchemy.orm import Session
 
-from app.models.data_models.prompt import Prompt
 from app.utils.logger import log_decorator
+from app.data_access.models.prompt import Prompt
+from app.schema.prompt import PromptCreate, PromptUpdate, PromptSearch
 
 
 class PromptRepository:

@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
+from app.data_access.session import get_db
 from app.schema.user import User, UserCreate
 from app.services.user_service import UserService
-from app.repositories.data_access.session import get_db
 
 router = APIRouter()
 

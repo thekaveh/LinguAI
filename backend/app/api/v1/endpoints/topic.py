@@ -2,8 +2,8 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.utils.logger import log_decorator
+from app.data_access.session import get_db
 from app.services.topic_service import TopicService
-from app.repositories.data_access.session import get_db
 from app.schema.topic import TopicCreate, Topic as TopicSchema
 
 router = APIRouter()

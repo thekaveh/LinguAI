@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from app.utils.logger import log_decorator
-from app.models.data_models.topic import Topic
-from app.repositories.topic_repository import TopicRepository
+from app.data_access.models.topic import Topic
 from app.schema.topic import TopicCreate, Topic as TopicSchema
+from app.data_access.repositories.topic_repository import TopicRepository
 
 
 class TopicService:

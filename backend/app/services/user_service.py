@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.schema.user import User, UserCreate
-from app.repositories.user_repository import UserRepository
-from app.models.data_models.user import User as DBUser, UserTopic
+from app.data_access.models.user import User as DBUser, UserTopic
+from app.data_access.repositories.user_repository import UserRepository
 
 
 class UserService:

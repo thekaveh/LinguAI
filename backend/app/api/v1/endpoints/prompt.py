@@ -2,9 +2,9 @@ from typing import List
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 
+from app.data_access.session import get_db
 from app.utils.logger import log_decorator
 from app.services.prompt_service import PromptService
-from app.repositories.data_access.session import get_db
 from app.schema.prompt import (
     PromptCreate,
     PromptUpdate,

@@ -2,9 +2,9 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 
 from app.utils.logger import log_decorator
-from app.models.data_models.prompt import Prompt
-from app.repositories.prompt_repository import PromptRepository
+from app.data_access.models.prompt import Prompt
 from app.schema.prompt import PromptCreate, PromptUpdate, PromptSearch
+from app.data_access.repositories.prompt_repository import PromptRepository
 
 
 class PromptService:
