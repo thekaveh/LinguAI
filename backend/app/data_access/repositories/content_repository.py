@@ -1,10 +1,10 @@
-from app.utils.logger import log_decorator
-from .base_repository import BaseRepository
-from sqlalchemy.orm import Session
 from typing import Optional
-from app.schema.content import ContentCreate
+from sqlalchemy.orm import Session
 
-from app.models.data_models.content import Content
+from app.utils.logger import log_decorator
+from app.schema.content import ContentCreate
+from app.data_access.models.content import Content
+from app.data_access.repositories.base_repository import BaseRepository
 
 
 class ContentRepository(BaseRepository[Content]):

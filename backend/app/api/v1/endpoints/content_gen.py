@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from app.utils.logger import log_decorator
+from app.data_access.session import get_db
 from app.schema.content_gen import ContentGenReq
-from app.repositories.data_access.session import get_db
 from app.services.content_gen_service import ContentGenService
 
 router = APIRouter()

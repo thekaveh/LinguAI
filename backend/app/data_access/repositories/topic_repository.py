@@ -1,10 +1,10 @@
-from app.schema.topic import TopicCreate
-from app.utils.logger import log_decorator
-from .base_repository import BaseRepository
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-from app.models.data_models.topic import Topic
+from app.schema.topic import TopicCreate
+from app.utils.logger import log_decorator
+from app.data_access.models.topic import Topic
+from app.data_access.repositories.base_repository import BaseRepository
 
 
 class TopicRepository(BaseRepository[Topic]):

@@ -2,9 +2,9 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 
 from app.utils.logger import log_decorator
-from app.models.data_models.content import Content
-from app.repositories.content_repository import ContentRepository
+from app.data_access.models.content import Content
 from app.schema.content import ContentCreate, Content as ContentSchema
+from app.data_access.repositories.content_repository import ContentRepository
 
 
 class ContentService:
