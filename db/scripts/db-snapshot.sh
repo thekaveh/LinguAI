@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# pg_dump -U linguai_db_user -d linguai_db --no-owner > /docker-entrypoint-initdb.d/linguai_db_ss.sql && { echo "CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';"; cat /docker-entrypoint-initdb.d/linguai_db_ss.sql; } > /docker-entrypoint-initdb.d/linguai_db_ss.sql.tmp && mv /docker-entrypoint-initdb.d/linguai_db_ss.sql.tmp /docker-entrypoint-initdb.d/linguai_db_ss.sql
-
 DUMP_FILE="/docker-entrypoint-initdb.d/linguai_db_ss.sql"
 
 DB_USER="${POSTGRES_USER}"
