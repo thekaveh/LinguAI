@@ -29,5 +29,9 @@ class Config:
     CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/content_gen/gen_by_content_topic"
     TOPIC_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/topics/list"    
     
+    # Logger
+    FRONTEND_LOG_LEVEL = os.getenv("FRONTEND_LOG_LEVEL", "INFO")
+    FRONTEND_LOGGER_NAME = os.getenv("FRONTEND_LOGGER_NAME", "LinguAI-FRONTEND")
+    FRONTEND_LOG_FILE = os.getenv("FRONTEND_LOG_FILE", "/app/logs/front-app.log")
     
 
