@@ -1,6 +1,8 @@
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr
 
+from app.schema.user_assessment import UserAssessmentBase
+
 
 class UserTopicBase(BaseModel):
     topic_name: str
@@ -19,6 +21,7 @@ class UserBase(BaseModel):
     landline_phone: Optional[str] = None
     contact_preference: Optional[str] = None
     user_topics: Optional[List[UserTopicBase]] = None
+    user_assessments: Optional[List[UserAssessmentBase]] = None    
 
 
 class UserCreate(UserBase):
