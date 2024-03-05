@@ -26,8 +26,11 @@ class Config:
     ADDRESS_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/addresses/list"
     
     CONTENT_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/contents/list"
-    CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/content_gen/gen_by_content_topic"
+    CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/content_gen/gen_by_content_topic"  
+    REWRITE_CONTENT_SERVICE_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/rewrite_content/"
     TOPIC_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/topics/list"    
+    
+    
     
     # Logger
     FRONTEND_LOG_LEVEL = os.getenv("FRONTEND_LOG_LEVEL", "INFO")
