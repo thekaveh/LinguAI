@@ -1,15 +1,14 @@
-import logging
+
 import streamlit as st
 
 from components import sidebar, home, settings, chat, user, content_gen, profile
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    filename="/app/logs/backend-app.log",
-    format="%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
+from utils.logger_config import setup_global_logging
+from core.config import Config
 
+
+# Setup global logging with a specific logger name
+setup_global_logging(logger_name=Config.FRONTEND_LOGGER_NAME,log_filename=Config.FRONTEND_LOG_FILE,log_level=Config.FRONTEND_LOG_LEVEL)
 
 def main():
     components_info = {
@@ -23,6 +22,6 @@ def main():
 
     sidebar.show(components_info).render()
 
-
+    
 if __name__ == "__main__":
     main()
