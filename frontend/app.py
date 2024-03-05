@@ -2,7 +2,7 @@ import streamlit as st
 
 from core.config import Config
 from utils.logger_config import setup_global_logging
-from components import sidebar, home, settings, chat, user, content_gen, profile
+from components import sidebar, home, settings, chat, user, content_gen, profile, interest_selection, rewrite_content
 
 # Setup global logging with a specific logger name
 setup_global_logging(
@@ -15,6 +15,8 @@ setup_global_logging(
 def main():
     components_info = {
         "Home": {"icon": "house", "page": home},
+        "Interest Selection": {"icon": "palette", "page": interest_selection},
+        "Rewrite Content": {"icon": "pen", "page": rewrite_content},
         "Chat": {"icon": "chat", "page": chat},
         "Account": {"icon": "person-circle", "page": profile},
         "Settings": {"icon": "gear", "page": settings},
