@@ -348,8 +348,11 @@ CREATE TABLE public.user_assessment (
     assessment_id integer NOT NULL,
     user_id integer,
     assessment_date date,
-    skill_level character varying(100) NOT NULL,
-    language_id integer
+    language_id integer,
+    assessment_type character varying(100),
+    skill_level character varying(100),
+    strength text,
+    weakness text
 );
 
 
@@ -587,6 +590,7 @@ COPY public.content (content_id, content_name) FROM stdin;
 6	news report
 7	biography
 8	essay
+9	satire
 \.
 
 
@@ -660,17 +664,27 @@ COPY public.topic (topic_id, topic_name) FROM stdin;
 -- Data for Name: user_assessment; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.user_assessment (assessment_id, user_id, assessment_date, skill_level, language_id) FROM stdin;
-1	1	2024-03-01	intermediate	1
-2	1	2024-03-01	intermediate	3
-3	1	2024-03-01	intermediate	5
-4	2	2024-03-01	intermediate	2
-5	2	2024-03-01	intermediate	4
-6	3	2024-03-01	intermediate	3
-7	3	2024-03-01	intermediate	4
-8	4	2024-03-01	beginner	5
-9	5	2024-03-01	intermediate	1
-10	5	2024-03-01	intermediate	2
+COPY public.user_assessment (assessment_id, user_id, assessment_date, language_id, assessment_type, skill_level, strength, weakness) FROM stdin;
+1	1	2023-01-01	2	reading	Intermediate	Good comprehension	Occasional difficulty with complex texts
+2	1	2023-01-01	3	reading	Intermediate	Can understand most sentences	Needs improvement in grammar
+3	1	2023-01-01	5	reading	Beginner	Starting to recognize basic words	Struggles with reading fluency
+4	2	2023-01-01	4	reading	Beginner	Motivated to learn	Limited vocabulary
+5	2	2023-01-01	5	reading	Intermediate	Can understand simple sentences	Needs practice with verb conjugation
+6	3	2023-01-01	3	reading	Advanced	Fluent reader	Occasional difficulty with idiomatic expressions
+7	3	2023-01-01	4	reading	Intermediate	Good understanding of grammar	Needs to expand vocabulary
+8	4	2023-01-01	5	reading	Beginner	Eager to learn	Limited reading comprehension
+9	5	2023-01-01	2	reading	Intermediate	Can understand basic texts	Difficulty with character recognition
+10	5	2023-01-01	3	reading	Beginner	Motivated to improve	Limited vocabulary
+11	1	2024-03-05	2	reading	Advanced	Excellent comprehension	None
+12	1	2024-03-05	3	reading	Intermediate	Good vocabulary	Difficulty with grammar
+13	1	2024-03-05	5	reading	Intermediate	Can understand basic sentences	Struggles with complex texts
+14	2	2024-03-05	4	reading	Beginner	Motivated to learn	Limited vocabulary
+15	2	2024-03-05	5	reading	Intermediate	Can understand simple sentences	Needs practice with verb conjugation
+16	3	2024-03-05	3	reading	Advanced	Fluent reader	Occasional difficulty with idiomatic expressions
+17	3	2024-03-05	4	reading	Intermediate	Good understanding of grammar	Needs to expand vocabulary
+18	4	2024-03-05	5	reading	Beginner	Eager to learn	Limited reading comprehension
+19	5	2024-03-05	2	reading	Intermediate	Can understand basic texts	Difficulty with character recognition
+20	5	2024-03-05	3	reading	Beginner	Motivated to improve	Limited vocabulary
 \.
 
 
@@ -728,11 +742,11 @@ COPY public.user_topics (user_id, topic_name) FROM stdin;
 --
 
 COPY public.users (user_id, username, email, password_hash, first_name, last_name, middle_name, mobile_phone, landline_phone, contact_preference, user_type, base_language, learning_languages) FROM stdin;
-1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{English,Spanish,French}
 2	captainamerica123	captainamerica@example.com	password_hash_captainamerica	Steve	Rogers		234-567-8901		mobile_phone	external	English	{Mandarin,German}
 3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
 4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
 5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
+1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{Spanish,French}
 \.
 
 
@@ -789,7 +803,7 @@ SELECT pg_catalog.setval('public.topic_topic_id_seq', 23, true);
 -- Name: user_assessment_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 10, true);
+SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 20, true);
 
 
 --
