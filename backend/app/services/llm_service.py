@@ -23,13 +23,6 @@ class LLMService:
                     openai_api_key=Config.OPENAI_API_KEY,
                 )
             else:
-                # return ChatOpenAI(
-                #     model=model,
-                #     streaming=True,
-                #     temperature=temperature,
-                #     base_url=Config.OLLAMA_OPENAI_API_ENDPOINT,
-                #     openai_api_key=Config.OLLAMA_OPENAI_API_KEY,
-                # )
                 return ChatOllama(
                     model=model,
                     streaming=True,

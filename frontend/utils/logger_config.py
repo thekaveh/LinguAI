@@ -58,4 +58,5 @@ def setup_global_logging(logger_name='LinguAI-FRONTEND', log_filename='/app/logs
     queue_listener.start()
 
     import atexit
+
     atexit.register(queue_listener.stop)
