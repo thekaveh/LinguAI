@@ -14,7 +14,6 @@ router = APIRouter()
 @log_decorator
 @router.get("/users/list", response_model=list[User])
 def read_users(db: Session = Depends(get_db)):
-    logging.info("This is a test log from read_users list endpoint, ensuring logs are being written to file")
     user_service = UserService(db)
     return user_service.get_users()
 

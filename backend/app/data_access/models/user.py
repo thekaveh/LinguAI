@@ -31,9 +31,6 @@ class User(Base):
         ARRAY(String)
     )  # Changed from ARRAY(Enum) to ARRAY(String)
 
-    # # Add this line to create a bidirectional relationship
-    # addresses = relationship("Address", back_populates="user")
-
     # User topics relationship
     user_topics = relationship("UserTopic", back_populates="user")
 

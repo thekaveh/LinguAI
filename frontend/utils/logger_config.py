@@ -1,12 +1,17 @@
-# logging_config.py
 import logging
 import logging.handlers
 from queue import Queue
 
-def setup_global_logging(logger_name='LinguAI', log_filename='/app/logs/frontend-app.log', log_level="INFO"):
+
+def setup_global_logging(
+    logger_name="LinguAI", log_filename="/app/logs/frontend-app.log", log_level="INFO"
+):
     log_queue = Queue(-1)
     file_handler = logging.FileHandler(log_filename)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - [%(filename)s:%(lineno)d] - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
     file_handler.setFormatter(formatter)
 
     queue_handler = logging.handlers.QueueHandler(log_queue)
@@ -21,4 +26,5 @@ def setup_global_logging(logger_name='LinguAI', log_filename='/app/logs/frontend
     queue_listener.start()
 
     import atexit
+
     atexit.register(queue_listener.stop)
