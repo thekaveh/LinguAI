@@ -1,8 +1,8 @@
 from typing import List
 from pydantic import BaseModel
 
-from .content import Content
-from .language import Language
+from schema.content import Content
+from schema.language import Language
 
 
 class ContentGenReq(BaseModel):
