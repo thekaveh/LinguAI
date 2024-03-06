@@ -19,7 +19,7 @@ async def generate_content_by_topic(
 ) -> StreamingResponse:
     con_gen_service = ContentGenService(db)
     try:
-        stream = con_gen_service.generate_content(request)
+        stream = await con_gen_service.agenerate_content(request)
         return StreamingResponse(content=stream, media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
