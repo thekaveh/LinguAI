@@ -29,7 +29,7 @@ class Config:
     CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/content_gen/gen_by_content_topic"  
     REWRITE_CONTENT_SERVICE_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/rewrite_content/"
     TOPIC_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/topics/list"    
-    
+    SKILL_LEVEL_SERVICE_LIST_ENDPOINT= f"{BACKEND_ENDPOINT}/v1/skill_levels/list"   
     
     
     # Logger
