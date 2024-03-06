@@ -109,5 +109,5 @@ def render():
         disabled=(state_service.persona is None)
         or (state_service.model is None)
         or (state_service.model not in vision_models),
-        key=f"file_uploader_{state_service.file_upload_key}",
+        key=f"file_uploader_{state_service.chat_file_upload_key}",
     )
