@@ -16,8 +16,8 @@ class StateService:
         st.session_state["images"] = []
         st.session_state["temperature"] = 0.0
         st.session_state["chat_messages"] = []
-        st.session_state["chat_file_upload_key"] = 0
         st.session_state["chat_messages"] = []
+        st.session_state["chat_file_upload_key"] = 0
 
     @log_decorator
     def _init_model(self):
