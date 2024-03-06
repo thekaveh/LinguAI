@@ -1,8 +1,10 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
+
 from app.data_access.models.language import Language
-from app.data_access.repositories.language_repository import LanguageRepository
 from app.schema.language import LanguageCreate, Language as LanguageSchema
+from app.data_access.repositories.language_repository import LanguageRepository
+
 
 class LanguageService:
     def __init__(self, db_session: Session):
