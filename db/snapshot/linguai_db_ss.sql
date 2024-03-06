@@ -311,6 +311,36 @@ ALTER SEQUENCE public.prompts_prompt_id_seq OWNED BY public.prompts.prompt_id;
 
 
 --
+-- Name: skill_level; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.skill_level (
+    id integer NOT NULL,
+    level character varying(50) NOT NULL
+);
+
+
+--
+-- Name: skill_level_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.skill_level_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: skill_level_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.skill_level_id_seq OWNED BY public.skill_level.id;
+
+
+--
 -- Name: topic; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -513,6 +543,13 @@ ALTER TABLE ONLY public.prompts ALTER COLUMN prompt_id SET DEFAULT nextval('publ
 
 
 --
+-- Name: skill_level id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.skill_level ALTER COLUMN id SET DEFAULT nextval('public.skill_level_id_seq'::regclass);
+
+
+--
 -- Name: topic topic_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -626,6 +663,19 @@ COPY public.persona (persona_id, persona_name, description) FROM stdin;
 
 COPY public.prompts (prompt_id, prompt_text, prompt_type, prompt_category, external_references) FROM stdin;
 1	Generate a {content_name} for the following topics: {topics}. Content should be generated only in {language_name} language.	system	content-gen-by-topics-content	\N
+\.
+
+
+--
+-- Data for Name: skill_level; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.skill_level (id, level) FROM stdin;
+1	beginner
+2	intermediate
+3	advanced
+4	expert
+5	master
 \.
 
 
@@ -793,6 +843,13 @@ SELECT pg_catalog.setval('public.prompts_prompt_id_seq', 1, true);
 
 
 --
+-- Name: skill_level_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.skill_level_id_seq', 5, true);
+
+
+--
 -- Name: topic_topic_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -890,6 +947,22 @@ ALTER TABLE ONLY public.persona
 
 ALTER TABLE ONLY public.prompts
     ADD CONSTRAINT prompts_pkey PRIMARY KEY (prompt_id);
+
+
+--
+-- Name: skill_level skill_level_level_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.skill_level
+    ADD CONSTRAINT skill_level_level_key UNIQUE (level);
+
+
+--
+-- Name: skill_level skill_level_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.skill_level
+    ADD CONSTRAINT skill_level_pkey PRIMARY KEY (id);
 
 
 --
@@ -1080,6 +1153,13 @@ GRANT ALL ON SEQUENCE public.persona_persona_id_seq TO linguai_app;
 --
 
 GRANT ALL ON TABLE public.prompts TO linguai_app;
+
+
+--
+-- Name: TABLE skill_level; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.skill_level TO linguai_app;
 
 
 --
