@@ -15,7 +15,7 @@ from services.content_service import ContentService
 from services.content_gen_service import ContentGenService
 from schema.rewrite_content import ContentRewriteReq
 from services.rewrite_content_service import RewriteContentService
-
+from services.skill_level_service import SkillLevelService
 
 @log_decorator
 def _fetch_user_by_username_sync(username):
@@ -68,34 +68,28 @@ def _add_instruction(user):
 
 @log_decorator
 def _add_skill_level_by_language(user):
-    st.write("\n\n")
-    st.write("##### Your Skill Level")
+    st.write("")
+    st.write("##### Your Current Skill Level")
     
     if not user or not user.user_assessments or not user.learning_languages:
         st.write("No user or user assessments or learning languages found")
-        return "", ""
+        return
     
-    # Create a list of languages
-    languages = user.learning_languages
-    
-    # Display a selectbox to choose a language
-    selected_language = st.selectbox("**Select a Language**", languages)
-    
-    # Find the latest assessment for the selected language
-    latest_assessment = None
-    for user_assessment in user.user_assessments:
-        if user_assessment.language.language_name == selected_language:
-            if latest_assessment is None or user_assessment.assessment_date > latest_assessment.assessment_date:
-                latest_assessment = user_assessment
-    
-    # Display the skill level for the selected language
-    if latest_assessment:
-        skill_level = latest_assessment.skill_level
-        st.write(f"###### {selected_language} : {skill_level}")
-    else:
-        st.write(f"###### No assessment found for {selected_language}")
-        
-    return selected_language, skill_level
+    # Loop through each language in the user's learning languages
+    for language in user.learning_languages:
+        # Find the latest assessment for the current language
+        latest_assessment = None
+        for user_assessment in user.user_assessments:
+            if user_assessment.language.language_name == language:
+                if latest_assessment is None or user_assessment.assessment_date > latest_assessment.assessment_date:
+                    latest_assessment = user_assessment
+
+        # Display the language and its skill level
+        if latest_assessment:
+            skill_level = latest_assessment.skill_level
+            st.write(f"###### {language} - Level: {skill_level}")
+
+
 
 @log_decorator
 def _build_content_rewrite_request(
@@ -134,6 +128,54 @@ def stream_content(content_gen_req):
     )
 
 @log_decorator
+def _fetch_skill_levels_sync():
+    # Wrapper function to call the async function synchronously
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(SkillLevelService.list())
+    loop.close()
+    return result
+
+
+@log_decorator
+def _fetch_skill_levels():
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_fetch_skill_levels_sync)
+        return future.result()
+
+
+@log_decorator
+def _render_skill_levels(skill_levels):
+    options = [""] + [skill_level.level for skill_level in skill_levels]
+    selected_option_index = st.selectbox("##### Select Skill Level", range(len(options)), format_func=lambda x: options[x])
+    
+    if selected_option_index > 0:
+        selected_skill_level = skill_levels[selected_option_index - 1]
+    else:
+        selected_skill_level = None
+    return selected_skill_level
+
+
+def _get_language_object(user, language_name):
+    language_object = None
+    if user.user_assessments:
+        for user_assessment in user.user_assessments:
+            if user_assessment.language.language_name == language_name:
+                language_object = user_assessment.language
+                break
+    return language_object
+
+def _select_learning_language(user):
+
+    if user.learning_languages:
+        selected_language = st.radio("##### Select Learning Language", user.learning_languages)
+        #st.write(f"You selected: {selected_language}")
+    else:
+        st.write("No learning languages specified.")
+    return _get_language_object(user, selected_language)
+
+
+@log_decorator
 def render():
     st.title("LinguAI")
 
@@ -161,21 +203,47 @@ def render():
 
     #current_skill = st.selectbox("Current Skill Level", skill_options)
     
-    selected_language, skill_level=_add_skill_level_by_language(user)
+    #selected_language, skill_level=_add_skill_level_by_language(user)
     #call backend service to prcess the content.
     
-    
+    skill_levels = _fetch_skill_levels()
+
+
+
+    _add_skill_level_by_language(user)
     
 
     st.write("")
+    st.write("")    
+    st.markdown("### Explore Rewritting in different levels and language")
+    
+    col1, col2 = st.columns(2)
+    # Add the first item to the first column
+    with col1:
+        skill_level=_render_skill_levels(skill_levels)
+
+    # Add the second item to the second column
+    with col2:        
+        selected_language=_select_learning_language(user)
+    
+    
+    st.write("")
     st.write("")
 
-    #st.button("Rewrite Content")
-    if st.button("Rewrite Content"):
+    if skill_level is None or selected_language is None or original_content == "":
+        st.markdown(
+            '<div style="padding: 10px; border: 1px solid red; border-radius: 5px;">'
+            '<b></b> Please Enter content int text area above, select a language and skill level.</div>',
+            unsafe_allow_html=True
+        )
         st.session_state["content_stream"] = ""
-        content_rewrite_req=_build_content_rewrite_request(user, original_content,skill_level,selected_language)
-        
-        stream_content(content_rewrite_req)
+    else:
+        # st.button("Rewrite Content")
+        if st.button("Rewrite Content"):
+            st.session_state["content_stream"] = ""
+            content_rewrite_req = _build_content_rewrite_request(user, original_content, skill_level.level, selected_language.language_name)
+            
+            stream_content(content_rewrite_req)
 
     # Placeholder for the response from LLM
     # st.write("#### Content")
