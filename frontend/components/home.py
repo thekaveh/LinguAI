@@ -5,9 +5,6 @@ from utils.logger import log_decorator
 
 @log_decorator
 def render():
-    # st.title("LinguAI")
-    # st.image("./static/LinguAI.png", width=1600)
-
     st.image("./static/logo.png", width=100)
 
     st.subheader("Personalized language learning for intermediate learners")
