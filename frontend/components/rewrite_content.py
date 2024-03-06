@@ -40,7 +40,7 @@ def _add_welcome(user):
     ### Hi, {user.first_name} {user.middle_name or ""} {user.last_name}!
 
     To get started, simply paste the text you'd like to convert into the text area below. 
-    Our system will then convert it into content that matches your skill level.
+    LinguAI can convert it into content that matches your skill level and language selected.
 
     """
     st.markdown(welcome, unsafe_allow_html=True)
