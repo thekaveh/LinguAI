@@ -1,4 +1,4 @@
-﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';
+CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
 --
 -- PostgreSQL database dump
 --
@@ -751,11 +751,6 @@ COPY public.user_performance (performance_id, user_id, performance_date, accurac
 --
 
 COPY public.user_persona (user_id, persona_id) FROM stdin;
-1	1
-2	2
-3	3
-4	4
-5	5
 \.
 
 
