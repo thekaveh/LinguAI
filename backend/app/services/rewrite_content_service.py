@@ -51,15 +51,21 @@ class RewriteContentService:
 
         if db_prompt:
             # Assuming the prompt text in the database is a template that needs to be formatted
-            formatted_prompt = db_prompt.prompt_text.format(
-                input_content=request.input_content,
-                language_name=request.language,
-                skill_level=request.skill_level,
-            )
-            return formatted_prompt
+            return f""" You will RE-WRITE the following {request.language} input content 
+                        for a reader at {request.skill_level} skill level in the same {request.language}. 
+                        Below is the input content:
+
+                        {request.input_content}
+                    """
         else:
             # Handle cases where no matching prompt is found
             return f"""Rewrite the following input content {request.input_content} 
                     for language {request.language} at skill level {request.skill_level} 
                     in the same language  {request.language}. 
                     """
+
+
+            # return f"""Rewrite the following input content {request.input_content} 
+            #         for language {request.language} at skill level {request.skill_level} 
+            #         in the same language  {request.language}. 
+            #         """

@@ -30,6 +30,7 @@ class Config:
     REWRITE_CONTENT_SERVICE_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/rewrite_content/"
     TOPIC_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/topics/list"    
     SKILL_LEVEL_SERVICE_LIST_ENDPOINT= f"{BACKEND_ENDPOINT}/v1/skill_levels/list"   
+    LANGUAGE_SERVICE_LIST_ENDPOINT= f"{BACKEND_ENDPOINT}/v1/languages/list"       
     
     
     # Logger

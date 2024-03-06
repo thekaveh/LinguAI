@@ -1,21 +1,18 @@
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+
 import streamlit as st
 from typing import List
 
 from core.config import Config
 from schema.language import Language
 from utils.logger import log_decorator
-from schema.user import User, UserTopicBase
-from schema.content_gen import ContentGenReq
+from schema.user import User
 from services.user_service import UserService
-from services.topic_service import TopicService
-
-from services.content_service import ContentService
-from services.content_gen_service import ContentGenService
 from schema.rewrite_content import ContentRewriteReq
 from services.rewrite_content_service import RewriteContentService
 from services.skill_level_service import SkillLevelService
+from services.language_service import LanguageService
 
 @log_decorator
 def _fetch_user_by_username_sync(username):
@@ -69,8 +66,10 @@ def _add_instruction(user):
 @log_decorator
 def _add_skill_level_by_language(user):
     st.write("")
-    st.write("##### Your Current Skill Level")
-    
+    st.write("")
+    st.write("")
+    st.write("##### Your Skill Level")
+    st.write("---")
     if not user or not user.user_assessments or not user.learning_languages:
         st.write("No user or user assessments or learning languages found")
         return
@@ -87,7 +86,7 @@ def _add_skill_level_by_language(user):
         # Display the language and its skill level
         if latest_assessment:
             skill_level = latest_assessment.skill_level
-            st.write(f"###### {language} - Level: {skill_level}")
+            st.write(f"###### {language}: {skill_level}")
 
 
 
@@ -122,7 +121,7 @@ def stream_content(content_gen_req):
 
     # Async call to generate content (simplified example, adjust as needed)
     asyncio.run(
-        RewriteContentService.rewrite_content(
+        RewriteContentService.arewrite_content(
             request=content_gen_req, on_next_fn=on_next, on_completed_fn=on_completed
         )
     )
@@ -176,6 +175,33 @@ def _select_learning_language(user):
 
 
 @log_decorator
+def _fetch_languages_sync():
+    # Wrapper function to call the async function synchronously
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(LanguageService.list())
+    loop.close()
+    return result
+
+@log_decorator
+def _fetch_languages():
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_fetch_languages_sync)
+        return future.result()
+
+@log_decorator
+def _render_language_dropdown(languages):
+    options = [""] + [language.language_name for language in languages]
+    selected_option_index = st.selectbox("##### Select Language", range(len(options)), format_func=lambda x: options[x])
+    
+    if selected_option_index > 0:
+        selected_language = languages[selected_option_index - 1]
+    else:
+        selected_language = None
+    return selected_language
+
+
+@log_decorator
 def render():
     st.title("LinguAI")
 
@@ -193,12 +219,17 @@ def render():
     
     _add_welcome(user)
 
-    original_content = st.text_area(
-    "", placeholder="", )
-
+    col1, col2 = st.columns([3,1])
+    with col1:
+        original_content = st.text_area(
+            "", height=400, placeholder="Enter your text here...", 
+            key="original_content")
+    with col2:
+        _add_skill_level_by_language(user)
+    
     st.write("")
     st.write("")
-
+    
     #skill_options = ['Level 1', 'Level 2', 'Level 3']
 
     #current_skill = st.selectbox("Current Skill Level", skill_options)
@@ -207,24 +238,26 @@ def render():
     #call backend service to prcess the content.
     
     skill_levels = _fetch_skill_levels()
+    languages=_fetch_languages()
 
 
 
-    _add_skill_level_by_language(user)
     
 
     st.write("")
     st.write("")    
-    st.markdown("### Explore Rewritting in different levels and language")
+    st.markdown("#### Explore Rewritting in different levels and language")
     
-    col1, col2 = st.columns(2)
+    st.write("")
+    col3, col4 = st.columns(2)
     # Add the first item to the first column
-    with col1:
+    with col3:
         skill_level=_render_skill_levels(skill_levels)
 
     # Add the second item to the second column
-    with col2:        
-        selected_language=_select_learning_language(user)
+    with col4:        
+        selected_language=_render_language_dropdown(languages)
+        #selected_language=_select_learning_language(user)
     
     
     st.write("")

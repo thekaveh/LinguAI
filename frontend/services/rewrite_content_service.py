@@ -9,7 +9,7 @@ from schema.rewrite_content import ContentRewriteReq
 class RewriteContentService:
     @log_decorator
     @staticmethod
-    async def rewrite_content(
+    async def arewrite_content(
         request: ContentRewriteReq,
         on_next_fn: Callable[[str], None],
         on_completed_fn: Callable[[], None],

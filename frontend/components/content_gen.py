@@ -288,7 +288,7 @@ def render():
     if st.button("Click to Get Your Content"):
         st.session_state["content_stream"] = ""
         content_gen_req = build_content_gen_request(
-            user, selected_topic_options, selected_content_type, get_language()
+            user, selected_topic_options, selected_content_type, selected_language
         )
 
         content_gen_placeholder = st.empty()
