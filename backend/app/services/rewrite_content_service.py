@@ -52,7 +52,7 @@ class RewriteContentService:
         if db_prompt:
             # Assuming the prompt text in the database is a template that needs to be formatted
             return f""" You will RE-WRITE the following {request.language} input content 
-                        for a reader at {request.skill_level} skill level in the same {request.language}. 
+                        for a reader at {request.skill_level} skill level in the same {request.language}, and provide feedback on what you changed. 
                         Below is the input content:
 
                         {request.input_content}

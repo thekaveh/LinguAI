@@ -31,7 +31,7 @@ class Config:
     TOPIC_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/topics/list"    
     SKILL_LEVEL_SERVICE_LIST_ENDPOINT= f"{BACKEND_ENDPOINT}/v1/skill_levels/list"   
     LANGUAGE_SERVICE_LIST_ENDPOINT= f"{BACKEND_ENDPOINT}/v1/languages/list"       
-    
+    REVIEW_WRITING_SERVICE_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/review_writing/"
     
     # Logger
     FRONTEND_LOG_LEVEL = os.getenv("FRONTEND_LOG_LEVEL", "INFO")
