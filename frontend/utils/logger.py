@@ -20,6 +20,11 @@ def log_decorator(func):
             result = func(*args, **kwargs)
             logger.debug(f"Function {func.__name__} returned {result}")
             return result
+        except Exception as e:
+            logger.exception(
+                f"Exception occurred in function {func.__name__}: {str(e)}"
+            )
+            raise  # Re-raise the exception after logging
         finally:
             end_time = time.time()
             logger.info(

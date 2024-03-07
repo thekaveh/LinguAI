@@ -105,7 +105,7 @@ def _build_content_rewrite_request(
     return content_rewrite_req
 
 @log_decorator
-def stream_content(content_gen_req):
+def stream_content(content_rewrite_req):
     # Placeholder for accumulated content
     if "content_stream" not in st.session_state:
         st.session_state["content_stream"] = ""
@@ -122,7 +122,7 @@ def stream_content(content_gen_req):
     # Async call to generate content (simplified example, adjust as needed)
     asyncio.run(
         RewriteContentService.arewrite_content(
-            request=content_gen_req, on_next_fn=on_next, on_completed_fn=on_completed
+            request=content_rewrite_req, on_next_fn=on_next, on_completed_fn=on_completed
         )
     )
 
@@ -203,6 +203,7 @@ def _render_language_dropdown(languages):
 
 @log_decorator
 def render():
+    st.session_state["content_stream"] = ""
     st.title("LinguAI")
 
     st.write("")
