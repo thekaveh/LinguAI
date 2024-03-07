@@ -96,6 +96,18 @@ class UserService:
             return db_user.topics
         return []
 
+    @log_decorator
+    def authenticate_user(self, username: str, password: str) -> Optional[dict]:
+        db_user = self.user_repo.find_by_username(username)
+        if not db_user:
+            return {"error": "No matching user found, please register"}
+        if db_user.password_hash != password:
+            return {"error": "Incorrect username or password."} 
+        return {
+            "name": f"{db_user.first_name} {db_user.last_name}",
+            "auth_status": True,
+            "username": db_user.username
+        }
     def create_user_assessment(self, user_id: int, assessment_data: UserAssessmentCreate) -> UserAssessment:
         db_assessment = UserAssessment(**assessment_data.dict(), user_id=user_id)
         self.db.add(db_assessment)

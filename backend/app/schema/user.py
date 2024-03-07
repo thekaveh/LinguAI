@@ -23,7 +23,6 @@ class UserBase(BaseModel):
     user_topics: Optional[List[UserTopicBase]] = None
     user_assessments: Optional[List[UserAssessmentBase]] = None    
 
-
 class UserCreate(UserBase):
     password_hash: str
 
