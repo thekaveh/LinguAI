@@ -17,7 +17,7 @@ def render():
         st.markdown("<hr>", unsafe_allow_html=True)
 
         models = asyncio.run(LLMService.list_models())
-        personas = asyncio.run(PersonaService.list())
+        personas = asyncio.run(PersonaService.get_all_names())
 
         new_model = st.selectbox(
             label="Model:",
