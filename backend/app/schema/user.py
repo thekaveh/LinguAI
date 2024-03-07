@@ -20,7 +20,6 @@ class UserBase(BaseModel):
     contact_preference: Optional[str] = None
     user_topics: Optional[List[UserTopicBase]] = None
 
-
 class UserCreate(UserBase):
     password_hash: str
 

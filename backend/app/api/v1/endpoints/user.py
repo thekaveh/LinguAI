@@ -7,6 +7,7 @@ from app.utils.logger import log_decorator
 from app.data_access.session import get_db
 from app.schema.user import User, UserCreate
 from app.services.user_service import UserService
+from app.schema.login_request import LoginRequest
 
 router = APIRouter()
 
@@ -78,3 +79,14 @@ def remove_topic_from_user(
 def read_user_topics(user_id: int, db: Session = Depends(get_db)):
     user_service = UserService(db)
     return user_service.get_user_topics(user_id)
+
+@log_decorator
+@router.post("/users/authenticate")
+def authenticate(login_request: LoginRequest, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    auth_result = user_service.authenticate_user(login_request.username, login_request.password)
+    if auth_result is None:
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+    if "error" in auth_result:
+        raise HTTPException(status_code=401, detail=auth_result["error"])
+    return auth_result
