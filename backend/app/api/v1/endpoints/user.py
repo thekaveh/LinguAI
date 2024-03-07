@@ -8,6 +8,7 @@ from app.data_access.session import get_db
 from app.schema.user import User, UserCreate
 from app.services.user_service import UserService
 from app.schema.login_request import LoginRequest
+from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
 
 router = APIRouter()
 
@@ -90,3 +91,29 @@ def authenticate(login_request: LoginRequest, db: Session = Depends(get_db)):
     if "error" in auth_result:
         raise HTTPException(status_code=401, detail=auth_result["error"])
     return auth_result
+
+# Add routes for CRUD operations on user_assessment
+@log_decorator
+@router.post("/users/{user_id}/assessments/", response_model=UserAssessment)
+def create_user_assessment(user_id: int, assessment_data: UserAssessmentCreate, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    return user_service.create_user_assessment(user_id, assessment_data)
+
+@log_decorator
+@router.get("/users/{user_id}/assessments/{assessment_id}", response_model=UserAssessment)
+def get_user_assessment(user_id: int, assessment_id: int, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    return user_service.get_user_assessment(assessment_id)
+
+@log_decorator
+@router.put("/users/{user_id}/assessments/{assessment_id}", response_model=UserAssessment)
+def update_user_assessment(user_id: int, assessment_id: int, assessment_data: UserAssessmentCreate, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    return user_service.update_user_assessment(assessment_id, assessment_data)
+
+@log_decorator
+@router.delete("/users/{user_id}/assessments/{assessment_id}")
+def delete_user_assessment(user_id: int, assessment_id: int, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    user_service.delete_user_assessment(assessment_id)
+    return {"message": "User assessment deleted successfully"}

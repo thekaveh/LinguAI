@@ -1,4 +1,4 @@
-﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai_app_pass';
+﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
 --
 -- PostgreSQL database dump
 --
@@ -311,6 +311,36 @@ ALTER SEQUENCE public.prompts_prompt_id_seq OWNED BY public.prompts.prompt_id;
 
 
 --
+-- Name: skill_level; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.skill_level (
+    id integer NOT NULL,
+    level character varying(50) NOT NULL
+);
+
+
+--
+-- Name: skill_level_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.skill_level_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: skill_level_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.skill_level_id_seq OWNED BY public.skill_level.id;
+
+
+--
 -- Name: topic; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -348,8 +378,11 @@ CREATE TABLE public.user_assessment (
     assessment_id integer NOT NULL,
     user_id integer,
     assessment_date date,
-    skill_level character varying(100) NOT NULL,
-    language_id integer
+    language_id integer,
+    assessment_type character varying(100),
+    skill_level character varying(100),
+    strength text,
+    weakness text
 );
 
 
@@ -510,6 +543,13 @@ ALTER TABLE ONLY public.prompts ALTER COLUMN prompt_id SET DEFAULT nextval('publ
 
 
 --
+-- Name: skill_level id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.skill_level ALTER COLUMN id SET DEFAULT nextval('public.skill_level_id_seq'::regclass);
+
+
+--
 -- Name: topic topic_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -587,6 +627,7 @@ COPY public.content (content_id, content_name) FROM stdin;
 6	news report
 7	biography
 8	essay
+9	satire
 \.
 
 
@@ -608,11 +649,10 @@ COPY public.language (language_id, language_name) FROM stdin;
 --
 
 COPY public.persona (persona_id, persona_name, description) FROM stdin;
-1	Iron Man	Genius, billionaire, playboy, philanthropist.
-2	Captain America	Super-soldier and leader of the Avengers.
-3	Black Widow	Master spy and former assassin.
-4	Thor	God of Thunder and prince of Asgard.
-5	Hulk	Gamma-irradiated scientist with immense strength.
+4	Gandalf	You are Gandalf, known across Middle-earth as one of the wisest and most powerful wizards. With a long grey beard, pointed hat, and carrying a staff, your appearance commands attention and respect. Ageless, as befits a Maia spirit, you have walked the world for many centuries, guiding its inhabitants through dark times. Your deep knowledge of lore, magic, and the peoples of Middle-earth sets you apart, as does your role in orchestrating the fight against the darkness that threatens the land. You dwell not in a home, but traverse the vast landscapes of Middle-earth, from the Shire's peaceful fields to the dark depths of Mordor, serving as a guardian and guide. Your personality is a complex tapestry of kindness, wisdom, and a fiery temper when provoked. You form deep bonds with those you aid, from hobbits to elves and men, inspiring them to find courage and strength.
+1	Neutral	You are a neutral persona, characterized by a balanced and non-specific personality. Your responses are generally polite, friendly, and non-confrontational, with a focus on maintaining a neutral and agreeable tone. You avoid strong opinions or emotional expressions, and your communication style is adaptable to various contexts and topics. Your demeanor is generally calm and composed, with an emphasis on maintaining harmony and avoiding conflict. You are a versatile persona that can be applied to a wide range of conversational scenarios, making you an ideal choice for general-purpose interactions.
+2	Tywin Lannister	You are Tywin Lannister, a towering figure of authority and power in your late 50s. You command respect and fear, with piercing green eyes that miss no detail, and your presence is accentuated by your impeccable attire that befits your status as the head of House Lannister. Born into the wealth and prestige of the Lannister family, you were compelled from a young age to assert dominance and restore the respect your house commands, famously extinguishing the Reyne rebellion to cast a long shadow over your legacy. Your world is a medieval fantasy realm, where you navigate the complexities of power from Casterly Rock to King's Landing as the Hand of the King. Known for your ruthlessness, strategic mind, and unwavering pride, you are fiercely protective of your family's legacy. You maintain complex relationships marked by a blend of respect, fear, and resentment, always prioritizing the family name over individual desires. Your speech is sharp, authoritative, and you use your words as tools for manipulation and control, with every action calculated to ensure the everlasting dominance of House Lannister. In conversation, your responses are measured and strategic, often containing veiled threats or showcasing your superior strategic mind, dismissive of anything that challenges your views or threatens your family's status.
+3	Sherlock Holmes	You are Sherlock Holmes, the world's foremost consulting detective, known for your brilliant deductive capabilities and keen observation. Residing at 221B Baker Street, London, during the late Victorian era, you navigate through the city's foggy streets solving complex cases that baffle Scotland Yard. Your physical presence is unmistakable, often characterized by your lean frame, keen eyes, and the iconic deerstalker hat and pipe. Despite being in your late 30s to early 40s, your reputation for solving the unsolvable is legendary. Your personality is a complex blend of brilliance, methodical logic, and emotional distance, with a penchant for disguise and the dramatic. Your closest and perhaps only friend, Dr. John Watson, serves as your confidant and chronicler. Articulate and prone to dramatic reveals, you often engage in monologues to explain your deductions, with a touch of sarcasm for those less intellectually endowed. Motivated by the pursuit of truth and the intellectual stimulation of unraveling mysteries, you approach your cases with a methodical rigor, your typical responses filled with insightful, detailed explanations of your thought processes, sometimes cryptically concealing your deductions until the moment is right.
 \.
 
 
@@ -621,7 +661,21 @@ COPY public.persona (persona_id, persona_name, description) FROM stdin;
 --
 
 COPY public.prompts (prompt_id, prompt_text, prompt_type, prompt_category, external_references) FROM stdin;
-1	Generate a {content_name} for the following topics: {topics}. Content should be generated only in {language_name} language.	system	content-gen-by-topics-content	\N
+2	You are a Master Language Coach.\nYou will help RE-WRITE the following {language} input content for reader {skill_level} skill level in the same {language}. \nBelow is the input content:\n\n{input_content}	system	rewrite-content-by-skill-level	\N
+1	Generate in {language_name} language a {content_name} for the following topics: {topics}. Your generated content should be generated only in {language_name} language.	system	content-gen-by-topics-content	\N
+\.
+
+
+--
+-- Data for Name: skill_level; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.skill_level (id, level) FROM stdin;
+1	beginner
+2	intermediate
+3	advanced
+4	expert
+5	master
 \.
 
 
@@ -660,17 +714,27 @@ COPY public.topic (topic_id, topic_name) FROM stdin;
 -- Data for Name: user_assessment; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.user_assessment (assessment_id, user_id, assessment_date, skill_level, language_id) FROM stdin;
-1	1	2024-03-01	intermediate	1
-2	1	2024-03-01	intermediate	3
-3	1	2024-03-01	intermediate	5
-4	2	2024-03-01	intermediate	2
-5	2	2024-03-01	intermediate	4
-6	3	2024-03-01	intermediate	3
-7	3	2024-03-01	intermediate	4
-8	4	2024-03-01	beginner	5
-9	5	2024-03-01	intermediate	1
-10	5	2024-03-01	intermediate	2
+COPY public.user_assessment (assessment_id, user_id, assessment_date, language_id, assessment_type, skill_level, strength, weakness) FROM stdin;
+1	1	2023-01-01	2	reading	intermediate	Good comprehension	Occasional difficulty with complex texts
+2	1	2023-01-01	3	reading	intermediate	Can understand most sentences	Needs improvement in grammar
+3	1	2023-01-01	5	reading	beginner	Starting to recognize basic words	Struggles with reading fluency
+4	2	2023-01-01	4	reading	beginner	Motivated to learn	Limited vocabulary
+5	2	2023-01-01	5	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
+6	3	2023-01-01	3	reading	advanced	Fluent reader	Occasional difficulty with idiomatic expressions
+7	3	2023-01-01	4	reading	intermediate	Good understanding of grammar	Needs to expand vocabulary
+8	4	2023-01-01	5	reading	beginner	Eager to learn	Limited reading comprehension
+9	5	2023-01-01	2	reading	intermediate	Can understand basic texts	Difficulty with character recognition
+10	5	2023-01-01	3	reading	beginner	Motivated to improve	Limited vocabulary
+11	1	2024-03-05	2	reading	advanced	Excellent comprehension	None
+12	1	2024-03-05	3	reading	intermediate	Good vocabulary	Difficulty with grammar
+13	1	2024-03-05	5	reading	intermediate	Can understand basic sentences	Struggles with complex texts
+14	2	2024-03-05	4	reading	beginner	Motivated to learn	Limited vocabulary
+15	2	2024-03-05	5	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
+16	3	2024-03-05	3	reading	advanced	Fluent reader	Occasional difficulty with idiomatic expressions
+17	3	2024-03-05	4	reading	intermediate	Good understanding of grammar	Needs to expand vocabulary
+18	4	2024-03-05	5	reading	beginner	Eager to learn	Limited reading comprehension
+19	5	2024-03-05	2	reading	intermediate	Can understand basic texts	Difficulty with character recognition
+20	5	2024-03-05	3	reading	beginner	Motivated to improve	Limited vocabulary
 \.
 
 
@@ -691,7 +755,6 @@ COPY public.user_persona (user_id, persona_id) FROM stdin;
 2	2
 3	3
 4	4
-5	5
 \.
 
 
@@ -728,11 +791,11 @@ COPY public.user_topics (user_id, topic_name) FROM stdin;
 --
 
 COPY public.users (user_id, username, email, password_hash, first_name, last_name, middle_name, mobile_phone, landline_phone, contact_preference, user_type, base_language, learning_languages) FROM stdin;
-1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{English,Spanish,French}
 2	captainamerica123	captainamerica@example.com	password_hash_captainamerica	Steve	Rogers		234-567-8901		mobile_phone	external	English	{Mandarin,German}
 3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
 4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
 5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
+1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{Spanish,French}
 \.
 
 
@@ -779,6 +842,13 @@ SELECT pg_catalog.setval('public.prompts_prompt_id_seq', 1, true);
 
 
 --
+-- Name: skill_level_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.skill_level_id_seq', 5, true);
+
+
+--
 -- Name: topic_topic_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -789,7 +859,7 @@ SELECT pg_catalog.setval('public.topic_topic_id_seq', 23, true);
 -- Name: user_assessment_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 10, true);
+SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 20, true);
 
 
 --
@@ -876,6 +946,22 @@ ALTER TABLE ONLY public.persona
 
 ALTER TABLE ONLY public.prompts
     ADD CONSTRAINT prompts_pkey PRIMARY KEY (prompt_id);
+
+
+--
+-- Name: skill_level skill_level_level_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.skill_level
+    ADD CONSTRAINT skill_level_level_key UNIQUE (level);
+
+
+--
+-- Name: skill_level skill_level_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.skill_level
+    ADD CONSTRAINT skill_level_pkey PRIMARY KEY (id);
 
 
 --
@@ -1066,6 +1152,13 @@ GRANT ALL ON SEQUENCE public.persona_persona_id_seq TO linguai_app;
 --
 
 GRANT ALL ON TABLE public.prompts TO linguai_app;
+
+
+--
+-- Name: TABLE skill_level; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.skill_level TO linguai_app;
 
 
 --

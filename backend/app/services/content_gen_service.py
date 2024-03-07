@@ -19,10 +19,10 @@ class ContentGenService:
         self.prompt_service = PromptService(db)
 
     @log_decorator
-    async def generate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
+    async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
         assert request is not None, "Request is required"
 
-        prompt_text = self.generate_prompt(request)
+        prompt_text = self._generate_prompt(request)
 
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
@@ -36,11 +36,10 @@ class ContentGenService:
         parser = StrOutputParser()
         chain = prompt | chat_runnable | parser
 
-        async for generated_content in chain.astream(input={}):
-            yield generated_content
+        return chain.astream(input={})
 
     @log_decorator
-    def generate_prompt(self, request: ContentGenReq) -> str:
+    def _generate_prompt(self, request: ContentGenReq) -> str:
         # Define the search criteria
         search_criteria = PromptSearch(
             prompt_type="system", prompt_category="content-gen-by-topics-content"

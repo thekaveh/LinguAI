@@ -51,9 +51,10 @@ def fetch_content_types():
 
 @log_decorator
 def render_content_types(content_types):
-    st.write("#### Select Content Type")
     options = [content_type.content_name for content_type in content_types]
-    selected_option = st.radio("", options, format_func=lambda x: x, horizontal=True)
+    selected_option = st.radio(
+        "##### Select Content Type", options, format_func=lambda x: x, horizontal=True
+    )
     global selected_content_type
     selected_content_type = next(
         (ct for ct in content_types if ct.content_name == selected_option), None
@@ -88,15 +89,16 @@ def get_user_topics(user: User) -> List[UserTopicBase]:
 
 @log_decorator
 def render_topic_combo_options(combo_options):
-    st.write("#### Topic Options")
+    st.write("##### Topic Options")
     selected_options = []
 
     # Determine the number of options per row
-    options_per_row = 4  # Adjust this number based on your UI/UX needs
+    options_per_row = 3  # Adjust this number based on your UI/UX needs
 
     # Calculate the number of rows needed
     num_rows = (len(combo_options) + options_per_row - 1) // options_per_row
 
+    default_selection = True  # Track default selection
     for row in range(num_rows):
         # For each row, create a new set of columns
         cols = st.columns(options_per_row)
@@ -106,8 +108,17 @@ def render_topic_combo_options(combo_options):
             if option_index < len(combo_options):  # Check to avoid index out of range
                 option = combo_options[option_index]
                 with cols[i]:
-                    if st.checkbox(option, key=f"topic_option_{option_index}"):
+                    # Use value parameter to set default selection
+                    selected = st.checkbox(
+                        option,
+                        value=default_selection,
+                        key=f"topic_option_{option_index}",
+                    )
+                    if selected:
                         selected_options.append(option)
+                    default_selection = (
+                        False  # Set default selection to False after first checkbox
+                    )
     return selected_options
 
 
@@ -136,44 +147,90 @@ def build_content_gen_request(
 
 
 @log_decorator
-def stream_content(content_gen_req):
-    # Placeholder for accumulated content
-    if "content_stream" not in st.session_state:
-        st.session_state["content_stream"] = ""
+def _add_welcome(user):
+    welcome_ = f"""
+    ### Hi, {user.first_name} {user.middle_name} {user.last_name}!
+    
+    We're delighted to have you here. You're on the path to expanding your knowledge and skills. 
+    Let's make today's learning session productive and engaging.
+    """
+    st.markdown(welcome_, unsafe_allow_html=True)
 
-    # Define callback functions
-    def on_next(content_chunk):
-        # Append new content chunk to the existing content
-        st.session_state["content_stream"] += content_chunk
 
-    def on_completed():
-        # Handle completion (e.g., clear session state if needed)
-        pass
+def _add_instruction(user):
+    welcome_ = f"""
 
-    # Async call to generate content (simplified example, adjust as needed)
-    asyncio.run(
-        ContentGenService.generate_content(
-            request=content_gen_req, on_next_fn=on_next, on_completed_fn=on_completed
-        )
+    ##### Get Started:
+    
+    1. Select **Topics** of Interest
+    2. Choose the **Content Type**
+    3. Select **Language**
+      
+    
+    """
+
+    st.markdown(welcome_, unsafe_allow_html=True)
+    st.markdown(
+        f"""
+                Once you made your selection,**Click to Get Your Content**.
+                \n Ready to dive in? receive personalized content tailored to your interests and skill level. 
+                Let's embark on today's learning journey together!. 
+                               
+                """
     )
 
 
 @log_decorator
-def get_welcome_message(user):
-    return f"""
-    ## Welcome, {user.first_name} {user.middle_name} {user.last_name}!
-    
-    We're delighted to have you here. As a {Config.DEFAULT_SKILL_LEVEL} learner, you're on the path to expanding your knowledge and skills. 
-    Let's make today's learning session productive and engaging.
-    
-    **Get Started:**
-    
-    1. **Select a Topic of Interest:** Pick and choose available topics.
-    2. **Choose the Content Type:** Select the type of content.
-    3. **Get Your Content:** **"Click to Get Your Content"** button.
-    
-    Ready to dive in? receive personalized content tailored to your interests and skill level.  Let's embark on today's learning journey together!
-    """
+def _add_skill_level_by_language(user):
+
+    st.write("\n\n")
+    st.write("##### Your Current Skills")
+
+    if not user or not user.user_assessments or not user.learning_languages:
+        st.write("No user or user assessments or learning languages found")
+        return
+
+    for language in user.learning_languages:
+        # st.write(f"Language: {language}")
+
+        latest_assessment = None
+        for user_assessment in user.user_assessments:
+            if user_assessment.language.language_name == language:
+                if (
+                    latest_assessment is None
+                    or user_assessment.assessment_date
+                    > latest_assessment.assessment_date
+                ):
+                    latest_assessment = user_assessment
+
+        if latest_assessment:
+            skill_level = latest_assessment.skill_level
+            st.write(f"###### {language} : {skill_level}")
+        else:
+            None
+            # st.write("No assessment found for this language")
+
+
+def _get_language_object(user, language_name):
+    language_object = None
+    if user.user_assessments:
+        for user_assessment in user.user_assessments:
+            if user_assessment.language.language_name == language_name:
+                language_object = user_assessment.language
+                break
+    return language_object
+
+
+def _select_learning_language(user):
+
+    if user.learning_languages:
+        selected_language = st.radio(
+            "##### Select Learning Language", user.learning_languages
+        )
+        # st.write(f"You selected: {selected_language}")
+    else:
+        st.write("No learning languages specified.")
+    return _get_language_object(user, selected_language)
 
 
 @log_decorator
@@ -185,8 +242,15 @@ def render():
         st.write("No user found")
         return
 
-    # Displaying the welcome message
-    st.markdown(get_welcome_message(user), unsafe_allow_html=True)
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        _add_welcome(user)
+
+    with col2:
+        _add_skill_level_by_language(user)
+
+    st.markdown("---")
 
     user_topics = get_user_topics(user)
     if user_topics:
@@ -195,27 +259,53 @@ def render():
         # Fetch default topic combo options if the user has no topics
         topic_combo_options = fetch_topic_combo_options()
 
-    selected_topic_options = render_topic_combo_options(topic_combo_options)
+    # selected_topic_options = render_topic_combo_options(topic_combo_options)
 
     # Content type selection section
     content_types = fetch_content_types()
-    render_content_types(content_types)
+    # render_content_types(content_types)
+
+    col3, col4 = st.columns([1, 2])
+
+    # Add _add_instruction(user) to column 1
+    with col3:
+        _add_instruction(user)
+
+    # Add selected_topic_options and render_content_types to column 2
+    with col4:
+        selected_topic_options = render_topic_combo_options(topic_combo_options)
+        render_content_types(content_types)
+        selected_language = _select_learning_language(user)
+
+    st.markdown("---")
+
+    if "content_stream" not in st.session_state:
+        st.session_state["content_stream"] = ""
+
+    if st.session_state["content_stream"]:
+        st.markdown(f"""{st.session_state["content_stream"]}""", unsafe_allow_html=True)
 
     if st.button("Click to Get Your Content"):
         st.session_state["content_stream"] = ""
         content_gen_req = build_content_gen_request(
-            user, selected_topic_options, selected_content_type, get_language()
+            user, selected_topic_options, selected_content_type, selected_language
         )
-        stream_content(content_gen_req)
 
-    # Placeholder for the response from LLM
-    # st.write("#### Content")
+        content_gen_placeholder = st.empty()
 
-    # content = st.session_state.get('content_stream', '')
+        # Define callback functions
+        def _content_gen_on_next(content_chunk):
+            content_gen_placeholder.markdown(
+                f"""{content_chunk}""", unsafe_allow_html=True
+            )
 
-    placeholder = st.empty()
+        def _content_gen_on_completed(content):
+            st.session_state["content_stream"] = content
 
-    # Update content dynamically
-    content = st.session_state.get("content_stream", "")
-
-    placeholder.markdown(f"""{content}""", unsafe_allow_html=True)
+        asyncio.run(
+            ContentGenService.agenerate_content(
+                request=content_gen_req,
+                on_next_fn=_content_gen_on_next,
+                on_completed_fn=_content_gen_on_completed,
+            )
+        )

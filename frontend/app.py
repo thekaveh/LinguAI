@@ -3,7 +3,9 @@ import requests
 import streamlit_authenticator as stauth
 from core.config import Config
 from utils.logger_config import setup_global_logging
-from components import sidebar, home, settings, chat, user, content_gen, profile, interest_selection, rewrite_content
+
+from components import sidebar, home, settings, chat, user, content_gen, profile, interest_selection, rewrite_content, review_writing
+
 
 import yaml 
 from yaml.loader import SafeLoader 

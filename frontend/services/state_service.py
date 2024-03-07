@@ -13,11 +13,10 @@ class StateService:
         self._init_model()
         self._init_persona()
 
-        st.session_state["images"] = []
-        st.session_state["messages"] = []
         st.session_state["temperature"] = 0.0
         st.session_state["chat_messages"] = []
-        st.session_state["file_upload_key"] = 0
+        st.session_state["chat_messages"] = []
+        st.session_state["chat_file_upload_key"] = 0
 
     @log_decorator
     def _init_model(self):
@@ -30,7 +29,7 @@ class StateService:
 
     @log_decorator
     def _init_persona(self):
-        personas = asyncio.run(PersonaService.list())
+        personas = asyncio.run(PersonaService.get_all_names())
 
         if personas and len(personas) > 0:
             st.session_state["persona"] = personas[0]
@@ -62,11 +61,11 @@ class StateService:
         st.session_state["persona"] = value
 
     @property
-    def file_upload_key(self):
-        return st.session_state["file_upload_key"]
+    def chat_file_upload_key(self):
+        return st.session_state["chat_file_upload_key"]
 
-    def increment_file_upload_key(self):
-        st.session_state["file_upload_key"] += 1
+    def increment_chat_file_upload_key(self):
+        st.session_state["chat_file_upload_key"] += 1
 
     @property
     def chat_messages(self):

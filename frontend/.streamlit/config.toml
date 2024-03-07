@@ -1,9 +1,9 @@
 # .streamlit/config.toml
 
 [theme]
-primaryColor = "#83c9ff"  # Blue for accents
-backgroundColor = "#daefff"  # Light Blue
-secondaryBackgroundColor = "#c1e4ff"  # Slightly darker light blue shade for secondary backgrounds
+primaryColor = "#dd6e42"  # Orange for accents
+backgroundColor = "#EAEAEA"  # Light gray
+secondaryBackgroundColor = "#C0D6DF"  # Light blue shade for secondary backgrounds
 textColor = "#3d404b"  # Dark text for readability
 font = "sans serif"
 

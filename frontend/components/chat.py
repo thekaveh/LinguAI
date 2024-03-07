@@ -64,7 +64,7 @@ def render():
 
             def _achat_on_completed(new_ai_chat_message: ChatMessage):
                 state_service.append_chat_message(new_ai_chat_message)
-                state_service.increment_file_upload_key()
+                state_service.increment_chat_file_upload_key()
 
             asyncio.run(
                 ChatService.achat(
@@ -82,7 +82,7 @@ def render():
     @log_decorator
     def _file_uploader_on_change():
         if uploaded_images := st.session_state[
-            f"file_uploader_{state_service.file_upload_key}"
+            f"file_uploader_{state_service.chat_file_upload_key}"
         ]:
             if (
                 state_service.chat_messages
@@ -109,5 +109,5 @@ def render():
         disabled=(state_service.persona is None)
         or (state_service.model is None)
         or (state_service.model not in vision_models),
-        key=f"file_uploader_{state_service.file_upload_key}",
+        key=f"file_uploader_{state_service.chat_file_upload_key}",
     )

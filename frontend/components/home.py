@@ -29,9 +29,9 @@ def render():
     if "authenticated" not in st.session_state:
         st.session_state["authenticated"] = False
 
-    # st.image("./static/logo.png", width=100)
+    st.image("./static/logo.png", width=100)
     st.subheader("Personalized language learning for intermediate learners")
-    # st.image("./static/different-languages.jpeg", width=704)
+    st.image("./static/different-languages.jpeg", width=704)
     st.write("")
 
 
@@ -72,14 +72,14 @@ def render():
     col1, col2 = st.columns([2, 1])
 
 
-    # with col1:
-    #     if not st.session_state["authenticated"]:
-    #         st.image("./static/language.jpg")
+    with col1:
+        if not st.session_state["authenticated"]:
+            st.image("./static/language.jpg")
 
 
-    # with col2:
-    #     if not st.session_state["authenticated"]:
-    #         st.write("_LinguAI provides customized language learning for learners who are looking to take the next step to improve their comprehension after learning the basics. Sign up today to continue your learning and try out our personalized features!_")
+    with col2:
+        if not st.session_state["authenticated"]:
+            st.write("_LinguAI provides customized language learning for learners who are looking to take the next step to improve their comprehension after learning the basics. Sign up today to continue your learning and try out our personalized features!_")
 
 
     st.markdown("---")

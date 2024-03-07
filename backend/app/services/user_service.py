@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.schema.user import User, UserCreate
-from app.data_access.models.user import User as DBUser, UserTopic
+from app.data_access.models.user import User as DBUser, UserAssessment, UserTopic
 from app.data_access.repositories.user_repository import UserRepository
+from app.schema.user_assessment import UserAssessmentCreate
 
 
 class UserService:
@@ -107,3 +108,29 @@ class UserService:
             "auth_status": True,
             "username": db_user.username
         }
+    def create_user_assessment(self, user_id: int, assessment_data: UserAssessmentCreate) -> UserAssessment:
+        db_assessment = UserAssessment(**assessment_data.dict(), user_id=user_id)
+        self.db.add(db_assessment)
+        self.db.commit()
+        self.db.refresh(db_assessment)
+        return db_assessment
+
+    def get_user_assessment(self, assessment_id: int) -> Optional[UserAssessment]:
+        return self.db.query(UserAssessment).filter(UserAssessment.assessment_id == assessment_id).first()
+
+    def update_user_assessment(self, assessment_id: int, assessment_data: UserAssessmentCreate) -> Optional[UserAssessment]:
+        db_assessment = self.get_user_assessment(assessment_id)
+        if db_assessment:
+            for key, value in assessment_data.dict().items():
+                setattr(db_assessment, key, value)
+            self.db.commit()
+            self.db.refresh(db_assessment)
+            return db_assessment
+        else:
+            return None
+
+    def delete_user_assessment(self, assessment_id: int) -> None:
+        db_assessment = self.get_user_assessment(assessment_id)
+        if db_assessment:
+            self.db.delete(db_assessment)
+            self.db.commit()    
