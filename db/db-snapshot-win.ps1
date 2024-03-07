@@ -1,5 +1,5 @@
 # Generate the dump
-docker exec -i db pg_dump -U linguai_db_user -d linguai_db --no-owner > ./snapshot\linguai_db_ss.sql
+docker exec -i db pg_dump -U admin -d linguai_db --no-owner > ./snapshot\linguai_db_ss.sql
 
 # Wait a moment to ensure the file write completes
 Start-Sleep -Seconds 5
