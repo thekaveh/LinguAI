@@ -13,7 +13,6 @@ class StateService:
         self._init_model()
         self._init_persona()
 
-        st.session_state["images"] = []
         st.session_state["temperature"] = 0.0
         st.session_state["chat_messages"] = []
         st.session_state["chat_messages"] = []
@@ -30,7 +29,7 @@ class StateService:
 
     @log_decorator
     def _init_persona(self):
-        personas = asyncio.run(PersonaService.list())
+        personas = asyncio.run(PersonaService.get_all_names())
 
         if personas and len(personas) > 0:
             st.session_state["persona"] = personas[0]
