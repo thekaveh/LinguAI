@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class PersonaBase(BaseModel):
     persona_name: str
     description: str
+    is_default: bool
 
 
 class PersonaCreate(PersonaBase):
