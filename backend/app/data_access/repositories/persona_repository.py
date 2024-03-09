@@ -34,6 +34,7 @@ class PersonaRepository:
         new_persona = Persona(
             persona_name=create.persona_name,
             description=create.description,
+            is_default=create.is_default,
         )
 
         self.db_session.add(new_persona)

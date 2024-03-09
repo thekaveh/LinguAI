@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class PersonaBase(BaseModel):
     persona_name: str
     description: str
+    is_default: bool
 
 
 class PersonaCreate(PersonaBase):
@@ -21,5 +22,5 @@ class Persona(PersonaBase):
         orm_mode = True
 
 
-class PersonaSearch(PersonaBase):
-    pass
+class PersonaSearch(BaseModel):
+    persona_name: str

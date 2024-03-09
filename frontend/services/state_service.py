@@ -29,10 +29,12 @@ class StateService:
 
     @log_decorator
     def _init_persona(self):
-        personas = asyncio.run(PersonaService.get_all_names())
+        personas = asyncio.run(PersonaService.get_all())
 
-        if personas and len(personas) > 0:
-            st.session_state["persona"] = personas[0]
+        if personas:
+            st.session_state["persona"] = next(
+                (p.persona_name for p in personas if p.is_default), personas[0]
+            )
         else:
             st.session_state["persona"] = None
 
