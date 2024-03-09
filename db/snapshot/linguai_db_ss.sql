@@ -1,4 +1,4 @@
-﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
+CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
 --
 -- PostgreSQL database dump
 --
@@ -795,7 +795,7 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
 4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
 5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
-1	ironman123	ironman@example.com	password_hash_ironman	Tony	Stark		123-456-7890		email	external	English	{Spanish,French}
+1	kaveh	razavi@vt.edu	linguai	Kaveh	Razavi		123-456-7890		email	admin	English	{German}
 \.
 
 
