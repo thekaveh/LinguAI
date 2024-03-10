@@ -19,11 +19,8 @@ class Config:
         f"{BACKEND_ENDPOINT}/v1/llm/list_vision_models"
     )
 
-    ADDRESS_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/addresses/list"
-
     CHAT_SERVICE_ENDPOINT 			= f"{BACKEND_ENDPOINT}/v1/chat"
     PERSONA_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/personas/"
- 
 
     
     CONTENT_SERVICE_LIST_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/contents/list"
@@ -47,3 +44,4 @@ class Config:
     USER_SERVICE_LIST_ENDPOINT 		= f"{BACKEND_ENDPOINT}/v1/users/list"
     USER_SERVICE_USERNAME_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/users/username/"   
     
+    TEXT_TO_SPEECH_SERVICE_ENDPOINT 	= f"{BACKEND_ENDPOINT}/v1/text_to_speech"

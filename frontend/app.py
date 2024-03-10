@@ -23,9 +23,9 @@ def main():
             "Rewrite Content": {"icon": "pen", "page": rewrite_content},
             "Chat": {"icon": "chat", "page": chat},
             "Account": {"icon": "person-circle", "page": profile},
-            "Settings": {"icon": "gear", "page": settings},
             "User": {"icon": "person-gear", "page": user},
             "Content": {"icon": "body-text", "page": content_gen},
+            "Settings": {"icon": "gear", "page": settings},
         }
 
     sidebar.show(components_info).render()

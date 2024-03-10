@@ -30,6 +30,33 @@ class HttpUtils:
 
     @log_decorator
     @staticmethod
+    async def apost(
+        url: str,
+        request: BaseModel,
+        response_model: Type[T],
+        timeout: Optional[Timeout] = None,
+    ) -> T:
+        if timeout is None:
+            timeout = Timeout(100.0, connect=40.0, read=60.0)
+
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                response = await client.post(url=url, content=request.model_dump_json())
+                response.raise_for_status()
+
+                try:
+                    return parse_obj_as(response_model, response.json())
+                except ValidationError as e:
+                    raise ValueError(
+                        f"Error casting response to model {response_model}: {e}"
+                    ) from e
+        except (HTTPStatusError, RequestError) as e:
+            raise Exception(f"HTTP error occurred: {e}") from e
+        except Exception as e:
+            raise Exception(f"An unexpected error occurred: {e}") from e
+
+    @log_decorator
+    @staticmethod
     async def get(
         url: str,
         response_model: Type[T],
