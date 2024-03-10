@@ -20,8 +20,6 @@ def render():
     st.write(f"Persona: {state_service.persona} - Model: {state_service.model}")
 
     def _render_chat_messages():
-        state_service = StateService.instance()
-
         messages = state_service.chat_messages
         n = len(messages)
 
@@ -48,7 +46,7 @@ def render():
             new_user_chat_message.set_text(prompt)
         else:
             new_user_chat_message = ChatMessage(sender="user", text=prompt)
-            state_service.append_chat_message(chat_message=new_user_chat_message)
+            state_service.chat_append_message(chat_message=new_user_chat_message)
 
         with st.chat_message(new_user_chat_message.sender):
             st.markdown(new_user_chat_message.text)
@@ -64,8 +62,8 @@ def render():
                 response_message_placeholder.markdown(chunk)
 
             async def _achat_on_completed(new_ai_chat_message: ChatMessage):
-                state_service.append_chat_message(new_ai_chat_message)
-                state_service.increment_chat_file_upload_key()
+                state_service.chat_append_message(new_ai_chat_message)
+                state_service.chat_increment_file_upload_key()
                 
                 audio_data = await TextToSpeechService.agenerate(
 						lang="en",
@@ -97,7 +95,7 @@ def render():
                 new_user_chat_message = state_service.chat_messages[-1]
             else:
                 new_user_chat_message = ChatMessage(sender="user")
-                state_service.append_chat_message(chat_message=new_user_chat_message)
+                state_service.chat_append_message(chat_message=new_user_chat_message)
 
             for uploaded_image in uploaded_images:
                 if uploaded_image_to_base64_image_url := ImageUtils.uploaded_image_to_base64_image_url(
@@ -117,3 +115,8 @@ def render():
         or (state_service.model not in vision_models),
         key=f"file_uploader_{state_service.chat_file_upload_key}",
     )
+    
+    if st.sidebar.button(label="Clear Chat", use_container_width=True):
+        state_service.chat_clear_messages()
+        st.experimental_rerun()
+        
