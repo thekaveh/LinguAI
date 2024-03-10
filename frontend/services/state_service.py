@@ -66,15 +66,18 @@ class StateService:
     def chat_file_upload_key(self):
         return st.session_state["chat_file_upload_key"]
 
-    def increment_chat_file_upload_key(self):
+    def chat_increment_file_upload_key(self):
         st.session_state["chat_file_upload_key"] += 1
 
     @property
     def chat_messages(self):
         return st.session_state["chat_messages"]
 
-    def append_chat_message(self, chat_message: ChatMessage) -> None:
+    def chat_append_message(self, chat_message: ChatMessage) -> None:
         st.session_state["chat_messages"].append(chat_message)
+        
+    def chat_clear_messages(self):
+        st.session_state["chat_messages"] = []
 
     @log_decorator
     @staticmethod
