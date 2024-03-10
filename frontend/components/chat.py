@@ -7,6 +7,7 @@ from utils.image_utils import ImageUtils
 from services.llm_service import LLMService
 from services.chat_service import ChatService
 from services.state_service import StateService
+from services.text_to_speech_service import TextToSpeechService
 
 
 @log_decorator
@@ -59,23 +60,28 @@ def render():
         with st.chat_message("ai"):
             response_message_placeholder = st.empty()
 
-            def _achat_on_next(chunk: str):
+            async def _achat_on_changed(chunk: str):
                 response_message_placeholder.markdown(chunk)
 
-            def _achat_on_completed(new_ai_chat_message: ChatMessage):
+            async def _achat_on_completed(new_ai_chat_message: ChatMessage):
                 state_service.append_chat_message(new_ai_chat_message)
                 state_service.increment_chat_file_upload_key()
+                
+                audio_data = await TextToSpeechService.agenerate(
+						lang="en",
+						text=new_ai_chat_message.text,
+					)         
+                audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                st.markdown(audio_html, unsafe_allow_html=True)
 
             asyncio.run(
                 ChatService.achat(
                     model=state_service.model,
                     persona=state_service.persona,
+                    on_changed_fn=_achat_on_changed,
+                    on_completed_fn=_achat_on_completed,
                     messages=state_service.chat_messages,
                     temperature=state_service.temperature,
-                    on_next_fn=lambda chunk: _achat_on_next(chunk),
-                    on_completed_fn=lambda chat_message: _achat_on_completed(
-                        chat_message
-                    ),
                 )
             )
 

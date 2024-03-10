@@ -1,4 +1,4 @@
-from typing import List, Callable
+from typing import List, Callable, Awaitable
 
 from core.config import Config
 from utils.logger import log_decorator
@@ -12,14 +12,14 @@ class ChatService:
     async def achat(
         model: str,
         messages: List[ChatMessage],
-        on_next_fn: Callable[[str], None],
-        on_completed_fn: Callable[[ChatMessage], None],
+        on_changed_fn: Callable[[str], Awaitable[None]],
+        on_completed_fn: Callable[[ChatMessage], Awaitable[None]],
         indicator: str = "▌",
         temperature: float = 0,
         persona: str = "neutral",
     ) -> None:
         message_text = ""
-        on_next_fn(indicator)
+        await on_changed_fn(indicator)
 
         async for message_text_chunk in HttpUtils.apost_stream(
             url=Config.CHAT_SERVICE_ENDPOINT,
@@ -31,7 +31,7 @@ class ChatService:
             ),
         ):
             message_text += message_text_chunk
-            on_next_fn(message_text + indicator)
+            await on_changed_fn(message_text + indicator)
 
-        on_next_fn(message_text)
-        on_completed_fn(ChatMessage(sender="ai", text=message_text, images=None))
+        await on_changed_fn(message_text)
+        await on_completed_fn(ChatMessage(sender="ai", text=message_text, images=None))

@@ -13,6 +13,7 @@ from app.api.v1.endpoints import (
     skill_level,
     language,
     review_writing,
+    text_to_speech,
 )
 
 router = APIRouter()
@@ -29,3 +30,4 @@ router.include_router(rewrite_content.router, prefix="/v1", tags=["v1"])
 router.include_router(skill_level.router, prefix="/v1", tags=["v1"])
 router.include_router(language.router, prefix="/v1", tags=["v1"])
 router.include_router(review_writing.router, prefix="/v1", tags=["v1"])
+router.include_router(text_to_speech.router, prefix="/v1", tags=["v1"])
