@@ -2,6 +2,7 @@ import streamlit as st
 from core.config import Config
 from utils.logger_config import setup_global_logging
 
+from services.state_service import StateService
 from components import sidebar, home, settings, chat, user, content_gen, profile, interest_selection, rewrite_content, review_writing
 
 # Setup global logging with a specific logger name
@@ -11,12 +12,14 @@ setup_global_logging(
     log_level=Config.FRONTEND_LOG_LEVEL,
 )
 
-def main():    
+def main():
+    state_service = StateService.instance()
+
     components_info = {
          "Home": {"icon": "house", "page": home},
     }
     
-    if st.session_state.get("authenticated", False):
+    if state_service.username is not None:
         components_info = {
             "Home": {"icon": "house", "page": home},
             "Interest Selection": {"icon": "palette", "page": interest_selection},

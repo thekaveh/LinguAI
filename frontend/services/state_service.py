@@ -12,11 +12,13 @@ class StateService:
     def __init__(self):
         self._init_model()
         self._init_persona()
-
         st.session_state["temperature"] = 0.0
+
         st.session_state["chat_messages"] = []
         st.session_state["chat_messages"] = []
         st.session_state["chat_file_upload_key"] = 0
+        
+        st.session_state["username"] = None
 
     @log_decorator
     def _init_model(self):
@@ -37,6 +39,14 @@ class StateService:
             )
         else:
             st.session_state["persona"] = None
+    
+    @property
+    def username(self):
+        return st.session_state.get("username", None)
+    
+    @username.setter
+    def username(self, value):
+        st.session_state["username"] = value
 
     @property
     def model(self):

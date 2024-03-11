@@ -1,35 +1,20 @@
 import asyncio
 import streamlit as st
 from typing import List
+from concurrent.futures import ThreadPoolExecutor
 
 from core.config import Config
-from schema.language import Language
 from utils.logger import log_decorator
+
+from schema.language import Language
 from schema.user import User, UserTopicBase
 from schema.content_gen import ContentGenReq
+
 from services.user_service import UserService
 from services.topic_service import TopicService
-from concurrent.futures import ThreadPoolExecutor
+from services.state_service import StateService
 from services.content_service import ContentService
 from services.content_gen_service import ContentGenService
-
-
-@log_decorator
-def fetch_user_by_username_sync(username):
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(UserService.get_user_by_username(username))
-    loop.close()
-    return result
-
-
-@log_decorator
-def get_user():
-    # TODO: Add in logged in user details here
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(fetch_user_by_username_sync, Config.DEFAULT_USER_NAME)
-        return future.result()
 
 
 @log_decorator
@@ -235,9 +220,13 @@ def _select_learning_language(user):
 
 @log_decorator
 def render():
+    state_service = StateService.instance()
+    
     st.title("Content For You")
 
-    user = get_user()
+    username = state_service.username
+    user = UserService.get_user_by_username_sync(username)
+
     if user is None:
         st.write("No user found")
         return

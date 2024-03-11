@@ -1,42 +1,26 @@
 import asyncio
+import streamlit as st
+from typing import List
+from datetime import date
+from datetime import datetime
+from langdetect import detect
+from typing import Optional, List
 from concurrent.futures import ThreadPoolExecutor
 
-from datetime import datetime
-import streamlit as st
-from langdetect import detect
-from typing import List
-from typing import Optional, List
-from datetime import date
-
 from core.config import Config
-from schema.language import Language
 from utils.logger import log_decorator
+
 from schema.user import User
-from services.user_service import UserService
+from schema.language import Language
 from schema.review_writing import ReviewWritingReq
 from schema.user_assessment import UserAssessmentBase
 
-from services.skill_level_service import SkillLevelService
+from services.user_service import UserService
+from services.state_service import StateService
 from services.language_service import LanguageService
+from services.skill_level_service import SkillLevelService
 from services.review_writiting import ReviewWritingService
 
-
-@log_decorator
-def _fetch_user_by_username_sync(username):
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(UserService.get_user_by_username(username))
-    loop.close()
-    return result
-
-
-@log_decorator
-def _get_user():
-    # TODO: Add in logged in user details here
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_fetch_user_by_username_sync, Config.DEFAULT_USER_NAME)
-        return future.result()
 
 @log_decorator
 def _add_welcome(user):
@@ -216,6 +200,8 @@ def _find_last_user_assessment(user: User, language: str) -> Optional[UserAssess
 
 @log_decorator
 def render():
+    state_service = StateService.instance()
+    
     st.title("LinguAI")
 
     st.write("")
@@ -224,7 +210,8 @@ def render():
 
     st.write("")
     
-    user = _get_user()
+    username = state_service.username
+    user = UserService.get_user_by_username_sync(username)
     
     if user is None:
         st.write("No user found")

@@ -4,9 +4,11 @@ from sqlalchemy.orm import Session
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.schema.user import User, UserCreate
-from app.data_access.models.user import User as DBUser, UserAssessment, UserTopic
+from app.schema.user_topic import UserTopicBase
 from app.data_access.repositories.user_repository import UserRepository
-from app.schema.user_assessment import UserAssessmentCreate
+from app.schema.user_assessment import UserAssessmentCreate, UserAssessmentBase
+from app.data_access.models.user import User as DBUser, UserAssessment, UserTopic
+from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
 
 class UserService:
@@ -97,18 +99,23 @@ class UserService:
         return []
 
     @log_decorator
-    def authenticate_user(self, username: str, password: str) -> Optional[dict]:
-        db_user = self.user_repo.find_by_username(username)
+    def authenticate(self, request: AuthenticationRequest) -> AuthenticationResponse:
+        db_user = self.user_repo.find_by_username(request.username)
+
         if not db_user:
-            return {"error": "No matching user found, please register"}
-        if db_user.password_hash != password:
-            return {"error": "Incorrect username or password."} 
-        return {
-            "name": f"{db_user.first_name} {db_user.last_name}",
-            "auth_status": True,
-            "username": db_user.username
-        }
-    def create_user_assessment(self, user_id: int, assessment_data: UserAssessmentCreate) -> UserAssessment:
+            return AuthenticationResponse.failure(
+                message="No matching user found, please register"
+            )
+        if db_user.password_hash != request.password:
+            return AuthenticationResponse.failure(
+                message="Incorrect username or password."
+            )
+
+        return AuthenticationResponse.success(username=request.username)
+
+    def create_user_assessment(
+        self, user_id: int, assessment_data: UserAssessmentCreate
+    ) -> UserAssessment:
         db_assessment = UserAssessment(**assessment_data.dict(), user_id=user_id)
         self.db.add(db_assessment)
         self.db.commit()
@@ -116,9 +123,15 @@ class UserService:
         return db_assessment
 
     def get_user_assessment(self, assessment_id: int) -> Optional[UserAssessment]:
-        return self.db.query(UserAssessment).filter(UserAssessment.assessment_id == assessment_id).first()
+        return (
+            self.db.query(UserAssessment)
+            .filter(UserAssessment.assessment_id == assessment_id)
+            .first()
+        )
 
-    def update_user_assessment(self, assessment_id: int, assessment_data: UserAssessmentCreate) -> Optional[UserAssessment]:
+    def update_user_assessment(
+        self, assessment_id: int, assessment_data: UserAssessmentCreate
+    ) -> Optional[UserAssessment]:
         db_assessment = self.get_user_assessment(assessment_id)
         if db_assessment:
             for key, value in assessment_data.dict().items():
@@ -133,4 +146,4 @@ class UserService:
         db_assessment = self.get_user_assessment(assessment_id)
         if db_assessment:
             self.db.delete(db_assessment)
-            self.db.commit()    
+            self.db.commit()
