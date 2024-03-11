@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from app.schema.language import Language
+
 
 class ContentRewriteReq(BaseModel):
     user_id: int

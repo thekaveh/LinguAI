@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from schema.user_assessment import UserAssessmentBase
+from .user_assessment import UserAssessmentBase
 
 
 class ReviewWritingReq(BaseModel):
