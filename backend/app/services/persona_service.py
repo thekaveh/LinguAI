@@ -13,16 +13,20 @@ class PersonaService:
 
     @log_decorator
     def create(self, create: PersonaCreate) -> Persona:
-        return self.persona_repository.create(create).to_schema()
+        persona_orm = self.persona_repository.create(create)
+        
+        return Persona.model_validate(persona_orm)
 
     @log_decorator
     def update(self, id: int, update: PersonaUpdate) -> Optional[Persona]:
-        current = self.persona_repository.get_by_id(id)
+        current_persona_orm = self.persona_repository.get_by_id(id)
 
-        if current is None:
+        if current_persona_orm is None:
             return None
 
-        return self.persona_repository.update(current, update).to_schema()
+        updated_persona_orm = self.persona_repository.update(current_persona_orm, update)
+        
+        return Persona.model_validate(updated_persona_orm)
 
     @log_decorator
     def delete(self, id: int) -> None:
@@ -30,16 +34,16 @@ class PersonaService:
 
     @log_decorator
     def get_by_id(self, id: int) -> Optional[Persona]:
-        ret = self.persona_repository.get_by_id(id)
-
-        return ret.to_schema() if ret else None
+        persona_orm = self.persona_repository.get_by_id(id)
+        
+        return Persona.model_validate(persona_orm) if persona_orm else None
 
     @log_decorator
     def get_by_criteria(self, criteria: PersonaSearch) -> Optional[Persona]:
-        ret = self.persona_repository.get_by_criteria(criteria)
+        persona_orm = self.persona_repository.get_by_criteria(criteria)
 
-        return ret.to_schema() if ret else None
+        return Persona.model_validate(persona_orm) if persona_orm else None
 
     @log_decorator
     def get_all(self) -> List[Persona]:
-        return [model.to_schema() for model in self.persona_repository.get_all()]
+        return [Persona.model_validate(persona_orm) for persona_orm in self.persona_repository.get_all() if persona_orm]
