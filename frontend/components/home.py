@@ -75,8 +75,17 @@ def render():
                 "LinguAI provides customized language learning for learners who are looking to take the next step to improve their comprehension after learning the basics. Sign up today to continue your learning and try out our personalized features!_"
             )
 
-    st.markdown("---")
-    st.write("© 2024 LinguAI. All rights reserved.")
+    #st.markdown("---")
+    st.markdown(f"""
+                LinguAI stands out in the realm of language education by offering personalized learning experiences tailored to 
+                individuals who have mastered the basics and are eager to advance their skills further. 
+                Recognizing the unique challenges and goals of each learner, LinguAI leverages cutting-edge AI technology 
+                to create a bespoke curriculum that adapts to the specific needs and learning pace of its users. 
+                
+                This approach not only enhances comprehension but also ensures that learners remain engaged and motivated throughout 
+                their language learning journey. With LinguAI, students can look forward to a seamless transition from basic understanding 
+                to advanced proficiency, making it an invaluable tool for anyone serious about language mastery.
+                """)
 
     styling = """
         <style>
