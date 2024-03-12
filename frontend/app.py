@@ -16,6 +16,7 @@ from components import (
     review_writing , 
     foot_notes,
     header,
+    register,
 )
 
 # Setup global logging with a specific logger name
@@ -30,7 +31,8 @@ def main():
     state_service = StateService.instance()
 
     components_info = {
-         "Home": {"icon": "house", "page": home},
+        "Home": {"icon": "house", "page": home},
+        "New User Registration": {"icon": "person-plus", "page": register}
     }
     
     if state_service.username is not None:
