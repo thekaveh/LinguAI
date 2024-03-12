@@ -1,49 +1,57 @@
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 
+from app.models.persona import Persona
 from app.utils.logger import log_decorator
-from app.data_access.repositories.persona_repository import PersonaRepository
-from app.schema.persona import Persona, PersonaCreate, PersonaUpdate, PersonaSearch
+from app.services.crud_service import CRUDService
 
-
-class PersonaService:
+class PersonaService(CRUDService[Persona]):
     @log_decorator
     def __init__(self, db_session: Session):
-        self.persona_repository = PersonaRepository(db_session)
+        self.db_session = db_session
 
     @log_decorator
-    def create(self, create: PersonaCreate) -> Persona:
-        persona_orm = self.persona_repository.create(create)
-        
-        return Persona.model_validate(persona_orm)
+    def get_by_id(self, id: int):
+        persona = self.db_session.get(Persona, id)
 
-    @log_decorator
-    def update(self, id: int, update: PersonaUpdate) -> Optional[Persona]:
-        current_persona_orm = self.persona_repository.get_by_id(id)
-
-        if current_persona_orm is None:
-            return None
-
-        updated_persona_orm = self.persona_repository.update(current_persona_orm, update)
-        
-        return Persona.model_validate(updated_persona_orm)
-
-    @log_decorator
-    def delete(self, id: int) -> None:
-        self.persona_repository.delete(id)
-
-    @log_decorator
-    def get_by_id(self, id: int) -> Optional[Persona]:
-        persona_orm = self.persona_repository.get_by_id(id)
-        
-        return Persona.model_validate(persona_orm) if persona_orm else None
-
-    @log_decorator
-    def get_by_criteria(self, criteria: PersonaSearch) -> Optional[Persona]:
-        persona_orm = self.persona_repository.get_by_criteria(criteria)
-
-        return Persona.model_validate(persona_orm) if persona_orm else None
+        return persona
 
     @log_decorator
     def get_all(self) -> List[Persona]:
-        return [Persona.model_validate(persona_orm) for persona_orm in self.persona_repository.get_all() if persona_orm]
+        personas = self.db_session.exec(select(Persona)).all()
+        
+        return personas
+
+    @log_decorator
+    def create(self, persona: Persona) -> Persona:
+        self.db_session.add(persona)
+        self.db_session.commit()
+        self.db_session.refresh(persona)
+
+        return persona
+
+    @log_decorator
+    def update(self, id: int, value: Persona) -> Optional[Persona]:
+        persona = self.db_session.get(Persona, id)
+        
+        if not persona:
+            return None
+        
+        data = value.dict(exclude_unset=True)
+        
+        for key, value in data.items():
+            setattr(persona, key, value)
+            
+        self.db_session.add(persona)
+        self.db_session.commit()
+        self.db_session.refresh(persona)
+        
+        return persona
+
+    @log_decorator
+    def delete(self, id: int) -> None:
+        persona = self.db_session.get(Persona, id)
+
+        if persona:
+            self.db_session.delete(persona)
+            self.db_session.commit()
