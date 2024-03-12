@@ -19,6 +19,13 @@ class StateService:
         st.session_state["chat_file_upload_key"] = 0
         
         st.session_state["username"] = None
+        st.session_state["session_user"] = None
+
+    @log_decorator
+    def clear_session_state(self):
+        keys_to_clear = list(st.session_state.keys())
+        for key in keys_to_clear:
+            del st.session_state[key]
 
     @log_decorator
     def _init_model(self):
@@ -40,6 +47,16 @@ class StateService:
         else:
             st.session_state["persona"] = None
     
+    @property
+    def session_user(self):
+        return st.session_state.get("session_user", None)
+    
+    @session_user.setter
+    def session_user(self, value):
+        st.session_state["session_user"] = value
+
+
+
     @property
     def username(self):
         return st.session_state.get("username", None)
