@@ -1,12 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr
-
+from .user_topic import UserTopicBase
 from .user_assessment import UserAssessmentBase
-
-
-class UserTopicBase(BaseModel):
-    topic_name: str
-
 
 class UserBase(BaseModel):
     username: str
