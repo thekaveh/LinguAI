@@ -3,7 +3,20 @@ from core.config import Config
 from utils.logger_config import setup_global_logging
 
 from services.state_service import StateService
-from components import sidebar, home, settings, chat, user, content_gen, profile, interest_selection, rewrite_content, review_writing
+from components import (
+    sidebar, 
+    home, 
+    settings, 
+    chat, 
+    user, 
+    content_gen, 
+    profile, 
+    interest_selection, 
+    rewrite_content, 
+    review_writing , 
+    foot_notes,
+    header,
+)
 
 # Setup global logging with a specific logger name
 setup_global_logging(
@@ -13,6 +26,7 @@ setup_global_logging(
 )
 
 def main():
+    header.render()
     state_service = StateService.instance()
 
     components_info = {
@@ -24,14 +38,22 @@ def main():
             "Home": {"icon": "house", "page": home},
             "Interest Selection": {"icon": "palette", "page": interest_selection},
             "Rewrite Content": {"icon": "pen", "page": rewrite_content},
+            "Review Writing": {"icon": "pencil-square", "page": review_writing},               
+            "Content Reading": {"icon": "body-text", "page": content_gen},            
             "Chat": {"icon": "chat", "page": chat},
             "Account": {"icon": "person-circle", "page": profile},
             "User": {"icon": "person-gear", "page": user},
-            "Content": {"icon": "body-text", "page": content_gen},
             "Settings": {"icon": "gear", "page": settings},
         }
 
-    sidebar.show(components_info).render()
+    selected_page = sidebar.show(components_info)
+    # Assuming sidebar.show() updates `st.session_state.current_page` based on the selected page
+    selected_page.render()
+
+    # Conditionally render foot_notes based on the current page
+    if selected_page != chat:
+        foot_notes.render()
+
     
 if __name__ == "__main__":
     main()
