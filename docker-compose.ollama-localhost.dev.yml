@@ -40,6 +40,7 @@ services:
     env_file:
       - .env
     environment:
+      - APP_CONTEXT=backend
       - OLLAMA_API_ENDPOINT=http://host.docker.internal:11434
 
   frontend:
@@ -56,6 +57,7 @@ services:
     env_file:
       - .env
     environment:
+      - APP_CONTEXT=frontend
       - BACKEND_ENDPOINT=http://backend:8000
     command: ["streamlit", "run", "app.py"]
 
