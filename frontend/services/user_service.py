@@ -7,6 +7,7 @@ from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
+from schema.user import User, UserCreate
 
 
 class UserService:
@@ -60,6 +61,18 @@ class UserService:
                 Config.USER_SERVICE_AUTHENTICATE_ENDPOINT,
                 request,
                 response_model=AuthenticationResponse,
+            )
+        except Exception as e:
+            raise e
+        
+    @log_decorator    
+    @staticmethod   
+    async def create_user(request: UserCreate) -> User:
+        try:
+            return await HttpUtils.apost(
+                Config.USER_SERVICE_CREATE_ENDPOINT,
+                request,
+                response_model=User,
             )
         except Exception as e:
             raise e

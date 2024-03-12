@@ -7,6 +7,16 @@ from services.state_service import StateService
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 
 
+def _add_linguai_note():
+    st.markdown(f"""
+    LinguAI stands out in the realm of language education by offering personalized learning experiences tailored to 
+    individuals who have mastered the basics and are eager to advance their skills further. 
+    Recognizing the unique challenges and goals of each learner, LinguAI leverages cutting-edge AI technology 
+    to create a bespoke curriculum that adapts to the specific needs and learning pace of its users. 
+    
+    This approach not only enhances comprehension but also ensures that learners remain engaged and motivated throughout 
+    their language learning journey. 
+    """)
 @log_decorator
 def render():
     state_service = StateService.instance()
@@ -27,31 +37,15 @@ def render():
             )
             st.write("- Rewrite existing content to match your skill level")
             st.write("- Progress tracking to monitor your improvement.")
+            st.markdown(f"""
+                        With LinguAI, students can look forward to a seamless transition from basic understanding 
+                        to advanced proficiency, making it an invaluable tool for anyone serious about language mastery.
+                        """)
 
         with col2:
-            with st.container():
-                with st.form(key="login_form"):
-                    st.subheader("Get Started Today!")
-                    st.write(
-                        "<div style='text-align: center;'>Login to continue your language learning journey:</div>",
-                        unsafe_allow_html=True,
-                    )
-                    username = st.text_input("Username")
-                    password = st.text_input("Password", type="password")
+            st.write("")
+            _add_linguai_note()
 
-                    if st.form_submit_button("Login"):
-                        auth_request = AuthenticationRequest(
-                            username=username, password=password
-                        )
-                        auth_response = asyncio.run(
-                            UserService.authenticate(auth_request)
-                        )
-
-                        if auth_response.status:
-                            state_service.username = auth_response.username
-                            st.experimental_rerun()
-                        else:
-                            st.error(auth_response.message)
 
     else:
         # User is authenticated; show the rest of the content
@@ -61,31 +55,23 @@ def render():
         st.write(
             f"Welcome back, {user.first_name} {user.last_name}.!"
         )
+        _add_linguai_note()
         # Add the rest of your application's components here
 
     col1, col2 = st.columns([2, 1])
 
     with col1:
-        if state_service.username is None:
-            st.image("./static/language.jpg")
-
+         if state_service.username is None:
+            st.image("./static/language.jpg")   
     with col2:
+
         if state_service.username is None:
             st.write(
-                "LinguAI provides customized language learning for learners who are looking to take the next step to improve their comprehension after learning the basics. Sign up today to continue your learning and try out our personalized features!_"
-            )
+                "_LinguAI provides customized language learning for learners who are looking to take the next step to improve their comprehension after learning the basics. Sign up today to continue your learning and try out our personalized features!_"
+            )    
 
     #st.markdown("---")
-    st.markdown(f"""
-                LinguAI stands out in the realm of language education by offering personalized learning experiences tailored to 
-                individuals who have mastered the basics and are eager to advance their skills further. 
-                Recognizing the unique challenges and goals of each learner, LinguAI leverages cutting-edge AI technology 
-                to create a bespoke curriculum that adapts to the specific needs and learning pace of its users. 
-                
-                This approach not only enhances comprehension but also ensures that learners remain engaged and motivated throughout 
-                their language learning journey. With LinguAI, students can look forward to a seamless transition from basic understanding 
-                to advanced proficiency, making it an invaluable tool for anyone serious about language mastery.
-                """)
+
 
     styling = """
         <style>

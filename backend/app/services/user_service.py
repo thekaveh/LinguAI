@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import List, Optional
 from sqlalchemy.orm import Session
+from typing import Sequence
 
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
@@ -17,6 +18,8 @@ class UserService:
         self.db = db
         self.user_repo = UserRepository(db)
 
+
+
     @log_decorator
     def create_user(self, user_create: UserCreate) -> User:
         db_user = DBUser(
@@ -32,11 +35,35 @@ class UserService:
             mobile_phone=user_create.mobile_phone,
             landline_phone=user_create.landline_phone,
             contact_preference=user_create.contact_preference,
+            #user_topics=user_create.user_topics,
+            #user_assessments=user_create.user_assessments # there wouldn't be any assessments at the time of user creation
         )
         self.db.add(db_user)
         self.db.commit()
-        self.db.refresh(db_user)
+        self.db.refresh(db_user)  # Refresh the db_user object after committing to get the user_id
+
+        if user_create.user_topics:
+            #db_user.user_topics = 
+            self.add_user_topics(db_user, user_create.user_topics)
+
         return db_user
+    
+
+
+    def add_user_topics(self, db_user: User, topics: List[UserTopicBase]) -> None:
+        # Create UserTopic objects
+        user_topics = []
+        for topic_base in topics:
+            user_topic = UserTopic(topic_name=topic_base.topic_name, user_id=db_user.user_id, user=db_user)
+            user_topics.append(user_topic)
+
+        # Add UserTopic objects to session and commit
+        self.db.add_all(user_topics)
+        self.db.commit()
+        #self.db.refresh(user_topics)  # Refresh the user_topics objects after committing to get any changes from the database
+        
+
+
 
     @log_decorator
     def get_user_by_id(self, user_id: int) -> User:
