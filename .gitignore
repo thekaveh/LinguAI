@@ -158,3 +158,4 @@ node_modules/
 *.tmp
 *.temp
 db/snapshot/linguai_db_ss.sql
+/logs
