@@ -808,6 +808,7 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
 1	kaveh	razavi@vt.edu	linguai	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}
 2	kumar	rameshkumar@vt.edu	linguai	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}
+22	spiderman	peter.parker@marvel.com	pass	Peter	Parker				\N	external	English	{Mandarin}
 \.
 
 
@@ -885,7 +886,7 @@ SELECT pg_catalog.setval('public.user_performance_performance_id_seq', 1, false)
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 5, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 22, true);
 
 
 --
