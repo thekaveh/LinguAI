@@ -11,7 +11,7 @@ from schema.authentication import AuthenticationRequest, AuthenticationResponse
 def render():
     state_service = StateService.instance()
 
-    st.image("./static/logo.png", width=100)
+    #st.image("./static/logo.png", width=100)
     st.subheader("Personalized language learning for intermediate learners")
     st.image("./static/different-languages.jpeg", width=704)
     st.write("")
