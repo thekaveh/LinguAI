@@ -23,7 +23,7 @@ class ChatService:
         assert request.messages is not None, "messages is required"
         assert len(request.messages) > 0, "messages must not be empty"
 
-        persona_service = PersonaService(self.db_session) 
+        persona_service = PersonaService(self.db_session)
         persona = persona_service.get_by_name(name=request.persona)
 
         if persona is None:
