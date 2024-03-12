@@ -5,47 +5,54 @@ from app.models.persona import Persona
 from app.utils.logger import log_decorator
 from app.services.crud_service import CRUDService
 
+
 class PersonaService(CRUDService[Persona]):
     @log_decorator
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
     @log_decorator
-    def get_by_id(self, id: int):
+    def get_all(self) -> List[Persona]:
+        personas = self.db_session.exec(select(Persona)).all()
+
+        return personas
+
+    @log_decorator
+    def get_by_id(self, id: int) -> Optional[Persona]:
         persona = self.db_session.get(Persona, id)
 
         return persona
 
     @log_decorator
-    def get_all(self) -> List[Persona]:
-        personas = self.db_session.exec(select(Persona)).all()
-        
-        return personas
+    def get_by_name(self, name: str) -> Optional[Persona]:
+        query = select(Persona).where(Persona.persona_name == name)
+
+        return self.db_session.exec(query).first()
 
     @log_decorator
-    def create(self, persona: Persona) -> Persona:
-        self.db_session.add(persona)
+    def create(self, entity: Persona) -> Persona:
+        self.db_session.add(entity)
         self.db_session.commit()
-        self.db_session.refresh(persona)
+        self.db_session.refresh(entity)
 
-        return persona
+        return entity
 
     @log_decorator
     def update(self, id: int, value: Persona) -> Optional[Persona]:
         persona = self.db_session.get(Persona, id)
-        
+
         if not persona:
             return None
-        
+
         data = value.dict(exclude_unset=True)
-        
+
         for key, value in data.items():
             setattr(persona, key, value)
-            
+
         self.db_session.add(persona)
         self.db_session.commit()
         self.db_session.refresh(persona)
-        
+
         return persona
 
     @log_decorator

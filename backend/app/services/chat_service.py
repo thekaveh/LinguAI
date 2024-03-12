@@ -1,13 +1,13 @@
+from sqlmodel import Session
 from typing import AsyncIterable
-from sqlalchemy.orm import Session
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain.schema.messages import HumanMessage, SystemMessage
 
+from app.models.persona import Persona
 from app.schema.chat import ChatRequest
 from app.utils.logger import log_decorator
 from app.services.llm_service import LLMService
-from app.schema.persona import Persona, PersonaSearch
 from app.services.persona_service import PersonaService
 
 
@@ -23,11 +23,9 @@ class ChatService:
         assert request.messages is not None, "messages is required"
         assert len(request.messages) > 0, "messages must not be empty"
 
-        persona_service = PersonaService(self.db_session)
-        persona = persona_service.get_by_criteria(
-            criteria=PersonaSearch(persona_name=request.persona)
-        )
-        print(persona if persona else "persona not found")
+        persona_service = PersonaService(self.db_session) 
+        persona = persona_service.get_by_name(name=request.persona)
+
         if persona is None:
             raise ValueError("Persona not found")
 
