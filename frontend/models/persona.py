@@ -1,8 +1,11 @@
+import os
 from sqlmodel import SQLModel, Field
 
+is_backend = os.getenv("APP_CONTEXT") == "backend"
 
-class Persona(SQLModel, table=False):
-    persona_id: int = Field(primary_key=True, alias="persona_id")
-    persona_name: str = Field(max_length=100, nullable=False, alias="persona_name")
-    description: str = Field(nullable=False, alias="description")
-    is_default: bool = Field(default=False, alias="is_default")
+
+class Persona(SQLModel, table=is_backend):
+    persona_id: int = Field(primary_key=True)
+    persona_name: str = Field(max_length=100, nullable=False)
+    description: str = Field(nullable=False)
+    is_default: bool = Field(default=False)

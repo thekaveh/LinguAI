@@ -43,13 +43,14 @@ services:
       - "${BACKEND_PORT}:8000"
     volumes:
       - ./backend:/app
-      - ./logs/backend:/app/logs       
+      - ./logs/backend:/app/logs
     depends_on:
       - db
       - ollama
     env_file:
       - .env
     environment:
+      - APP_CONTEXT=backend
       - OLLAMA_API_ENDPOINT=http://ollama:11434
 
   frontend:
@@ -60,12 +61,13 @@ services:
       - "${FRONTEND_PORT}:8501"
     volumes:
       - ./frontend:/app
-      - ./logs/frontend:/app/logs      
+      - ./logs/frontend:/app/logs
     depends_on:
       - backend
     env_file:
       - .env
     environment:
+      - APP_CONTEXT=frontend
       - BACKEND_ENDPOINT=http://backend:8000
     command: ["streamlit", "run", "app.py"]
 
