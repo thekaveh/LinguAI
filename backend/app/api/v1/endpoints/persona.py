@@ -54,9 +54,7 @@ def create(persona: Persona, service: PersonaService = Depends(_get_service)):
 
 @log_decorator
 @router.put("/personas/{id}")
-def update_persona(
-    id: int, persona: Persona, service: PersonaService = Depends(_get_service)
-):
+def update(id: int, persona: Persona, service: PersonaService = Depends(_get_service)):
     updated = service.update(id, persona)
 
     if updated is None:
@@ -67,7 +65,7 @@ def update_persona(
 
 @log_decorator
 @router.delete("/personas/{id}", response_model=None)
-def delete_persona(id: int, service: PersonaService = Depends(_get_service)):
+def delete(id: int, service: PersonaService = Depends(_get_service)):
     try:
         service.delete(id)
         return {"message": "Persona deleted successfully."}

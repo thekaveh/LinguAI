@@ -1,22 +1,64 @@
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 
-from app.data_access.models.language import Language
-from app.schema.language import LanguageCreate, Language as LanguageSchema
-from app.data_access.repositories.language_repository import LanguageRepository
+from app.models.language import Language
+from app.utils.logger import log_decorator
+from app.services.crud_service import CRUDService
 
 
-class LanguageService:
+class LanguageService(CRUDService[Language]):
+    @log_decorator
     def __init__(self, db_session: Session):
-        self.language_repo = LanguageRepository(db_session)
+        self.db_session = db_session
 
-    def get_language_by_name(self, language_name: str) -> Optional[LanguageSchema]:
-        language = self.language_repo.find_by_name(language_name)
+    @log_decorator
+    def get_all(self) -> List[Language]:
+        languages = self.db_session.exec(select(Language)).all()
+
+        return languages
+
+    @log_decorator
+    def get_by_id(self, id: int) -> Optional[Language]:
+        language = self.db_session.get(Language, id)
+
+        return language
+
+    @log_decorator
+    def get_by_name(self, name: str) -> Optional[Language]:
+        query = select(Language).where(Language.language_name == name)
+
+        return self.db_session.exec(query).first()
+
+    @log_decorator
+    def create(self, entity: Language) -> Language:
+        self.db_session.add(entity)
+        self.db_session.commit()
+        self.db_session.refresh(entity)
+
+        return entity
+
+    @log_decorator
+    def update(self, id: int, value: Language) -> Optional[Language]:
+        language = self.db_session.get(Language, id)
+
+        if not language:
+            return None
+
+        data = value.dict(exclude_unset=True)
+
+        for key, value in data.items():
+            setattr(language, key, value)
+
+        self.db_session.add(language)
+        self.db_session.commit()
+        self.db_session.refresh(language)
+
+        return language
+
+    @log_decorator
+    def delete(self, id: int) -> None:
+        language = self.db_session.get(Language, id)
+
         if language:
-            return LanguageSchema(**language.__dict__)
-        return None
-
-
-    def get_all_languages(self) -> List[LanguageSchema]:
-        languages = self.language_repo.get_all_languages()
-        return [LanguageSchema(**language.__dict__) for language in languages]
+            self.db_session.delete(language)
+            self.db_session.commit()
