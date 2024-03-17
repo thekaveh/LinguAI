@@ -2,9 +2,9 @@ import os
 
 
 class Config:
-    # BACKEND_ENDPOINT = os.environ.get("BACKEND_ENDPOINT", "")
+    BACKEND_ENDPOINT = os.environ.get("BACKEND_ENDPOINT", "")
     # Use this to run tests locally
-    BACKEND_ENDPOINT = "http://localhost:50003"
+    # BACKEND_ENDPOINT = "http://localhost:50003"
 
     # Defaults for the frontend and for demo purposes
     # DEFAULT_USER_NAME = os.environ.get("DEFAULT_USER_NAME", "")
