@@ -12,6 +12,7 @@ from app.data_access.models.user import User as DBUser, UserAssessment, UserTopi
 from app.data_access.models.topic import Topic
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
+import bcrypt
 
 class UserService:
     @log_decorator
@@ -19,14 +20,26 @@ class UserService:
         self.db = db
         self.user_repo = UserRepository(db)
 
-
+    # hashes a password
+    def hash_password(self, password: str) -> str:
+        password_bytes = password.encode('utf-8')
+        salted_hash = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        return salted_hash.decode('utf-8')
+    
+    # verifies a password hash 
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        password_bytes = plain_password.encode('utf-8')
+        hashed_password_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password_bytes, hashed_password_bytes)
 
     @log_decorator
     def create_user(self, user_create: UserCreate) -> User:
+        hashed_password = self.hash_password(user_create.password_hash)
+
         db_user = DBUser(
             username=user_create.username,
             email=user_create.email,
-            password_hash=user_create.password_hash,
+            password_hash=hashed_password, # use the hashed password 
             user_type=user_create.user_type,
             base_language=user_create.base_language,
             learning_languages=user_create.learning_languages,
@@ -150,7 +163,7 @@ class UserService:
             return AuthenticationResponse.failure(
                 message="No matching user found, please register"
             )
-        if db_user.password_hash != request.password:
+        if not self.verify_password(request.password, db_user.password_hash):
             return AuthenticationResponse.failure(
                 message="Incorrect username or password."
             )
