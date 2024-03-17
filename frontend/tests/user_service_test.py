@@ -10,7 +10,7 @@ from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
-from schema.user import User, UserCreate
+from schema.user import User, UserCreate, UserTopicBase
 from services.user_service import UserService
 
 @pytest.mark.asyncio
@@ -80,3 +80,28 @@ async def test_create_user():
     # Assertions
     assert user == expected_user
     HttpUtils.apost.assert_awaited_once_with(Config.USER_SERVICE_CREATE_ENDPOINT, request, response_model=User)
+
+@pytest.mark.asyncio
+async def test_update_topics():
+    # Mocks
+    request = ["topic1", "topic2"]
+    expected_request_body = User(
+        user_id=-1,
+        username="example_username",
+        email="example@example.com",
+        user_type="example_user_type",
+        first_name="John",
+        last_name="Doe",
+        user_topics=[UserTopicBase(user_id=-1, topic_name=topic) for topic in request]
+    )
+    HttpUtils.apost = AsyncMock()
+
+    # Test
+    await UserService.update_topics(request, "example_username")
+
+    # Assertions
+    HttpUtils.apost.assert_awaited_once_with(
+        f"{Config.USER_SERVICE_CREATE_ENDPOINT}example_username/topics",
+        expected_request_body,
+        response_model=None,
+    )
