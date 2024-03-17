@@ -7,7 +7,7 @@ from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
-from schema.user import User, UserCreate
+from schema.user import User, UserCreate, UserTopicBase
 
 
 class UserService:
@@ -73,6 +73,27 @@ class UserService:
                 Config.USER_SERVICE_CREATE_ENDPOINT,
                 request,
                 response_model=User,
+            )
+        except Exception as e:
+            raise e
+        
+    @log_decorator    
+    @staticmethod   
+    async def update_topics(request: List[str], username:str):
+        user_base_with_topics = User(
+            user_id=-1,
+            username="example_username",
+            email="example@example.com",
+            user_type="example_user_type",
+            first_name="John",
+            last_name="Doe",
+            user_topics=[UserTopicBase(user_id=-1, topic_name=topic) for topic in request]
+        )
+        try:
+            return await HttpUtils.apost(
+                f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/topics",
+                user_base_with_topics,
+                response_model=None,
             )
         except Exception as e:
             raise e
