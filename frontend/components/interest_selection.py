@@ -18,7 +18,6 @@ def render():
 
     state_service = StateService.instance()
 
-    time.sleep(1)
     topics = asyncio.run(TopicService.list())
     topics = [topic.topic_name for topic in topics]
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
