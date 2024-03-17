@@ -48,14 +48,13 @@ def read_user_by_username(username: str, db: Session = Depends(get_db)):
 
 
 @log_decorator
-@router.put("/users/{user_id}/topics", response_model=None)
+@router.post("/users/{username}/topics", response_model=None)
 def update_user_topics(
-    user_id: int, new_topics: list[str], db: Session = Depends(get_db)
+    username: str, new_topics: User, db: Session = Depends(get_db)
 ):
     user_service = UserService(db)
-    user_service.update_user_topics(user_id, new_topics)
+    user_service.update_user_topics(username, new_topics)
     return None
-
 
 @log_decorator
 @router.post("/users/{user_id}/topics/{topic_name}", response_model=None)
