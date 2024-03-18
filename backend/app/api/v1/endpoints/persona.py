@@ -1,78 +1,75 @@
-from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session
+from fastapi import APIRouter, HTTPException, Depends
 
-from app.data_access.session import get_db
+from app.models.persona import Persona
 from app.utils.logger import log_decorator
 from app.services.persona_service import PersonaService
-from app.schema.persona import (
-    PersonaCreate,
-    PersonaUpdate,
-    Persona,
-    PersonaSearch,
-)
+from app.services.dependency.db_service import get_db_session
 
 router = APIRouter()
 
 
-@log_decorator
-@router.post("/personas/", response_model=Persona)
-def create(create: PersonaCreate, db: Session = Depends(get_db)):
-    service = PersonaService(db)
-    return service.create(create)
+def _get_service(db_session: Session = Depends(get_db_session)) -> PersonaService:
+    return PersonaService(db_session=db_session)
 
 
 @log_decorator
-@router.get("/personas/{id}", response_model=Persona)
-def get_by_id(id: int, db: Session = Depends(get_db)):
-    service = PersonaService(db)
+@router.get("/personas/")
+def get_all(service: PersonaService = Depends(_get_service)):
+    try:
+        return service.get_all()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@log_decorator
+@router.get("/personas/by_id/{id}", response_model=None)
+def get_by_id(id: int, service: PersonaService = Depends(_get_service)):
     persona = service.get_by_id(id)
 
     if persona is None:
-        raise HTTPException(status_code=404, detail="Persona not found")
+        raise HTTPException(status_code=404, detail="Persona not found!")
 
     return persona
 
 
 @log_decorator
-@router.get("/personas/", response_model=list[Persona])
-def get_all(db: Session = Depends(get_db)):
-    service = PersonaService(db)
-    return service.get_all()
-
-
-@log_decorator
-@router.post("/personas/search", response_model=Persona)
-def get_by_criteria(criteria: PersonaSearch, db: Session = Depends(get_db)):
-    service = PersonaService(db)
-    persona = service.get_by_criteria(criteria)
+@router.get("/personas/by_name/{name}", response_model=None)
+def get_by_name(name: str, service: PersonaService = Depends(_get_service)):
+    persona = service.get_by_name(name)
 
     if persona is None:
-        raise HTTPException(
-            status_code=404, detail="Persona not found based on search criteria"
-        )
+        raise HTTPException(status_code=404, detail="Persona not found!")
 
     return persona
 
 
+@router.post("/personas/")
+def create(persona: Persona, service: PersonaService = Depends(_get_service)):
+    try:
+        return service.create(persona)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @log_decorator
-@router.put("/personas/{id}", response_model=Persona)
-def update(id: int, update: PersonaUpdate, db: Session = Depends(get_db)):
-    service = PersonaService(db)
-    updated = service.update(id, update)
+@router.put("/personas/{id}")
+def update_persona(
+    id: int, persona: Persona, service: PersonaService = Depends(_get_service)
+):
+    updated = service.update(id, persona)
 
     if updated is None:
-        raise HTTPException(status_code=404, detail="Persona not found")
+        raise HTTPException(status_code=404, detail="Persona not found!")
 
     return updated
 
 
 @log_decorator
-@router.delete("/personas/{id}")
-def delete(id: int, db: Session = Depends(get_db)):
+@router.delete("/personas/{id}", response_model=None)
+def delete_persona(id: int, service: PersonaService = Depends(_get_service)):
     try:
-        service = PersonaService(db)
         service.delete(id)
-
         return {"message": "Persona deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -2,15 +2,17 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 from typing import Sequence
 
-from app.schema.topic import Topic
+# from app.schema.topic import Topic
 from app.utils.logger import log_decorator
-from app.schema.user import User, UserCreate
+from app.schema.user import User, UserCreate, UserBase
 from app.schema.user_topic import UserTopicBase
 from app.data_access.repositories.user_repository import UserRepository
 from app.schema.user_assessment import UserAssessmentCreate, UserAssessmentBase
 from app.data_access.models.user import User as DBUser, UserAssessment, UserTopic
+from app.data_access.models.topic import Topic
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
+import bcrypt
 
 class UserService:
     @log_decorator
@@ -18,14 +20,26 @@ class UserService:
         self.db = db
         self.user_repo = UserRepository(db)
 
-
+    # hashes a password
+    def hash_password(self, password: str) -> str:
+        password_bytes = password.encode('utf-8')
+        salted_hash = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+        return salted_hash.decode('utf-8')
+    
+    # verifies a password hash 
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
+        password_bytes = plain_password.encode('utf-8')
+        hashed_password_bytes = hashed_password.encode('utf-8')
+        return bcrypt.checkpw(password_bytes, hashed_password_bytes)
 
     @log_decorator
     def create_user(self, user_create: UserCreate) -> User:
+        hashed_password = self.hash_password(user_create.password_hash)
+
         db_user = DBUser(
             username=user_create.username,
             email=user_create.email,
-            password_hash=user_create.password_hash,
+            password_hash=hashed_password, # use the hashed password 
             user_type=user_create.user_type,
             base_language=user_create.base_language,
             learning_languages=user_create.learning_languages,
@@ -94,14 +108,30 @@ class UserService:
                 self.db.commit()
 
     @log_decorator
-    def update_user_topics(self, user_id: int, new_topics: list) -> None:
-        self.db.query(UserTopic).filter(UserTopic.user_id == user_id).delete()
-        for topic_name in new_topics:
-            topic = self.db.query(Topic).filter(Topic.topic_name == topic_name).first()
-            if topic:
-                user_topic = UserTopic(user_id=user_id, topic_id=topic.topic_id)
-                self.db.add(user_topic)
-        self.db.commit()
+    def update_user_topics(self, username: str, new_topics: User) -> None:
+        user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        
+        # Checking if user exists
+        if user:
+            # Deleting UserTopics associated with the found user_id
+            self.db.query(UserTopic).filter(UserTopic.user_id == user.user_id).delete()
+            for topic_base in new_topics.user_topics:
+                topic = self.db.query(Topic).filter(Topic.topic_name == topic_base.topic_name).first()
+                if topic:
+                    user_topic = UserTopic(user_id=user.user_id, topic_name=topic.topic_name)
+                    self.db.add(user_topic)
+            self.db.commit()
+            print("UserTopics updated for user:", username)
+        else:
+            print("User not found with username:", username)
+
+        # self.db.query(UserTopic).filter(UserTopic.user_id == user_id).delete()
+        # for topic_name in new_topics:
+        #     topic = self.db.query(Topic).filter(Topic.topic_name == topic_name).first()
+        #     if topic:
+        #         user_topic = UserTopic(user_id=user_id, topic_id=topic.topic_id)
+        #         self.db.add(user_topic)
+        # self.db.commit()
 
     @log_decorator
     def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:
@@ -133,7 +163,7 @@ class UserService:
             return AuthenticationResponse.failure(
                 message="No matching user found, please register"
             )
-        if db_user.password_hash != request.password:
+        if not self.verify_password(request.password, db_user.password_hash):
             return AuthenticationResponse.failure(
                 message="Incorrect username or password."
             )
