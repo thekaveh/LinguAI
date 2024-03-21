@@ -809,7 +809,7 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 3	blackwidow123	blackwidow@example.com	password_hash_blackwidow	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
 4	thor123	thor@example.com	password_hash_thor	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
 5	hulk123	hulk@example.com	password_hash_hulk	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
-1	kaveh	razavi@vt.edu	linguai	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}
+1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}
 2	kumar	rameshkumar@vt.edu	linguai	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}
 6	spiderman	peter.parker@marvel.com	pass	Peter	Parker	Ben	+1 212 914 2124	+1 212 914 2124	\N	external	English	{Mandarin}
 23	captainamerica	rameshkumar@vt.edu	$2b$12$M1zhmH3iazDnaaAgTJWwge83gi/WYFINwelmIjPVPHI5c4PDElvOC	kumar	govindaraju				\N	external	English	{Spanish}
