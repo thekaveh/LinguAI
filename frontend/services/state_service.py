@@ -21,6 +21,7 @@ class StateService:
         st.session_state["username"] = None
         st.session_state["session_user"] = None
 
+        st.session_state["review_writing"] = ""
         st.session_state["rewrite_content"] = ""
 
     @log_decorator
@@ -113,6 +114,14 @@ class StateService:
     @rewrite_content.setter
     def rewrite_content(self, value):
         st.session_state["rewrite_content"] = value
+
+    @property
+    def review_writing(self):
+        return st.session_state["review_writing"]
+
+    @review_writing.setter
+    def review_writing(self, value):
+        st.session_state["review_writing"] = value
 
     @log_decorator
     @staticmethod

@@ -1,19 +1,17 @@
-from typing import AsyncIterable, Optional
-from sqlalchemy.orm import Session
 from typing import AsyncIterable
 from sqlalchemy.orm import Session
 from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from app.schema.review_writing import ReviewWritingReq
+from app.core.config import Config
 from app.schema.prompt import PromptSearch
+from app.utils.logger import log_decorator
 from app.services.llm_service import LLMService
 from app.services.prompt_service import PromptService
-from app.utils.logger import log_decorator
-from app.core.config import Config
+from app.schema.review_writing import ReviewWritingReq
 from app.services.skill_level_service import SkillLevelService
-from app.schema.skill_level import SkillLevelSchema
+
 
 class ReviewWritingService:
     @log_decorator
@@ -23,12 +21,11 @@ class ReviewWritingService:
         self.skill_level_service = SkillLevelService(db)
 
     @log_decorator
-    async def review_writing(self, request: ReviewWritingReq) -> AsyncIterable[str]:
+    async def areview_writing(self, request: ReviewWritingReq) -> AsyncIterable[str]:
         assert request is not None, "Request is required"
-            
-        prompt_text = self.generate_prompt(request)
 
-        
+        prompt_text = self._generate_prompt(request)
+
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
 
@@ -41,12 +38,10 @@ class ReviewWritingService:
         parser = StrOutputParser()
         chain = prompt | chat_runnable | parser
 
-        async for generated_content in chain.astream(input={}):
-            yield generated_content
+        return chain.astream(input={})
 
-    
     @log_decorator
-    def generate_prompt(self, request: ReviewWritingReq) -> str:
+    def _generate_prompt(self, request: ReviewWritingReq) -> str:
         # Define the search criteria
         search_criteria = PromptSearch(
             prompt_type="system", prompt_category="rewrite-content-by-skill-level"
@@ -70,7 +65,7 @@ class ReviewWritingService:
 
         else:
             # Handle cases where no matching prompt is found
-            return  f"""
+            return f"""
                     The writer of the following text is currently at {request.curr_skill_level.upper} in language {request.language.upper}. 
                     The next skill level for the writter is {request.next_skill_level.upper}. 
                     The last feedback provided as strengths is {request.strength} and the weakness is {request.weakness}.
@@ -81,4 +76,3 @@ class ReviewWritingService:
                     {request.input_content}
                     
                     """
-
