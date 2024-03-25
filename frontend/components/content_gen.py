@@ -157,8 +157,8 @@ def _add_instruction(user):
     st.markdown(welcome_, unsafe_allow_html=True)
     st.markdown(
         f"""
-                Once you made your selection,**Click to Get Your Content**.
-                \n Ready to dive in? receive personalized content tailored to your interests and skill level. 
+                Once you made your selection, **Click to Get Your Content**.
+                \n {user.first_name}, are you ready to dive in? receive personalized content tailored to your interests and skill level. 
                 Let's embark on today's learning journey together!. 
                                
                 """
@@ -192,8 +192,8 @@ def _add_skill_level_by_language(user):
             skill_level = latest_assessment.skill_level
             st.write(f"###### {language} : {skill_level}")
         else:
-            None
-            # st.write("No assessment found for this language")
+            pass
+            #st.write("No assessment found for this language")
 
 
 def _get_language_object(user, language_name):
@@ -268,33 +268,40 @@ def render():
 
     st.markdown("---")
 
-    if "content_stream" not in st.session_state:
-        st.session_state["content_stream"] = ""
+    #if "content_stream" not in st.session_state:
+    st.session_state["content_stream"] = ""
 
     if st.session_state["content_stream"]:
         st.markdown(f"""{st.session_state["content_stream"]}""", unsafe_allow_html=True)
-
-    if st.button("Click to Get Your Content"):
-        st.session_state["content_stream"] = ""
-        content_gen_req = build_content_gen_request(
-            user, selected_topic_options, selected_content_type, selected_language
-        )
-
-        content_gen_placeholder = st.empty()
-
-        # Define callback functions
-        def _content_gen_on_next(content_chunk):
-            content_gen_placeholder.markdown(
-                f"""{content_chunk}""", unsafe_allow_html=True
+    
+    col5, col6 = st.columns([5, 1])
+    with col5:
+        if st.button("Click to Get Your Content", type="primary"):
+            st.session_state["content_stream"] = ""
+            content_gen_req = build_content_gen_request(
+                user, selected_topic_options, selected_content_type, selected_language
             )
 
-        def _content_gen_on_completed(content):
-            st.session_state["content_stream"] = content
+            content_gen_placeholder = st.empty()
 
-        asyncio.run(
-            ContentGenService.agenerate_content(
-                request=content_gen_req,
-                on_next_fn=_content_gen_on_next,
-                on_completed_fn=_content_gen_on_completed,
+            # Define callback functions
+            def _content_gen_on_next(content_chunk):
+                content_gen_placeholder.markdown(
+                    f"""{content_chunk}""", unsafe_allow_html=True
+                )
+
+            def _content_gen_on_completed(content):
+                st.session_state["content_stream"] = content
+                
+
+            asyncio.run(
+                ContentGenService.agenerate_content(
+                    request=content_gen_req,
+                    on_next_fn=_content_gen_on_next,
+                    on_completed_fn=_content_gen_on_completed,
+                )
             )
-        )
+    with col6:
+        if st.button("Clear", type="primary"):
+            st.session_state["content_stream"] = ""
+            st.rerun()
