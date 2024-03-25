@@ -24,7 +24,7 @@ def show(pages):
         if state_service.username is not None:
             # Visually separate the logout button from the menu
             st.write("---")
-            if st.button("Logout"):
+            if st.button("Logout", use_container_width=True):
                 # Perform logout actions: Reset the authentication state
                 state_service.clear_session_state()
                 st.experimental_rerun()
@@ -34,28 +34,30 @@ def show(pages):
             st.subheader("Login to LinguAI")
 
             username = st.text_input("Username", placeholder="Your Username")
-            password = st.text_input("Password", placeholder="Your Password", type="password")
-            
+            password = st.text_input(
+                "Password", placeholder="Your Password", type="password"
+            )
+
             if st.button("Login"):
                 # Placeholder for your authentication logic
                 # Replace the next line with your authentication check
-                #authenticated = username == "admin" and password == "password"  # Example condition
+                # authenticated = username == "admin" and password == "password"  # Example condition
                 auth_request = AuthenticationRequest(
                     username=username, password=password
                 )
-                auth_response = asyncio.run(
-                    UserService.authenticate(auth_request)
-                )
+                auth_response = asyncio.run(UserService.authenticate(auth_request))
 
                 if auth_response.status:
                     state_service.username = auth_response.username
                     st.experimental_rerun()
                 else:
                     st.error(auth_response.message)
-                    
-            st.markdown(f"""Don't have an account?                         
-                        click  <b>New User Registration</b>""", unsafe_allow_html=True)
-            #register.render()
+
+            st.markdown(
+                f"""Don't have an account?                         
+                        click  <b>New User Registration</b>""",
+                unsafe_allow_html=True,
+            )
+            # register.render()
 
         return pages[selected]["page"]
-

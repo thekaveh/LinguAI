@@ -17,9 +17,11 @@ class StateService:
         st.session_state["chat_messages"] = []
         st.session_state["chat_messages"] = []
         st.session_state["chat_file_upload_key"] = 0
-        
+
         st.session_state["username"] = None
         st.session_state["session_user"] = None
+
+        st.session_state["rewrite_content"] = ""
 
     @log_decorator
     def clear_session_state(self):
@@ -46,21 +48,19 @@ class StateService:
             )
         else:
             st.session_state["persona"] = None
-    
+
     @property
     def session_user(self):
         return st.session_state.get("session_user", None)
-    
+
     @session_user.setter
     def session_user(self, value):
         st.session_state["session_user"] = value
 
-
-
     @property
     def username(self):
         return st.session_state.get("username", None)
-    
+
     @username.setter
     def username(self, value):
         st.session_state["username"] = value
@@ -102,9 +102,17 @@ class StateService:
 
     def chat_append_message(self, chat_message: ChatMessage) -> None:
         st.session_state["chat_messages"].append(chat_message)
-        
+
     def chat_clear_messages(self):
         st.session_state["chat_messages"] = []
+
+    @property
+    def rewrite_content(self):
+        return st.session_state["rewrite_content"]
+
+    @rewrite_content.setter
+    def rewrite_content(self, value):
+        st.session_state["rewrite_content"] = value
 
     @log_decorator
     @staticmethod

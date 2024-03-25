@@ -64,11 +64,11 @@ def render():
             async def _achat_on_completed(new_ai_chat_message: ChatMessage):
                 state_service.chat_append_message(new_ai_chat_message)
                 state_service.chat_increment_file_upload_key()
-                
+
                 audio_data = await TextToSpeechService.agenerate(
-						lang="en",
-						text=new_ai_chat_message.text,
-					)         
+                    lang="en",
+                    text=new_ai_chat_message.text,
+                )
                 audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
                 st.markdown(audio_html, unsafe_allow_html=True)
 
@@ -105,6 +105,12 @@ def render():
                         uploaded_image_to_base64_image_url
                     )
 
+    st.sidebar.write("---")
+
+    if st.sidebar.button(label="Clear Chat", use_container_width=True):
+        state_service.chat_clear_messages()
+        st.experimental_rerun()
+
     st.sidebar.file_uploader(
         label="Attach images:",
         accept_multiple_files=True,
@@ -115,8 +121,3 @@ def render():
         or (state_service.model not in vision_models),
         key=f"file_uploader_{state_service.chat_file_upload_key}",
     )
-    
-    if st.sidebar.button(label="Clear Chat", use_container_width=True):
-        state_service.chat_clear_messages()
-        st.experimental_rerun()
-        

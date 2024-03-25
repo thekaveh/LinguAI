@@ -17,7 +17,7 @@ async def rewrite_content(
 ) -> StreamingResponse:
     rewrite_service = RewriteContentService(db)
     try:
-        stream = rewrite_service.rewrite_content(request)
+        stream = await rewrite_service.arewrite_content(request)
         return StreamingResponse(content=stream, media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
