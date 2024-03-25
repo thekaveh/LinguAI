@@ -27,11 +27,17 @@ class ContentGenService:
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
 
+        temperature = request.temperature
+        if request.model_name:
+            model_name=request.model_name
+        else:
+            model_name=Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
+
         # Use temperature from the request if provided, else use the default
-        temperature = float(Config.DEFAULT_TEMPERATURE)
+        #temperature = float(Config.DEFAULT_TEMPERATURE)
 
         chat_runnable = LLMService.get_chat_runnable(
-            model=Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL, temperature=temperature
+            model=model_name, temperature=temperature
         )
         parser = StrOutputParser()
         chain = prompt | chat_runnable | parser
@@ -49,13 +55,19 @@ class ContentGenService:
 
         if db_prompt:
             # Assuming the prompt text in the database is a template that needs to be formatted
-            formatted_prompt = db_prompt.prompt_text.format(
-                content_name=request.content.content_name,
-                topics=", ".join(request.user_topics),
-                language_name=request.language.language_name,
-            )
-            return formatted_prompt
+            # formatted_prompt = db_prompt.prompt_text.format(
+            #     content_name=request.content.content_name,
+            #     topics=", ".join(request.user_topics),
+            #     language_name=request.language.language_name,
+            # )
+            # return formatted_prompt
+            return f"""Generate a {request.content.content_name} for a user at {request.skill_level} reading skill level, 
+                       for the following topics: {', '.join(request.user_topics)}. 
+                       
+                       \n Content should be generated only in {request.language.language_name} language."""            
         else:
             # Handle cases where no matching prompt is found
-            return f"""Generate a {request.content.content_name} for the following topics: {', '.join(request.user_topics)}. 
-                       Content should be generated only in {request.language.language_name} language."""
+            return f"""Generate a {request.content.content_name} for a user at {request.skill_level} reading skill level, 
+                       for the following topics: {', '.join(request.user_topics)}. 
+                       
+                       \n Content should be generated only in {request.language.language_name} language."""

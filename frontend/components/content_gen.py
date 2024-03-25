@@ -1,7 +1,6 @@
 import asyncio
 import streamlit as st
 from typing import List
-from concurrent.futures import ThreadPoolExecutor
 
 from core.config import Config
 from utils.logger import log_decorator
@@ -18,54 +17,24 @@ from services.content_gen_service import ContentGenService
 
 
 @log_decorator
-def fetch_content_types_sync():
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(ContentService.list())
-    loop.close()
-    return result
-
-
-@log_decorator
-def fetch_content_types():
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(fetch_content_types_sync)
-        return future.result()
-
-
-@log_decorator
-def render_content_types(content_types):
+def _render_content_types(content_types):
     options = [content_type.content_name for content_type in content_types]
     selected_option = st.radio(
-        "##### Select Content Type", options, format_func=lambda x: x, horizontal=True
+        "##### Select Content Type", options, format_func=lambda x: x, horizontal=True, index=None
     )
     global selected_content_type
     selected_content_type = next(
         (ct for ct in content_types if ct.content_name == selected_option), None
     )
 
-
 @log_decorator
-def fetch_topics_sync():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    topics = loop.run_until_complete(TopicService.list())
-    loop.close()
-    return topics
-
-
-@log_decorator
-def fetch_topic_combo_options():
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(fetch_topics_sync)
-        topics = future.result()
-    # Assuming topics is a list of Topic objects, extract the topic_name for each
+def _fetch_topic_combo_options():
+    topics = asyncio.run(TopicService.list())
     return [topic.topic_name for topic in topics]
 
 
 @log_decorator
-def get_user_topics(user: User) -> List[UserTopicBase]:
+def _get_user_topics(user: User) -> List[UserTopicBase]:
     if user.user_topics:
         return user.user_topics
     else:
@@ -73,7 +42,7 @@ def get_user_topics(user: User) -> List[UserTopicBase]:
 
 
 @log_decorator
-def render_topic_combo_options(combo_options):
+def _render_topic_combo_options(combo_options):
     st.write("##### Topic Options")
     selected_options = []
 
@@ -83,7 +52,6 @@ def render_topic_combo_options(combo_options):
     # Calculate the number of rows needed
     num_rows = (len(combo_options) + options_per_row - 1) // options_per_row
 
-    default_selection = True  # Track default selection
     for row in range(num_rows):
         # For each row, create a new set of columns
         cols = st.columns(options_per_row)
@@ -96,36 +64,31 @@ def render_topic_combo_options(combo_options):
                     # Use value parameter to set default selection
                     selected = st.checkbox(
                         option,
-                        value=default_selection,
+                        value=False, #default_selection,
                         key=f"topic_option_{option_index}",
                     )
                     if selected:
                         selected_options.append(option)
-                    default_selection = (
-                        False  # Set default selection to False after first checkbox
-                    )
     return selected_options
 
 
 @log_decorator
-def get_language():
-    # TODO: Add in logged in user language selection here
-    return Language(language_id=3, language_name=Config.DEFAULT_LANGUAGE)
+def _build_content_gen_request(
+    user, selected_topic_options, selected_content_type, language, 
+    model_name:str,temperature:float, float,last_assessment=None) -> ContentGenReq:
 
-
-@log_decorator
-def build_content_gen_request(
-    user, selected_topic_options, selected_content_type, language
-) -> ContentGenReq:
-    # Extract user_topics as a list of strings from selected_topic_options
-    # user_topics = [topic.topic_name for topic in selected_topic_options]
+    if not last_assessment:
+        skill_level="beginner"
+    else:
+        skill_level=last_assessment.skill_level
 
     # Build the ContentGenReq object
     content_gen_req = ContentGenReq(
         user_id=user.user_id,
         user_topics=selected_topic_options,
         content=selected_content_type,
-        language=language,
+        language=language,skill_level=skill_level,
+        model_name=model_name,temperature=temperature
     )
 
     return content_gen_req
@@ -149,8 +112,7 @@ def _add_instruction(user):
     
     1. Select **Topics** of Interest
     2. Choose the **Content Type**
-    3. Select **Language**
-      
+    3. Select **Language**      
     
     """
 
@@ -164,7 +126,6 @@ def _add_instruction(user):
                 """
     )
 
-
 @log_decorator
 def _add_skill_level_by_language(user):
 
@@ -176,17 +137,7 @@ def _add_skill_level_by_language(user):
         return
 
     for language in user.learning_languages:
-        # st.write(f"Language: {language}")
-
-        latest_assessment = None
-        for user_assessment in user.user_assessments:
-            if user_assessment.language.language_name == language:
-                if (
-                    latest_assessment is None
-                    or user_assessment.assessment_date
-                    > latest_assessment.assessment_date
-                ):
-                    latest_assessment = user_assessment
+        latest_assessment = _get_last_assessment_by_language(user, language)
 
         if latest_assessment:
             skill_level = latest_assessment.skill_level
@@ -194,6 +145,18 @@ def _add_skill_level_by_language(user):
         else:
             pass
             #st.write("No assessment found for this language")
+
+def _get_last_assessment_by_language(user, language):
+    latest_assessment = None
+    for user_assessment in user.user_assessments:
+        if user_assessment.language.language_name == language:
+            if (
+                latest_assessment is None
+                or user_assessment.assessment_date
+                > latest_assessment.assessment_date
+            ):
+                latest_assessment = user_assessment
+    return latest_assessment
 
 
 def _get_language_object(user, language_name):
@@ -210,7 +173,7 @@ def _select_learning_language(user):
 
     if user.learning_languages:
         selected_language = st.radio(
-            "##### Select Learning Language", user.learning_languages
+            "##### Select Learning Language", user.learning_languages, index=None
         )
         # st.write(f"You selected: {selected_language}")
     else:
@@ -221,7 +184,9 @@ def _select_learning_language(user):
 @log_decorator
 def render():
     state_service = StateService.instance()
-    
+    temperature =state_service.temperature
+    model_name = state_service.model
+
     st.title("Content For You")
 
     username = state_service.username
@@ -241,18 +206,15 @@ def render():
 
     st.markdown("---")
 
-    user_topics = get_user_topics(user)
+    user_topics = _get_user_topics(user)
     if user_topics:
         topic_combo_options = [topic.topic_name for topic in user_topics]
     else:
         # Fetch default topic combo options if the user has no topics
-        topic_combo_options = fetch_topic_combo_options()
-
-    # selected_topic_options = render_topic_combo_options(topic_combo_options)
+        topic_combo_options = _fetch_topic_combo_options()
 
     # Content type selection section
-    content_types = fetch_content_types()
-    # render_content_types(content_types)
+    content_types = asyncio.run(ContentService.list())
 
     col3, col4 = st.columns([1, 2])
 
@@ -262,8 +224,8 @@ def render():
 
     # Add selected_topic_options and render_content_types to column 2
     with col4:
-        selected_topic_options = render_topic_combo_options(topic_combo_options)
-        render_content_types(content_types)
+        selected_topic_options = _render_topic_combo_options(topic_combo_options)
+        _render_content_types(content_types)
         selected_language = _select_learning_language(user)
 
     st.markdown("---")
@@ -277,9 +239,24 @@ def render():
     col5, col6 = st.columns([5, 1])
     with col5:
         if st.button("Click to Get Your Content", type="primary"):
+            error=[]
+            if not selected_topic_options:
+                error.append("You have to Select at least one topic.")
+            if not selected_content_type:
+                error.append("You have to Select at least one content type.")
+            if not selected_language:
+                error.append("You have to Select at least one language.")
+            if error:
+                st.markdown("##### Please correct the following errors:")
+                for err in error:
+                    st.error(err)
+                return
+
+            last_assessment=_get_last_assessment_by_language(user, selected_language)
             st.session_state["content_stream"] = ""
-            content_gen_req = build_content_gen_request(
-                user, selected_topic_options, selected_content_type, selected_language
+            content_gen_req = _build_content_gen_request(
+                user, selected_topic_options, selected_content_type, 
+                selected_language, model_name, temperature,last_assessment
             )
 
             content_gen_placeholder = st.empty()
