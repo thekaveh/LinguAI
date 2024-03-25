@@ -12,7 +12,7 @@ def render():
             width: 100%;
             color: #ffffff;
             background-color: #ff6600;
-            padding: 10px;
+            padding: 5px;
             display: flex;
             justify-content: space-between;
             z-index: 2; /* Ensure footer is above other content */
@@ -49,7 +49,7 @@ def render():
                 <p>LinguAI Inc.</p>
             </div>
             <div class="footer-column right">
-                <p class="copyright">© 2024 LinguAI Inc. All rights reserved. Unauthorized use and/or duplication of this material without express and written permission from this site’s author and/or owner is strictly prohibited.</p>
+                <p class="copyright">© 2024 LinguAI Inc. All rights reserved.</p>
             </div>
         </div>
         """,
