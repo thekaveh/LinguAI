@@ -30,32 +30,10 @@ def _add_welcome(user):
     st.markdown(welcome, unsafe_allow_html=True)
 
 
-def _add_instruction(user):
-    welcome_ = f"""
-
-    ##### Get Started:
-    
-    1. Select **Topics** of Interest
-    2. Choose the **Content Type**
-    3. Select **Language**
-
-    
-    """
-
-    st.markdown(welcome_, unsafe_allow_html=True)
-    st.markdown(
-        f"""
-                Once you made your selection,**Click to Get Your Content**.
-                \n Ready to dive in? receive personalized content tailored to your interests and skill level. 
-                Let's embark on today's learning journey together!. 
-
-        """
-    )
-
 
 @log_decorator
 def _add_skill_level_by_language(user):
-    st.write("")
+
     st.write("")
     st.write("")
     st.write("##### Your Skill Level")
@@ -66,33 +44,41 @@ def _add_skill_level_by_language(user):
 
     # Loop through each language in the user's learning languages
     for language in user.learning_languages:
-        # Find the latest assessment for the current language
-        latest_assessment = None
-        for user_assessment in user.user_assessments:
-            if user_assessment.language.language_name == language:
-                if (
-                    latest_assessment is None
-                    or user_assessment.assessment_date
-                    > latest_assessment.assessment_date
-                ):
-                    latest_assessment = user_assessment
+        latest_assessment = _get_last_assessment_by_language(user, language)
 
         # Display the language and its skill level
         if latest_assessment:
             skill_level = latest_assessment.skill_level
             st.write(f"###### {language}: {skill_level}")
 
+def _get_last_assessment_by_language(user, language):
+    latest_assessment = None
+    for user_assessment in user.user_assessments:
+        if user_assessment.language.language_name == language:
+            if (
+                latest_assessment is None
+                or user_assessment.assessment_date
+                > latest_assessment.assessment_date
+            ):
+                latest_assessment = user_assessment
+    return latest_assessment
+
+
 
 @log_decorator
 def _build_content_rewrite_request(
-    user: User, input_content: str, skill_level: str, language: str
-) -> ContentRewriteReq:
+    user: User, input_content: str, skill_level: str, 
+    language: str, user_skill_level:str, user_base_lang:str, model: str, temperature: float) -> ContentRewriteReq:
     # Build the ContentRewriteReq object
     content_rewrite_req = ContentRewriteReq(
         user_id=user.user_id,
         input_content=input_content,
         skill_level=skill_level,
         language=language,
+        model=model,
+        temperature=temperature,
+        user_skill_level=user_skill_level,
+        user_base_language=user_base_lang
     )
 
     return content_rewrite_req
@@ -130,27 +116,6 @@ def _render_skill_levels(skill_levels):
         selected_skill_level = None
     return selected_skill_level
 
-
-def _get_language_object(user, language_name):
-    language_object = None
-    if user.user_assessments:
-        for user_assessment in user.user_assessments:
-            if user_assessment.language.language_name == language_name:
-                language_object = user_assessment.language
-                break
-    return language_object
-
-
-def _select_learning_language(user):
-
-    if user.learning_languages:
-        selected_language = st.radio(
-            "##### Select Learning Language", user.learning_languages
-        )
-        # st.write(f"You selected: {selected_language}")
-    else:
-        st.write("No learning languages specified.")
-    return _get_language_object(user, selected_language)
 
 
 @log_decorator
@@ -204,7 +169,9 @@ def render():
         return
 
     _add_welcome(user)
-
+    
+    state_service.rewrite_content = ""
+    
     col1, col2 = st.columns([3, 1])
     with col1:
         original_content = st.text_area(
@@ -212,19 +179,13 @@ def render():
             height=400,
             placeholder="Enter your text here...",
             key="original_content",
+            value="",
         )
     with col2:
         _add_skill_level_by_language(user)
 
     st.write("")
     st.write("")
-
-    # skill_options = ['Level 1', 'Level 2', 'Level 3']
-
-    # current_skill = st.selectbox("Current Skill Level", skill_options)
-
-    # selected_language, skill_level=_add_skill_level_by_language(user)
-    # call backend service to prcess the content.
 
     skill_levels = _fetch_skill_levels()
     languages = _fetch_languages()
@@ -251,13 +212,21 @@ def render():
     button_placeholder = st.empty()
     st.write("---")
     content_placeholder = st.empty()
-    audio_placeholder = st.empty()
+    #audio_placeholder = st.empty()
 
     # Display initial or existing rewritten content if available
     if state_service.rewrite_content:
         content_placeholder.markdown(
             f"""{state_service.rewrite_content}""", unsafe_allow_html=True
         )
+
+    temperature = state_service.temperature
+    model=state_service.model
+    if user.base_language is None:
+        user_base_lang = "english"
+    else:
+        user_base_lang = user.base_language
+
 
     with button_placeholder.container():
         if skill_level is None or selected_language is None or original_content == "":
@@ -267,34 +236,54 @@ def render():
                 unsafe_allow_html=True,
             )
         else:
-            if st.button("Rewrite Content", use_container_width=True):
-                content_rewrite_req = _build_content_rewrite_request(
-                    user,
-                    original_content,
-                    skill_level.level,
-                    selected_language.language_name,
-                )
+            col1, col2, col3 = st.columns([3,2,1])
+            with col1:
+                audio_placeholder = st.empty()
+            with col2:
+                if st.button("Rewrite Content", type="primary", use_container_width=True):
+                    
+                    user_skill_level=""
+                    if selected_language:
+                        last_assessment_info= _get_last_assessment_by_language(user, selected_language.language_name)
+                        if last_assessment_info:
+                            user_skill_level = last_assessment_info.skill_level
 
-                async def _content_on_changed(content):
-                    content_placeholder.markdown(
-                        f"""{content}""", unsafe_allow_html=True
+                    content_rewrite_req = _build_content_rewrite_request(
+                        user,
+                        original_content,
+                        skill_level.level,
+                        selected_language.language_name,
+                        user_skill_level,
+                        user_base_lang,
+                        model,
+                        temperature
                     )
 
-                async def _content_on_completed(content):
-                    state_service.rewrite_content = content
+                    async def _content_on_changed(rewrite_content):
+                        content_placeholder.markdown(
+                            f"""{rewrite_content}""", unsafe_allow_html=True
+                        )
 
-                    audio_data = await TextToSpeechService.agenerate(
-                        lang="en",
-                        text=content,
+                    async def _content_on_completed(rewrite_content):
+                        state_service.rewrite_content = rewrite_content
+
+                        audio_data = await TextToSpeechService.agenerate(
+                            lang="en",
+                            text=rewrite_content,
+                        )
+
+                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+
+                    asyncio.run(
+                        RewriteContentService.arewrite_content(
+                            request=content_rewrite_req,
+                            on_changed_fn=_content_on_changed,
+                            on_completed_fn=_content_on_completed,
+                        )
                     )
+            with col3:
+                if st.button("Clear", type="primary", use_container_width=True):
+                    state_service.rewrite_content = ""
+                    st.rerun()                
 
-                    audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                    audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
-
-                asyncio.run(
-                    RewriteContentService.arewrite_content(
-                        request=content_rewrite_req,
-                        on_changed_fn=_content_on_changed,
-                        on_completed_fn=_content_on_completed,
-                    )
-                )
