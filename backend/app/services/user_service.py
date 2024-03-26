@@ -37,7 +37,7 @@ class UserService:
         hashed_password = self.hash_password(user_create.password_hash)
 
         db_user = DBUser(
-            username=user_create.username,
+            username=user_create.username.lower(), # convert username to lowercase
             email=user_create.email,
             password_hash=hashed_password, # use the hashed password 
             user_type=user_create.user_type,
@@ -86,7 +86,7 @@ class UserService:
 
     @log_decorator
     def get_user_by_username(self, username: str) -> Optional[User]:
-        return self.user_repo.find_by_username(username)
+        return self.user_repo.find_by_username(username.lower())
 
     @log_decorator
     def get_users(self) -> list:
@@ -109,7 +109,7 @@ class UserService:
 
     @log_decorator
     def update_user_topics(self, username: str, new_topics: User) -> None:
-        user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         
         # Checking if user exists
         if user:
@@ -157,7 +157,7 @@ class UserService:
 
     @log_decorator
     def authenticate(self, request: AuthenticationRequest) -> AuthenticationResponse:
-        db_user = self.user_repo.find_by_username(request.username)
+        db_user = self.user_repo.find_by_username(request.username.lower())
 
         if not db_user:
             return AuthenticationResponse.failure(

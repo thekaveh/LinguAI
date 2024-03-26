@@ -93,7 +93,7 @@ def render():
             first_name = st.text_input("First Name*", placeholder="Your first name")
             last_name = st.text_input("Last Name*", placeholder="Your last name")
             middle_name = st.text_input("Middle Name", placeholder="Your middle name (optional)")
-            preferred_name = st.text_input("Preferred Name", placeholder="How should we call you?")
+            preferred_name = st.text_input("Preferred Name", placeholder="What should we call you?")
             email = st.text_input("Email*", placeholder="Enter your email")
             
         # Column 2: Account & Security
@@ -102,7 +102,7 @@ def render():
             password = st.text_input("Password*", placeholder="Create a password", type="password")
             confirm_password = st.text_input("Confirm Password*", placeholder="Confirm your password", type="password")
             age = st.selectbox("Age*", options=list(range(15, 66)), index=0)
-            sex = st.selectbox("Sex*", options=["", "Male", "Female", "Prefer not to say"])            
+            gender = st.selectbox("Gender*", options=["", "Male", "Female", "Nonbinary", "Prefer not to say"])            
 
 
         st.write("")        
