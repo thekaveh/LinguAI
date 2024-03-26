@@ -96,8 +96,13 @@ def _build_content_gen_request(
 
 @log_decorator
 def _add_welcome(user):
+    if user.preferred_name:
+            user_first = user.preferred_name
+    else:
+        user_first = user.first_name
+
     welcome_ = f"""
-    ### Hi, {user.first_name} {user.middle_name} {user.last_name}!
+    ### Hi, {user_first} {user.middle_name} {user.last_name}!
     
     We're delighted to have you here. You're on the path to expanding your knowledge and skills. 
     Let's make today's learning session productive and engaging.

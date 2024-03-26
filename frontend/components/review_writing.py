@@ -20,8 +20,13 @@ from services.review_writing_service import ReviewWritingService
 
 @log_decorator
 def _add_welcome(user):
+    if user.preferred_name:
+            user_first = user.preferred_name
+    else:
+        user_first = user.first_name
+        
     welcome = f"""
-    ### Hi, {user.first_name} {user.middle_name or ""} {user.last_name}!
+    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!
 
     To get started, Write the content that you want feedback in the text area below. 
     LinguAI can provide feedback on your written content based on your skill level, 

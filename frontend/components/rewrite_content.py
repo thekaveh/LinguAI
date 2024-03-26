@@ -19,8 +19,12 @@ from services.rewrite_content_service import RewriteContentService
 
 @log_decorator
 def _add_welcome(user):
+    if user.preferred_name:
+            user_first = user.preferred_name
+    else:
+        user_first = user.first_name
     welcome = f"""
-    ### Hi, {user.first_name} {user.middle_name or ""} {user.last_name}!
+    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!
 
     To get started, simply paste the text you'd like to convert into the text area below. 
     LinguAI can convert it into content that matches your skill level and language selected.
