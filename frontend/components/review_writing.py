@@ -1,25 +1,21 @@
 import asyncio
+import traceback
 import streamlit as st
-from typing import List
-from datetime import date
-from datetime import datetime
+from typing import Optional
 from langdetect import detect
-from typing import Optional, List
-from concurrent.futures import ThreadPoolExecutor
+#from concurrent.futures import ThreadPoolExecutor
 
-from core.config import Config
 from utils.logger import log_decorator
 
 from schema.user import User
-from schema.language import Language
 from schema.review_writing import ReviewWritingReq
 from schema.user_assessment import UserAssessmentBase
 
 from services.user_service import UserService
 from services.state_service import StateService
-from services.language_service import LanguageService
 from services.skill_level_service import SkillLevelService
-from services.review_writiting import ReviewWritingService
+from services.text_to_speech_service import TextToSpeechService
+from services.review_writing_service import ReviewWritingService
 
 
 @log_decorator
@@ -33,7 +29,6 @@ def _add_welcome(user):
 
     """
     st.markdown(welcome, unsafe_allow_html=True)
-    
 
 
 @log_decorator
@@ -46,14 +41,18 @@ def _add_skill_level_by_language(user):
     if not user or not user.user_assessments or not user.learning_languages:
         st.write("No user or user assessments or learning languages found")
         return
-    
+
     # Loop through each language in the user's learning languages
     for language in user.learning_languages:
         # Find the latest assessment for the current language
         latest_assessment = None
         for user_assessment in user.user_assessments:
             if user_assessment.language.language_name == language:
-                if latest_assessment is None or user_assessment.assessment_date > latest_assessment.assessment_date:
+                if (
+                    latest_assessment is None
+                    or user_assessment.assessment_date
+                    > latest_assessment.assessment_date
+                ):
                     latest_assessment = user_assessment
 
         # Display the language and its skill level
@@ -61,51 +60,9 @@ def _add_skill_level_by_language(user):
             skill_level = latest_assessment.skill_level
             st.write(f"###### {language}: {skill_level}")
 
-
-
-
-
-@log_decorator
-def stream_content(contentRewriteReq):
-    # Placeholder for accumulated content
-    if "content_stream" not in st.session_state:
-        st.session_state["content_stream"] = ""
-
-    # Define callback functions
-    def on_next(content_chunk):
-        # Append new content chunk to the existing content
-        st.session_state["content_stream"] += content_chunk
-
-    def on_completed():
-        # Handle completion (e.g., clear session state if needed)
-        pass
-
-    # Async call to generate content (simplified example, adjust as needed)
-    asyncio.run(
-        ReviewWritingService.areview_writing(contentRewriteReq, on_next_fn=on_next, on_completed_fn=on_completed)
-        )
-    
-
-@log_decorator
-def _fetch_skill_levels_sync():
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(SkillLevelService.list())
-    loop.close()
-    return result
-
-
-@log_decorator
-def _fetch_skill_levels():
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_fetch_skill_levels_sync)
-        return future.result()
-
-
 @log_decorator
 def _get_next_skill_level(curr_skill_level: str) -> Optional[str]:
-    skill_levels = _fetch_skill_levels()
+    skill_levels = asyncio.run(SkillLevelService.list())
 
     if skill_levels is None:
         return None
@@ -119,7 +76,7 @@ def _get_next_skill_level(curr_skill_level: str) -> Optional[str]:
         if level_obj.level == curr_skill_level:
             given_level_id = level_obj.id
             break
-        
+
     # If the given level is not found, return None
     if given_level_id is None:
         return None
@@ -134,14 +91,14 @@ def _get_next_skill_level(curr_skill_level: str) -> Optional[str]:
     return skill_levels_dict[next_level_id]
 
 
-
 @log_decorator
 def _build_review_writing_request(
-    user: User, input_content: str, 
-    curr_skill_level: str, 
-    next_skill_level: str, 
-    language: str,
-    strength: Optional[str] = None, 
+    user: User,
+    input_content: str,
+    curr_skill_level: str,
+    next_skill_level: str,
+    language: str, model:str, temperature:float,
+    strength: Optional[str] = None,
     weakness: Optional[str] = None,
 ) -> ReviewWritingReq:
 
@@ -160,40 +117,50 @@ def _build_review_writing_request(
         strength=strength,
         weakness=weakness,
         language=language,
+        model=model,
+        temperature=temperature
     )
 
     return review_writing_req
 
-def language_code_to_name(code):
-    if code == 'en':
-        return 'English'
-    elif code == 'de':
-        return 'German'
-    elif code == 'es':
-        return 'Spanish'
-    elif code == 'zh':
-        return 'Mandarin'
-    elif code == 'fr':
-        return 'French'
-    else:
-        return 'unknown'
 
-def _find_last_user_assessment(user: User, language: str) -> Optional[UserAssessmentBase]:
+def language_code_to_name(code):
+    if code == "en":
+        return "English"
+    elif code == "de":
+        return "German"
+    elif code == "es":
+        return "Spanish"
+    elif code == "zh":
+        return "Mandarin"
+    elif code == "fr":
+        return "French"
+    else:
+        return "unknown"
+
+
+def _find_last_user_assessment(
+    user: User, language: str
+) -> Optional[UserAssessmentBase]:
     user_assessments = user.user_assessments
 
     if user_assessments is None:
         return None
-    
+
     # Filter user assessments for the given language
-    language_user_assessments = [ua for ua in user_assessments if ua.language.language_name == language]
-    
+    language_user_assessments = [
+        ua for ua in user_assessments if ua.language.language_name == language
+    ]
+
     # If no assessments found for the language, return None
     if not language_user_assessments:
         return None
-    
+
     # Sort the assessments by assessment_date in descending order
-    sorted_assessments = sorted(language_user_assessments, key=lambda x: x.assessment_date, reverse=True)
-    
+    sorted_assessments = sorted(
+        language_user_assessments, key=lambda x: x.assessment_date, reverse=True
+    )
+
     # Return the first assessment (which is the latest one)
     return sorted_assessments[0]
 
@@ -202,6 +169,11 @@ def _find_last_user_assessment(user: User, language: str) -> Optional[UserAssess
 def render():
     state_service = StateService.instance()
     
+    state_service.review_writing = ""    
+    
+    model= state_service.model
+    temperature= state_service.temperature
+    
     st.title("LinguAI")
 
     st.write("")
@@ -209,84 +181,147 @@ def render():
     st.subheader("Review your writing and get feedback on how to improve it.")
 
     st.write("")
-    
+
     username = state_service.username
     user = UserService.get_user_by_username_sync(username)
-    
+
     if user is None:
         st.write("No user found")
         return
-    
+
     _add_welcome(user)
 
-    col1, col2 = st.columns([3,1])
+    col1, col2 = st.columns([3, 1])
     with col1:
-        original_content = st.text_area(
-            "", height=400, placeholder="Enter your text here...", 
-            key="original_content")
+        user_writing_content = st.text_area(
+            "",
+            height=400,
+            placeholder="Enter your text here...",
+            key="user_writing_content",
+            value="",            
+        )
+        announcement_placeholder = st.empty()
+        button_placeholder = st.empty()
+        audio_placeholder = st.empty()
     with col2:
         _add_skill_level_by_language(user)
-    
     st.write("")
-    st.write("")
+
+
+    # Placeholders for different sections of the page
+
+    #st.write("---")
     
-    if original_content is None or original_content.strip() == "":
+    st.write("---")
+    content_placeholder = st.empty()
+
+
+
+
+    # Display initial or existing content if available
+    if state_service.review_writing:
+        content_placeholder.markdown(
+            f"""{state_service.review_writing}""", unsafe_allow_html=True
+        )
+
+    if user_writing_content is None or user_writing_content.strip() == "":
         return
 
     try:
-        detected_language = detect(original_content)
-       
-        if detected_language is "unknown":      
-            st.write(f"""Hello {user.last_name}, {user.first_name}. The Language you provided is not supported by LinguAI. 
-                 Please provide content in a supported language.""")
-            return        
-        
-        selected_language = language_code_to_name(detected_language)    
-        st.write("Text is written in :", selected_language)
-        last_assessment= _find_last_user_assessment(user, selected_language)
-        
-        if last_assessment is None:
-            curr_skill_level="Beginner"
-            next_skill_level="Beginner"
-            st.write(f"""Hello {user.last_name}, {user.first_name}. We do not have any assessment for you in {selected_language}.
-                     We recommend you to take an assessment first before we can provide feedback.""")
-        else:
-            curr_skill_level=last_assessment.skill_level
-            next_skill_level = _get_next_skill_level(curr_skill_level)
-        
-        
-    except Exception:
-        st.write("Please input content in a supported language.")
+        detected_language = detect(user_writing_content)
 
-    if detected_language is None:
-        return
-    
-
-    
-    
-    
-    st.write("")
-    st.write("")    
-    st.markdown("#### Let's get your writing feedback!")
-    
-    
-    st.write("")
-    st.write("")
-    
-
-    if st.button("Writing Feedback"):
-        if selected_language is None or curr_skill_level is None or next_skill_level is None or last_assessment is None:
+        if detected_language is "unknown":
+            announcement_placeholder.markdown(
+                f"""Hello {user.last_name}, {user.first_name}. The Language you provided is not supported by LinguAI. 
+                 Please provide content in a supported language."""
+            )
             return
-        st.session_state["content_stream"] = ""
-        content_rewrite_req = _build_review_writing_request(user, original_content,curr_skill_level, 
-                                                            next_skill_level,selected_language,last_assessment.strength, 
-                                                            last_assessment.weakness)
-        
-        stream_content(content_rewrite_req)
 
-    placeholder = st.empty()
+        if detected_language is None:
+            return
 
-    # Update content dynamically
-    content = st.session_state.get("content_stream", "")
+        user_entered_language = language_code_to_name(detected_language)
+        announcement_placeholder.markdown(f"Text is written in : {user_entered_language}")
+        last_assessment = _find_last_user_assessment(user, user_entered_language)
 
-    placeholder.markdown(f"""{content}""", unsafe_allow_html=True)
+        if last_assessment is None:
+            curr_skill_level = "Beginner"
+            next_skill_level = "Beginner"
+            announcement_placeholder.markdown(
+                f"""Hello {user.last_name}, {user.first_name}. We do not have any assessment for you in {user_entered_language}.
+                     We recommend you to take an assessment first before we can provide feedback."""
+            )
+        else:
+            curr_skill_level = last_assessment.skill_level
+            next_skill_level = _get_next_skill_level(curr_skill_level)
+            if next_skill_level is None:
+                next_skill_level = curr_skill_level
+            strength = ""
+            if last_assessment.strength:
+                strength=last_assessment.strength
+            weakness = ""
+            if last_assessment.weakness:
+                weakness=last_assessment.weakness            
+
+        with button_placeholder.container():
+            cant_review = (
+                user_entered_language is None
+                or curr_skill_level is None
+                or next_skill_level is None
+                or last_assessment is None
+            )
+            col3, col4 = st.columns([3, 1])
+            with col3:
+                if st.button(
+                    "Review Writing", use_container_width=True, disabled=cant_review , type="primary"):
+                    if cant_review:
+                        return
+
+                    st.write("")
+                    st.write("")
+                    announcement_placeholder.markdown(
+                        "#### Let's get your writing feedback!"
+                    )
+
+                    st.write("")
+                    st.write("")
+
+                    review_writing_req = _build_review_writing_request(
+                        user,
+                        user_writing_content,
+                        curr_skill_level,
+                        next_skill_level,
+                        user_entered_language,model, temperature,
+                        strength,
+                        weakness,
+                    )
+
+                    async def _content_on_changed(content):
+                        content_placeholder.markdown(
+                            f"""{content}""", unsafe_allow_html=True
+                        )
+
+                    async def _content_on_completed(content):
+                        state_service.review_writing = content
+
+                        audio_data = await TextToSpeechService.agenerate(
+                            lang="en", text=content
+                        )
+
+                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+
+                    asyncio.run(
+                        ReviewWritingService.areview_writing(
+                            review_writing_req,
+                            on_changed_fn=_content_on_changed,
+                            on_completed_fn=_content_on_completed,
+                        )
+                    )
+            with col4:
+                if st.button("Clear", type="primary", use_container_width=True):
+                    state_service.review_writing = ""
+                    st.rerun()                    
+
+    except Exception:
+        announcement_placeholder.write("Please input content in a supported language.")

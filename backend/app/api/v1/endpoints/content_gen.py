@@ -1,8 +1,6 @@
-# Backend: FastAPI Streaming Endpoint Adjustment
-
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.utils.logger import log_decorator
 from app.data_access.session import get_db
@@ -17,9 +15,9 @@ router = APIRouter()
 async def generate_content_by_topic(
     request: ContentGenReq, db: Session = Depends(get_db)
 ) -> StreamingResponse:
-    con_gen_service = ContentGenService(db)
+    service = ContentGenService(db)
     try:
-        stream = await con_gen_service.agenerate_content(request)
+        stream = await service.agenerate_content(request)
         return StreamingResponse(content=stream, media_type="text/event-stream")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -8,7 +8,7 @@ textColor = "#0d0d0d"
 font = "sans serif"
 
 [server]
-# Your server configuration here (if needed)
+fileWatcherType="poll"
 
 [browser]
 # Any browser-specific configurations

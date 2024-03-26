@@ -12,3 +12,6 @@ class ReviewWritingReq(BaseModel):
     strength: str
     weakness: str
     input_content: str
+    model: str
+    temperature: float
+    

@@ -10,7 +10,9 @@ class ContentGenReq(BaseModel):
     user_topics: List[str]
     content: Content
     language: Language
-
+    skill_level: str
+    model_name: str    
+    temperature: float
 
 class ContentGenRes(BaseModel):
     generated_content: str
