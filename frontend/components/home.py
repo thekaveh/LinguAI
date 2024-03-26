@@ -52,7 +52,12 @@ def render():
         user = UserService.get_user_by_username_sync(
 			state_service.username
 		)
-        st.write(
+        if user.preferred_name:
+            st.write(
+            f"Welcome back, {user.preferred_name} {user.last_name}.!"
+        )
+        else:
+            st.write(
             f"Welcome back, {user.first_name} {user.last_name}.!"
         )
         _add_linguai_note()

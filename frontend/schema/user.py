@@ -16,6 +16,11 @@ class UserBase(BaseModel):
     first_name: str
     last_name: str
     middle_name: Optional[str] = None
+    preferred_name: Optional[str] = None # optional preferred name field
+    age: Optional[int] = None # age field
+    gender: Optional[str] = None 
+    discovery_method: Optional[str] = None # optional field for "how did you hear about us?"
+    motivation: Optional[str] = None # optional field for "what is your motivation to use the platform?"
     mobile_phone: Optional[str] = None
     landline_phone: Optional[str] = None
     contact_preference: Optional[str] = None

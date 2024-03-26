@@ -51,7 +51,7 @@ def _fetch_languages():
 @log_decorator
 def _render_language_dropdown(languages):
     options = [""] + [language.language_name for language in languages]
-    selected_option_index = st.selectbox("Select Base Language", range(len(options)), format_func=lambda x: options[x])
+    selected_option_index = st.selectbox("Select Base Language*", range(len(options)), format_func=lambda x: options[x])
     
     if selected_option_index > 0:
         selected_base_language = languages[selected_option_index - 1]
@@ -90,17 +90,17 @@ def render():
 
         # Column 1: Personal Details
         with col1:
-            first_name = st.text_input("First Name*", placeholder="Your first name")
-            last_name = st.text_input("Last Name*", placeholder="Your last name")
-            middle_name = st.text_input("Middle Name", placeholder="Your middle name (optional)")
-            preferred_name = st.text_input("Preferred Name", placeholder="What should we call you?")
+            first_name = st.text_input("First Name*", placeholder="Your first name", max_chars=20)
+            last_name = st.text_input("Last Name*", placeholder="Your last name", max_chars=20)
+            middle_name = st.text_input("Middle Name", placeholder="Your middle name (optional)", max_chars=20)
+            preferred_name = st.text_input("Preferred Name", placeholder="What should we call you?", max_chars=20)
             email = st.text_input("Email*", placeholder="Enter your email")
             
         # Column 2: Account & Security
         with col2:
-            username = st.text_input("Username*", placeholder="Choose a username")
-            password = st.text_input("Password*", placeholder="Create a password", type="password")
-            confirm_password = st.text_input("Confirm Password*", placeholder="Confirm your password", type="password")
+            username = st.text_input("Username*", placeholder="Choose a username", max_chars=20)
+            password = st.text_input("Password*", placeholder="Create a password", type="password", max_chars=20)
+            confirm_password = st.text_input("Confirm Password*", placeholder="Confirm your password", type="password", max_chars=20)
             age = st.selectbox("Age*", options=list(range(15, 66)), index=0)
             gender = st.selectbox("Gender*", options=["", "Male", "Female", "Nonbinary", "Prefer not to say"])            
 
@@ -113,7 +113,7 @@ def render():
         col3, col4 = st.columns(2)
         with col3:
             st.markdown("#### Additional Information")            
-            reference_providers = st.text_input("How did you learn about us?", placeholder="e.g., School, Friend, Online Ad")
+            discovery_method = st.text_input("How did you learn about us?", placeholder="e.g., School, Friend, Online Ad", max_chars=100)
             day_time_phone = st.text_input("Day Time Mobile Phone", placeholder="+1 234 567 8900")
             st.write("")
             st.markdown("##### Select Languages and Topics")
@@ -133,24 +133,27 @@ def render():
             st.markdown("")
             selected_base_language=_render_language_dropdown(_fetch_languages())
 
-            motivation = st.text_area("Your Motivation to Use the Platform", height=255, placeholder="Share what motivates you to use this platform")
-        
+            motivation = st.text_area("Your Motivation to Use the Platform", height=172, placeholder="Share what motivates you to use this platform", max_chars=100)
 
-        #st.multiselect()
-
+            contact_preference_entry = st.selectbox("Contact Preference:", options=["", "Email", "Mobile"])
+            if (contact_preference_entry == "Mobile"):
+                contact_preference = "mobile_phone"
+            else:
+                contact_preference = "email"
         
         submit_button = st.form_submit_button(label='Register')
 
         if submit_button:
             # Validate form
-            errors = validate_registration_form(first_name, last_name, username, password, confirm_password, email, age,selected_base_language)
+            errors = validate_registration_form(motivation, middle_name, first_name, last_name, username, password, confirm_password, email, age,selected_base_language)
 
             # Display errors or success message
             if errors:
                 st.error("\n".join(errors))
             else:
+                contact_preference="email" # hardcoded for testing 
                 user_language_list= create_user_language_list(selected_languages, language_list)
-                user_create = create_user_create_object(first_name, last_name, middle_name, day_time_phone, email, username, password, selected_base_language, user_language_list, selected_topics)
+                user_create = create_user_create_object(preferred_name, age, gender, discovery_method, motivation, contact_preference, first_name, last_name, middle_name, day_time_phone, email, username, password, selected_base_language, user_language_list, selected_topics)
                 user_create_in_db= asyncio.run(UserService.create_user(user_create))
                 st.success("Registration Successful!, Login to the Platform from the sidebar.")
 
@@ -164,7 +167,7 @@ def create_user_language_list(selected_languages: List[str], language_list: List
         user_languages.append(language_name)
     return user_languages
 
-def create_user_create_object(first_name, last_name, middle_name, day_time_phone,email, username, password, base_language, user_language_list, selected_topics):
+def create_user_create_object(preferred_name, age, gender, discovery_method, motivation, contact_preference, first_name, last_name, middle_name, day_time_phone,email, username, password, base_language, user_language_list, selected_topics):
     # Create UserTopicBase objects for each selected topic
     user_topics = [UserTopicBase(user_id=0, topic_name=topic) for topic in selected_topics]
     #st.write(" learning_languages: ", user_language_list)
@@ -175,8 +178,14 @@ def create_user_create_object(first_name, last_name, middle_name, day_time_phone
         first_name=first_name,
         last_name=last_name,
         middle_name=middle_name,
+        preferred_name=preferred_name,
+        age=age,
+        gender=gender,
+        discovery_method=discovery_method,
+        motivation=motivation,
         mobile_phone=day_time_phone,
-        landline_phone=day_time_phone, # set to the same as mobile phone fo
+        landline_phone=day_time_phone, # set to the same as mobile phone 
+        contact_preference=contact_preference,
         base_language=base_language,        
         learning_languages=user_language_list,
         user_topics=user_topics,  
@@ -184,9 +193,22 @@ def create_user_create_object(first_name, last_name, middle_name, day_time_phone
     )
 
 
-def validate_registration_form(first_name, last_name, username, password, confirm_password, email, age, selected_base_language):
+def validate_registration_form(motivation, middle_name, first_name, last_name, username, password, confirm_password, email, age, selected_base_language):
     errors = []
 
+    # name validation regex pattern 
+    name_pattern = r"^[A-Za-z-' ]+$"
+    if not re.match(name_pattern, first_name):
+        errors.append("First Name can only contain letters, hyphens, apostrophes, and spaces.")
+    if not re.match(name_pattern, last_name):
+        errors.append("Last Name can only contain letters, hyphens, apostrophes, and spaces.")
+    if not re.match(name_pattern, middle_name):
+        errors.append("Middle Name can only contain letters, hyphens, apostrophes, and spaces.")
+    if not re.match(name_pattern, username):
+        errors.append("Username can only contain letters, hyphens, apostrophes, and spaces.")
+    if len(motivation) > 100:
+        errors.append("Motivation cannot exceed 100 characters.")
+        
     if not first_name:
         errors.append("First Name is required. \n")
 
