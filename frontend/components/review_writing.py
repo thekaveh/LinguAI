@@ -3,7 +3,7 @@ import traceback
 import streamlit as st
 from typing import Optional
 from langdetect import detect
-from concurrent.futures import ThreadPoolExecutor
+#from concurrent.futures import ThreadPoolExecutor
 
 from utils.logger import log_decorator
 
@@ -60,27 +60,9 @@ def _add_skill_level_by_language(user):
             skill_level = latest_assessment.skill_level
             st.write(f"###### {language}: {skill_level}")
 
-
-@log_decorator
-def _fetch_skill_levels_sync():
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(SkillLevelService.list())
-    loop.close()
-    return result
-
-
-@log_decorator
-def _fetch_skill_levels():
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_fetch_skill_levels_sync)
-        return future.result()
-
-
 @log_decorator
 def _get_next_skill_level(curr_skill_level: str) -> Optional[str]:
-    skill_levels = _fetch_skill_levels()
+    skill_levels = asyncio.run(SkillLevelService.list())
 
     if skill_levels is None:
         return None
@@ -115,7 +97,7 @@ def _build_review_writing_request(
     input_content: str,
     curr_skill_level: str,
     next_skill_level: str,
-    language: str,
+    language: str, model:str, temperature:float,
     strength: Optional[str] = None,
     weakness: Optional[str] = None,
 ) -> ReviewWritingReq:
@@ -135,6 +117,8 @@ def _build_review_writing_request(
         strength=strength,
         weakness=weakness,
         language=language,
+        model=model,
+        temperature=temperature
     )
 
     return review_writing_req
@@ -184,7 +168,12 @@ def _find_last_user_assessment(
 @log_decorator
 def render():
     state_service = StateService.instance()
-
+    
+    state_service.review_writing = ""    
+    
+    model= state_service.model
+    temperature= state_service.temperature
+    
     st.title("LinguAI")
 
     st.write("")
@@ -204,25 +193,30 @@ def render():
 
     col1, col2 = st.columns([3, 1])
     with col1:
-        original_content = st.text_area(
+        user_writing_content = st.text_area(
             "",
             height=400,
             placeholder="Enter your text here...",
-            key="original_content",
+            key="user_writing_content",
+            value="",            
         )
+        announcement_placeholder = st.empty()
+        button_placeholder = st.empty()
+        audio_placeholder = st.empty()
     with col2:
         _add_skill_level_by_language(user)
+    st.write("")
 
-    st.write("")
-    st.write("")
 
     # Placeholders for different sections of the page
-    button_placeholder = st.empty()
-    st.write("---")
-    announcement_placeholder = st.empty()
+
+    #st.write("---")
+    
     st.write("---")
     content_placeholder = st.empty()
-    audio_placeholder = st.empty()
+
+
+
 
     # Display initial or existing content if available
     if state_service.review_writing:
@@ -230,11 +224,11 @@ def render():
             f"""{state_service.review_writing}""", unsafe_allow_html=True
         )
 
-    if original_content is None or original_content.strip() == "":
+    if user_writing_content is None or user_writing_content.strip() == "":
         return
 
     try:
-        detected_language = detect(original_content)
+        detected_language = detect(user_writing_content)
 
         if detected_language is "unknown":
             announcement_placeholder.markdown(
@@ -246,74 +240,88 @@ def render():
         if detected_language is None:
             return
 
-        selected_language = language_code_to_name(detected_language)
-        announcement_placeholder.markdown(f"Text is written in : {selected_language}")
-        last_assessment = _find_last_user_assessment(user, selected_language)
+        user_entered_language = language_code_to_name(detected_language)
+        announcement_placeholder.markdown(f"Text is written in : {user_entered_language}")
+        last_assessment = _find_last_user_assessment(user, user_entered_language)
 
         if last_assessment is None:
             curr_skill_level = "Beginner"
             next_skill_level = "Beginner"
             announcement_placeholder.markdown(
-                f"""Hello {user.last_name}, {user.first_name}. We do not have any assessment for you in {selected_language}.
+                f"""Hello {user.last_name}, {user.first_name}. We do not have any assessment for you in {user_entered_language}.
                      We recommend you to take an assessment first before we can provide feedback."""
             )
         else:
             curr_skill_level = last_assessment.skill_level
             next_skill_level = _get_next_skill_level(curr_skill_level)
+            if next_skill_level is None:
+                next_skill_level = curr_skill_level
+            strength = ""
+            if last_assessment.strength:
+                strength=last_assessment.strength
+            weakness = ""
+            if last_assessment.weakness:
+                weakness=last_assessment.weakness            
 
         with button_placeholder.container():
             cant_review = (
-                selected_language is None
+                user_entered_language is None
                 or curr_skill_level is None
                 or next_skill_level is None
                 or last_assessment is None
             )
-            if st.button(
-                "Review Writing", use_container_width=True, disabled=cant_review
-            ):
-                if cant_review:
-                    return
+            col3, col4 = st.columns([3, 1])
+            with col3:
+                if st.button(
+                    "Review Writing", use_container_width=True, disabled=cant_review , type="primary"):
+                    if cant_review:
+                        return
 
-                st.write("")
-                st.write("")
-                announcement_placeholder.markdown(
-                    "#### Let's get your writing feedback!"
-                )
-
-                st.write("")
-                st.write("")
-
-                review_writing_req = _build_review_writing_request(
-                    user,
-                    original_content,
-                    curr_skill_level,
-                    next_skill_level,
-                    selected_language,
-                    last_assessment.strength,
-                    last_assessment.weakness,
-                )
-
-                async def _content_on_changed(content):
-                    content_placeholder.markdown(
-                        f"""{content}""", unsafe_allow_html=True
+                    st.write("")
+                    st.write("")
+                    announcement_placeholder.markdown(
+                        "#### Let's get your writing feedback!"
                     )
 
-                async def _content_on_completed(content):
-                    state_service.review_writing = content
+                    st.write("")
+                    st.write("")
 
-                    audio_data = await TextToSpeechService.agenerate(
-                        lang="en", text=content
+                    review_writing_req = _build_review_writing_request(
+                        user,
+                        user_writing_content,
+                        curr_skill_level,
+                        next_skill_level,
+                        user_entered_language,model, temperature,
+                        strength,
+                        weakness,
                     )
 
-                    audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                    audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+                    async def _content_on_changed(content):
+                        content_placeholder.markdown(
+                            f"""{content}""", unsafe_allow_html=True
+                        )
 
-                asyncio.run(
-                    ReviewWritingService.areview_writing(
-                        review_writing_req,
-                        on_changed_fn=_content_on_changed,
-                        on_completed_fn=_content_on_completed,
+                    async def _content_on_completed(content):
+                        state_service.review_writing = content
+
+                        audio_data = await TextToSpeechService.agenerate(
+                            lang="en", text=content
+                        )
+
+                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+
+                    asyncio.run(
+                        ReviewWritingService.areview_writing(
+                            review_writing_req,
+                            on_changed_fn=_content_on_changed,
+                            on_completed_fn=_content_on_completed,
+                        )
                     )
-                )
+            with col4:
+                if st.button("Clear", type="primary", use_container_width=True):
+                    state_service.review_writing = ""
+                    st.rerun()                    
+
     except Exception:
         announcement_placeholder.write("Please input content in a supported language.")

@@ -1,7 +1,6 @@
 import asyncio
 import streamlit as st
 from typing import List
-from concurrent.futures import ThreadPoolExecutor
 
 from core.config import Config
 from utils.logger import log_decorator
@@ -85,23 +84,6 @@ def _build_content_rewrite_request(
 
 
 @log_decorator
-def _fetch_skill_levels_sync():
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(SkillLevelService.list())
-    loop.close()
-    return result
-
-
-@log_decorator
-def _fetch_skill_levels():
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_fetch_skill_levels_sync)
-        return future.result()
-
-
-@log_decorator
 def _render_skill_levels(skill_levels):
     options = [""] + [skill_level.level for skill_level in skill_levels]
     selected_option_index = st.selectbox(
@@ -115,24 +97,6 @@ def _render_skill_levels(skill_levels):
     else:
         selected_skill_level = None
     return selected_skill_level
-
-
-
-@log_decorator
-def _fetch_languages_sync():
-    # Wrapper function to call the async function synchronously
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(LanguageService.list())
-    loop.close()
-    return result
-
-
-@log_decorator
-def _fetch_languages():
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(_fetch_languages_sync)
-        return future.result()
 
 
 @log_decorator
@@ -174,11 +138,11 @@ def render():
     
     col1, col2 = st.columns([3, 1])
     with col1:
-        original_content = st.text_area(
+        original_rewrite_content = st.text_area(
             "",
             height=400,
             placeholder="Enter your text here...",
-            key="original_content",
+            key="original_rewrite_content",
             value="",
         )
     with col2:
@@ -187,8 +151,9 @@ def render():
     st.write("")
     st.write("")
 
-    skill_levels = _fetch_skill_levels()
-    languages = _fetch_languages()
+    skill_levels = asyncio.run(SkillLevelService.list())
+
+    languages = asyncio.run(LanguageService.list())
 
     st.write("")
     st.write("")
@@ -229,7 +194,7 @@ def render():
 
 
     with button_placeholder.container():
-        if skill_level is None or selected_language is None or original_content == "":
+        if skill_level is None or selected_language is None or original_rewrite_content == "":
             st.markdown(
                 '<div style="padding: 10px; border: 1px solid red; border-radius: 5px;">'
                 "<b></b> Please Enter content int text area above, select a language and skill level.</div>",
@@ -250,7 +215,7 @@ def render():
 
                     content_rewrite_req = _build_content_rewrite_request(
                         user,
-                        original_content,
+                        original_rewrite_content,
                         skill_level.level,
                         selected_language.language_name,
                         user_skill_level,

@@ -29,11 +29,17 @@ class ReviewWritingService:
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
 
-        # Use temperature from the request if provided, else use the default
+        model_name=Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
         temperature = float(Config.DEFAULT_TEMPERATURE)
 
+        if not request.model:
+            model_name=request.model
+        
+        if request.temperature:
+            temperature=request.temperature
+
         chat_runnable = LLMService.get_chat_runnable(
-            model=Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL, temperature=temperature
+            model=model_name, temperature=temperature
         )
         parser = StrOutputParser()
         chain = prompt | chat_runnable | parser
@@ -48,16 +54,22 @@ class ReviewWritingService:
         )
         # Fetch the prompt based on the defined criteria
         db_prompt = self.prompt_service.get_prompt_by_search_criteria(search_criteria)
-
+        
+        #The last feedback provided as strengths is {request.strength} and the weakness is {request.weakness}.
+        
         if db_prompt:
             # Assuming the prompt text in the database is a template that needs to be formatted
             return f"""
-                    The writer of the following text is currently at {request.curr_skill_level.upper} in language {request.language.upper}. 
-                    The next skill level for the writter is {request.next_skill_level.upper}. 
+                    The writer of the following text is currently at {request.curr_skill_level} skill level in {request.language} language. 
+                    The next skill level for the writter is {request.next_skill_level} level. 
                     The last feedback provided as strengths is {request.strength} and the weakness is {request.weakness}.
                     
-                    With the above information, now review the following input content from the writer below and provide summary of findings, 
-                    and provide feedback in DIRECT VOICE to improve further. Here is the input content to review:
+                    \n With the above information, now review the following input content from the writer below and provide summary of findings, 
+                    and provide feedback in DIRECT VOICE to improve from {request.curr_skill_level.upper} skill level to next. 
+                    
+                    \n Your feedback should be in  {request.language}
+                    
+                    \nHere is the input content to review:
                     
                     {request.input_content}
                     
@@ -65,13 +77,17 @@ class ReviewWritingService:
 
         else:
             # Handle cases where no matching prompt is found
+            # Assuming the prompt text in the database is a template that needs to be formatted
             return f"""
-                    The writer of the following text is currently at {request.curr_skill_level.upper} in language {request.language.upper}. 
+                    The writer of the following text is currently at {request.curr_skill_level.upper} skill level in language {request.language.upper}. 
                     The next skill level for the writter is {request.next_skill_level.upper}. 
-                    The last feedback provided as strengths is {request.strength} and the weakness is {request.weakness}.
                     
-                    With the above information, now review the following input content from the writer below and provide summary of findings, 
-                    and provide feedback in DIRECT VOICE to improve further. Here is the input content to review:
+                    \n With the above information, now review the following input content from the writer below and provide summary of findings, 
+                    and provide feedback in DIRECT VOICE to improve from {request.curr_skill_level.upper} skill level to next. 
+                    
+                    \n Your feedback should be in  {request.language.upper} language.
+                    
+                    \nHere is the input content to review:
                     
                     {request.input_content}
                     
