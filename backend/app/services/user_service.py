@@ -61,20 +61,22 @@ class UserService:
             contact_preference=user_create.contact_preference,
         )
         self.db.add(db_user)
-        # self.db.flush() # flush to get the db_user.id for FK relationships without committing the transaction
         
-        # if user_create.learning_languages:
-        #     for language_name in user_create.learning_languages:
-        #         language_schema = self.language_service.get_language_by_name(language_name)
-        #         if language_schema:
-        #             default_assessment = UserAssessment(
-        #                 user_id=db_user.user_id,
-        #                 assessment_date=date.today(),
-        #                 assessment_type="Initial",
-        #                 skill_level="beginner",
-        #                 language=language_schema.language_id,
-        #             )
-        #             self.db.add(default_assessment)
+        self.db.flush() # flush to get the db_user.id for FK relationships without committing the transaction
+        
+        # create initial default assessments 
+        if user_create.learning_languages:
+            for language_name in user_create.learning_languages:
+                language_schema = self.language_service.get_language_by_name(language_name=language_name)
+                if language_schema:
+                    default_assessment = UserAssessment(
+                        user_id=db_user.user_id,
+                        assessment_date=date.today(),
+                        assessment_type="Initial",
+                        skill_level="beginner",
+                        language_id=language_schema.language_id,
+                    )
+                    self.db.add(default_assessment)
             
         self.db.commit()
         self.db.refresh(db_user)  # Refresh the db_user object after committing to get the user_id
