@@ -55,6 +55,13 @@ Please note that you can optionally start services in detached mode using `docke
 10. In order to make sure recent DB schema and data changes are reflected in your DB container, make sure you bring down the docker compose using the command below (with `-v`):
     - `docker-compose down -v --remove-orphans`
 
+## Running Local Tests
+
+Frontend services: cd into frontend/ and run `python -m pytest tests/` to run all frontend service tests
+Backend services: cd into backend/ and run `python -m pytest app/tests/` to run all backend service tests
+
+*Make sure to install pytest, pytest-asyncio, and do `poetry install` to get rest of dependencies locally in virtual env
+
 ### Code Changes
 
 Thanks to Docker volumes that mount the code inside the containers, changes made to the codebase will automatically reflect in the running containers and will, in turn, show up on both the running frontend and backend services. Once happy with your changes, you can simply commit them to Git branch you're working on regardless of whether you applied the changes from inside the running containers or outside.
