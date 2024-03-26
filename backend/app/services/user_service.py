@@ -12,13 +12,18 @@ from app.data_access.models.user import User as DBUser, UserAssessment, UserTopi
 from app.data_access.models.topic import Topic
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
+
 import bcrypt
+
+from app.services.language_service import LanguageService
+from datetime import date
 
 class UserService:
     @log_decorator
     def __init__(self, db: Session):
         self.db = db
         self.user_repo = UserRepository(db)
+        self.language_service = LanguageService(db)
 
     # hashes a password
     def hash_password(self, password: str) -> str:
@@ -45,14 +50,32 @@ class UserService:
             learning_languages=user_create.learning_languages,
             first_name=user_create.first_name,
             last_name=user_create.last_name,
+            preferred_name=user_create.preferred_name,
+            age=user_create.age,
+            gender=user_create.gender,
+            discovery_method=user_create.discovery_method,
+            motivation=user_create.motivation,
             middle_name=user_create.middle_name,
             mobile_phone=user_create.mobile_phone,
             landline_phone=user_create.landline_phone,
             contact_preference=user_create.contact_preference,
-            #user_topics=user_create.user_topics,
-            #user_assessments=user_create.user_assessments # there wouldn't be any assessments at the time of user creation
         )
         self.db.add(db_user)
+        # self.db.flush() # flush to get the db_user.id for FK relationships without committing the transaction
+        
+        # if user_create.learning_languages:
+        #     for language_name in user_create.learning_languages:
+        #         language_schema = self.language_service.get_language_by_name(language_name)
+        #         if language_schema:
+        #             default_assessment = UserAssessment(
+        #                 user_id=db_user.user_id,
+        #                 assessment_date=date.today(),
+        #                 assessment_type="Initial",
+        #                 skill_level="beginner",
+        #                 language=language_schema.language_id,
+        #             )
+        #             self.db.add(default_assessment)
+            
         self.db.commit()
         self.db.refresh(db_user)  # Refresh the db_user object after committing to get the user_id
 
