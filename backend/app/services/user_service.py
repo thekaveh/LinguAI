@@ -12,13 +12,18 @@ from app.data_access.models.user import User as DBUser, UserAssessment, UserTopi
 from app.data_access.models.topic import Topic
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
+
 import bcrypt
+
+from app.services.language_service import LanguageService
+from datetime import date
 
 class UserService:
     @log_decorator
     def __init__(self, db: Session):
         self.db = db
         self.user_repo = UserRepository(db)
+        self.language_service = LanguageService(db)
 
     # hashes a password
     def hash_password(self, password: str) -> str:
@@ -37,7 +42,7 @@ class UserService:
         hashed_password = self.hash_password(user_create.password_hash)
 
         db_user = DBUser(
-            username=user_create.username,
+            username=user_create.username.lower(), # convert username to lowercase
             email=user_create.email,
             password_hash=hashed_password, # use the hashed password 
             user_type=user_create.user_type,
@@ -45,14 +50,34 @@ class UserService:
             learning_languages=user_create.learning_languages,
             first_name=user_create.first_name,
             last_name=user_create.last_name,
+            preferred_name=user_create.preferred_name,
+            age=user_create.age,
+            gender=user_create.gender,
+            discovery_method=user_create.discovery_method,
+            motivation=user_create.motivation,
             middle_name=user_create.middle_name,
             mobile_phone=user_create.mobile_phone,
             landline_phone=user_create.landline_phone,
             contact_preference=user_create.contact_preference,
-            #user_topics=user_create.user_topics,
-            #user_assessments=user_create.user_assessments # there wouldn't be any assessments at the time of user creation
         )
         self.db.add(db_user)
+        
+        self.db.flush() # flush to get the db_user.id for FK relationships without committing the transaction
+        
+        # create initial default assessments 
+        if user_create.learning_languages:
+            for language_name in user_create.learning_languages:
+                language_schema = self.language_service.get_language_by_name(language_name=language_name)
+                if language_schema:
+                    default_assessment = UserAssessment(
+                        user_id=db_user.user_id,
+                        assessment_date=date.today(),
+                        assessment_type="Initial",
+                        skill_level="beginner",
+                        language_id=language_schema.language_id,
+                    )
+                    self.db.add(default_assessment)
+            
         self.db.commit()
         self.db.refresh(db_user)  # Refresh the db_user object after committing to get the user_id
 
@@ -86,7 +111,7 @@ class UserService:
 
     @log_decorator
     def get_user_by_username(self, username: str) -> Optional[User]:
-        return self.user_repo.find_by_username(username)
+        return self.user_repo.find_by_username(username.lower())
 
     @log_decorator
     def get_users(self) -> list:
@@ -109,7 +134,7 @@ class UserService:
 
     @log_decorator
     def update_user_topics(self, username: str, new_topics: User) -> None:
-        user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         
         # Checking if user exists
         if user:
@@ -157,7 +182,7 @@ class UserService:
 
     @log_decorator
     def authenticate(self, request: AuthenticationRequest) -> AuthenticationResponse:
-        db_user = self.user_repo.find_by_username(request.username)
+        db_user = self.user_repo.find_by_username(request.username.lower())
 
         if not db_user:
             return AuthenticationResponse.failure(
