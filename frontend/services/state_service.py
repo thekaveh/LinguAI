@@ -5,6 +5,7 @@ from schema.chat import ChatMessage
 from utils.logger import log_decorator
 from services.llm_service import LLMService
 from services.persona_service import PersonaService
+from services.notification_service import NotificationService
 
 
 class StateService:
@@ -73,7 +74,10 @@ class StateService:
 
     @model.setter
     def model(self, value):
-        st.session_state["model"] = value
+        if value and value != self.model:
+            st.session_state["model"] = value
+
+            NotificationService.success(f"LLM Model setting changed to {value}")
 
     @property
     def temperature(self):
@@ -81,7 +85,10 @@ class StateService:
 
     @temperature.setter
     def temperature(self, value):
-        st.session_state["temperature"] = value
+        if value != self.temperature:
+            st.session_state["temperature"] = value
+
+            NotificationService.success(f"LLM Temperature setting changed to {value}")
 
     @property
     def persona(self):
@@ -89,7 +96,10 @@ class StateService:
 
     @persona.setter
     def persona(self, value):
-        st.session_state["persona"] = value
+        if value and value != self.temperature:
+            st.session_state["persona"] = value
+
+            NotificationService.success(f"Persona setting changed to {value}")
 
     @property
     def chat_file_upload_key(self):
