@@ -5,6 +5,7 @@ from schema.chat import ChatMessage
 from utils.logger import log_decorator
 from services.llm_service import LLMService
 from services.persona_service import PersonaService
+from services.notification_service import NotificationService
 
 
 class StateService:
@@ -23,6 +24,7 @@ class StateService:
 
         st.session_state["review_writing"] = ""
         st.session_state["rewrite_content"] = ""
+        st.session_state["content_reading"] = ""
 
     @log_decorator
     def clear_session_state(self):
@@ -72,7 +74,10 @@ class StateService:
 
     @model.setter
     def model(self, value):
-        st.session_state["model"] = value
+        if value and value != self.model:
+            st.session_state["model"] = value
+
+            NotificationService.success(f"LLM Model setting changed to {value}")
 
     @property
     def temperature(self):
@@ -80,7 +85,10 @@ class StateService:
 
     @temperature.setter
     def temperature(self, value):
-        st.session_state["temperature"] = value
+        if value != self.temperature:
+            st.session_state["temperature"] = value
+
+            NotificationService.success(f"LLM Temperature setting changed to {value}")
 
     @property
     def persona(self):
@@ -88,7 +96,10 @@ class StateService:
 
     @persona.setter
     def persona(self, value):
-        st.session_state["persona"] = value
+        if value and value != self.temperature:
+            st.session_state["persona"] = value
+
+            NotificationService.success(f"Persona setting changed to {value}")
 
     @property
     def chat_file_upload_key(self):
@@ -122,6 +133,14 @@ class StateService:
     @review_writing.setter
     def review_writing(self, value):
         st.session_state["review_writing"] = value
+
+    @property
+    def content_reading(self):
+        return st.session_state["content_reading"]
+
+    @content_reading.setter
+    def content_reading(self, value):
+        st.session_state["content_reading"] = value
 
     @log_decorator
     @staticmethod

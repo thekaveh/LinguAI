@@ -14,18 +14,24 @@ from services.topic_service import TopicService
 from services.state_service import StateService
 from services.content_service import ContentService
 from services.content_gen_service import ContentGenService
+from services.text_to_speech_service import TextToSpeechService
 
 
 @log_decorator
 def _render_content_types(content_types):
     options = [content_type.content_name for content_type in content_types]
     selected_option = st.radio(
-        "##### Select Content Type", options, format_func=lambda x: x, horizontal=True, index=None
+        "##### Select Content Type",
+        options,
+        format_func=lambda x: x,
+        horizontal=True,
+        index=None,
     )
     global selected_content_type
     selected_content_type = next(
         (ct for ct in content_types if ct.content_name == selected_option), None
     )
+
 
 @log_decorator
 def _fetch_topic_combo_options():
@@ -64,7 +70,7 @@ def _render_topic_combo_options(combo_options):
                     # Use value parameter to set default selection
                     selected = st.checkbox(
                         option,
-                        value=False, #default_selection,
+                        value=False,  # default_selection,
                         key=f"topic_option_{option_index}",
                     )
                     if selected:
@@ -74,21 +80,30 @@ def _render_topic_combo_options(combo_options):
 
 @log_decorator
 def _build_content_gen_request(
-    user, selected_topic_options, selected_content_type, language, 
-    model_name:str,temperature:float, float,last_assessment=None) -> ContentGenReq:
+    user,
+    selected_topic_options,
+    selected_content_type,
+    language,
+    model_name: str,
+    temperature: float,
+    float,
+    last_assessment=None,
+) -> ContentGenReq:
 
     if not last_assessment:
-        skill_level="beginner"
+        skill_level = "beginner"
     else:
-        skill_level=last_assessment.skill_level
+        skill_level = last_assessment.skill_level
 
     # Build the ContentGenReq object
     content_gen_req = ContentGenReq(
         user_id=user.user_id,
         user_topics=selected_topic_options,
         content=selected_content_type,
-        language=language,skill_level=skill_level,
-        model_name=model_name,temperature=temperature
+        language=language,
+        skill_level=skill_level,
+        model_name=model_name,
+        temperature=temperature,
     )
 
     return content_gen_req
@@ -126,6 +141,7 @@ def _add_instruction(user):
                 """
     )
 
+
 @log_decorator
 def _add_skill_level_by_language(user):
 
@@ -144,7 +160,8 @@ def _add_skill_level_by_language(user):
             st.write(f"###### {language} : {skill_level}")
         else:
             pass
-            #st.write("No assessment found for this language")
+            # st.write("No assessment found for this language")
+
 
 def _get_last_assessment_by_language(user, language):
     latest_assessment = None
@@ -152,8 +169,7 @@ def _get_last_assessment_by_language(user, language):
         if user_assessment.language.language_name == language:
             if (
                 latest_assessment is None
-                or user_assessment.assessment_date
-                > latest_assessment.assessment_date
+                or user_assessment.assessment_date > latest_assessment.assessment_date
             ):
                 latest_assessment = user_assessment
     return latest_assessment
@@ -184,12 +200,13 @@ def _select_learning_language(user):
 @log_decorator
 def render():
     state_service = StateService.instance()
-    temperature =state_service.temperature
+
     model_name = state_service.model
+    username = state_service.username
+    temperature = state_service.temperature
 
     st.title("Content For You")
 
-    username = state_service.username
     user = UserService.get_user_by_username_sync(username)
 
     if user is None:
@@ -230,16 +247,16 @@ def render():
 
     st.markdown("---")
 
-    #if "content_stream" not in st.session_state:
-    st.session_state["content_stream"] = ""
+    col_btn_gen, col_btn_clear, col_tts = st.columns([3, 2, 3])
+    content_gen_placeholder = st.empty()
 
-    if st.session_state["content_stream"]:
-        st.markdown(f"""{st.session_state["content_stream"]}""", unsafe_allow_html=True)
-    
-    col5, col6 = st.columns([5, 1])
-    with col5:
+    state_service.content_reading = ""
+
+    with col_tts:
+        audio_placeholder = st.empty()
+    with col_btn_gen:
         if st.button("Click to Get Your Content", type="primary"):
-            error=[]
+            error = []
             if not selected_topic_options:
                 error.append("You have to Select at least one topic.")
             if not selected_content_type:
@@ -252,33 +269,42 @@ def render():
                     st.error(err)
                 return
 
-            last_assessment=_get_last_assessment_by_language(user, selected_language)
-            st.session_state["content_stream"] = ""
+            last_assessment = _get_last_assessment_by_language(user, selected_language)
+            state_service.content_reading = ""
             content_gen_req = _build_content_gen_request(
-                user, selected_topic_options, selected_content_type, 
-                selected_language, model_name, temperature,last_assessment
+                user,
+                selected_topic_options,
+                selected_content_type,
+                selected_language,
+                model_name,
+                temperature,
+                last_assessment,
             )
 
-            content_gen_placeholder = st.empty()
-
-            # Define callback functions
-            def _content_gen_on_next(content_chunk):
+            async def _content_on_changed(content):
                 content_gen_placeholder.markdown(
-                    f"""{content_chunk}""", unsafe_allow_html=True
+                    f"""{content}""", unsafe_allow_html=True
                 )
 
-            def _content_gen_on_completed(content):
-                st.session_state["content_stream"] = content
-                
+            async def _content_on_completed(content):
+                state_service.content_reading = content
+
+                audio_data = await TextToSpeechService.agenerate(
+                    lang="en",
+                    text=content,
+                )
+
+                audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
 
             asyncio.run(
                 ContentGenService.agenerate_content(
                     request=content_gen_req,
-                    on_next_fn=_content_gen_on_next,
-                    on_completed_fn=_content_gen_on_completed,
+                    on_changed_fn=_content_on_changed,
+                    on_completed_fn=_content_on_completed,
                 )
             )
-    with col6:
+    with col_btn_clear:
         if st.button("Clear", type="primary"):
-            st.session_state["content_stream"] = ""
+            state_service.content_reading = ""
             st.rerun()

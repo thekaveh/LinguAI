@@ -1,5 +1,5 @@
-from typing import Callable
 from core.config import Config
+from typing import Callable, Awaitable
 
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
@@ -11,17 +11,19 @@ class ContentGenService:
     @staticmethod
     async def agenerate_content(
         request: ContentGenReq,
-        on_next_fn: Callable[[str], None],
-        on_completed_fn: Callable[[str], None],
+        on_changed_fn: Callable[[str], Awaitable[None]],
+        on_completed_fn: Callable[[str], Awaitable[None]],
+        indicator: str = "▌",
     ) -> None:
-        content_text = ""
+        content_txt = ""
+        on_changed_fn(indicator)
 
         async for content_text_chunk in HttpUtils.apost_stream(
             url=Config.CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT,
             request=request,
         ):
-            content_text += content_text_chunk
-            on_next_fn(content_text)
+            content_txt += content_text_chunk
+            await on_changed_fn(content_txt + indicator)
 
-        on_next_fn(content_text)
-        on_completed_fn(content_text)
+        await on_changed_fn(content_txt)
+        await on_completed_fn(content_txt)
