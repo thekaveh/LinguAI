@@ -5,6 +5,7 @@ import asyncio
 from utils.logger import log_decorator
 from services.user_service import UserService
 from services.state_service import StateService
+from services.notification_service import NotificationService
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 
 
@@ -50,8 +51,10 @@ def show(pages):
 
                 if auth_response.status:
                     state_service.username = auth_response.username
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
+                    NotificationService.failure(message=auth_response.message)
+
                     st.error(auth_response.message)
 
             st.markdown(
