@@ -23,8 +23,7 @@ def show(pages):
         # Check if the user is authenticated
         if state_service.username is not None:
             # Visually separate the logout button from the menu
-            st.write("---")
-            if st.button("Logout", use_container_width=True):
+            if st.button("Logout", type="primary", use_container_width=True):
                 # Perform logout actions: Reset the authentication state
                 state_service.clear_session_state()
                 st.experimental_rerun()
@@ -38,7 +37,9 @@ def show(pages):
                 "Password", placeholder="Your Password", type="password"
             )
 
-            if st.button("Login"):
+            if st.button("Login", type="primary", use_container_width=True) or (
+                username and password
+            ):
                 # Placeholder for your authentication logic
                 # Replace the next line with your authentication check
                 # authenticated = username == "admin" and password == "password"  # Example condition
