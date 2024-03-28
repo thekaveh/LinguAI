@@ -20,6 +20,13 @@ class User(Base):
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
     middle_name = Column(String(100))
+    preferred_name = Column(String(100))
+    age = Column(Integer)
+    gender = Column(String(50))
+    
+    # Additional information
+    discovery_method = Column(String(100))
+    motivation = Column(Text)
 
     # Contact information
     mobile_phone = Column(String(20))

@@ -1,4 +1,4 @@
-﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
+CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
 --
 -- PostgreSQL database dump
 --
@@ -477,7 +477,12 @@ CREATE TABLE public.users (
     contact_preference character varying(50),
     user_type character varying(100) NOT NULL,
     base_language character varying(100),
-    learning_languages character varying[]
+    learning_languages character varying[],
+    preferred_name character varying(100),
+    age integer,
+    gender character varying(50),
+    discovery_method character varying(100),
+    motivation character varying(100)
 );
 
 
@@ -747,6 +752,9 @@ COPY public.user_assessment (assessment_id, user_id, assessment_date, language_i
 15	2	2024-03-05	4	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
 3	1	2023-01-01	4	reading	beginner	Starting to recognize basic words	Struggles with reading fluency
 13	1	2024-03-05	4	reading	intermediate	Can understand basic sentences	Struggles with complex texts
+21	30	2024-03-26	1	Initial	beginner	\N	\N
+22	30	2024-03-26	3	Initial	beginner	\N	\N
+23	31	2024-03-26	3	Initial	beginner	\N	\N
 \.
 
 
@@ -798,6 +806,15 @@ COPY public.user_topics (user_id, topic_name) FROM stdin;
 6	culture
 6	speaking
 23	movies
+24	sports
+24	nutrition
+27	history
+27	technology
+30	history
+30	technology
+30	nutrition
+31	technology
+31	business
 \.
 
 
@@ -805,14 +822,18 @@ COPY public.user_topics (user_id, topic_name) FROM stdin;
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.users (user_id, username, email, password_hash, first_name, last_name, middle_name, mobile_phone, landline_phone, contact_preference, user_type, base_language, learning_languages) FROM stdin;
-3	blackwidow123	blackwidow@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}
-4	thor123	thor@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}
-5	hulk123	hulk@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}
-1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}
-2	kumar	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}
-6	spiderman	peter.parker@marvel.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Peter	Parker	Ben	+1 212 914 2124	+1 212 914 2124	\N	external	English	{Mandarin}
-23	captainamerica	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	kumar	govindaraju				\N	external	English	{Spanish}
+COPY public.users (user_id, username, email, password_hash, first_name, last_name, middle_name, mobile_phone, landline_phone, contact_preference, user_type, base_language, learning_languages, preferred_name, age, gender, discovery_method, motivation) FROM stdin;
+3	blackwidow123	blackwidow@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}	\N	\N	\N	\N	\N
+4	thor123	thor@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}	\N	\N	\N	\N	\N
+5	hulk123	hulk@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}	\N	\N	\N	\N	\N
+1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}	\N	\N	\N	\N	\N
+2	kumar	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}	\N	\N	\N	\N	\N
+6	spiderman	peter.parker@marvel.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Peter	Parker	Ben	+1 212 914 2124	+1 212 914 2124	\N	external	English	{Mandarin}	\N	\N	\N	\N	\N
+23	captainamerica	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	kumar	govindaraju				\N	external	English	{Spanish}	\N	\N	\N	\N	\N
+24	t	t@t.com	$2b$12$w5OKgCqDAAbEkebp1rmV2evkTXecqn269SfiXGuhtWI4TgZJQdLZ6	t	t				\N	external	English	{English,Mandarin}	\N	\N	\N	\N	\N
+27	g	g@g.com	$2b$12$TkxEX.8VfSfs2ZwBpOdOGelzniIS/48JjvqCJxQ3s72zWV11.eGMO	g	g	g	g	g	\N	external	English	{English,Spanish}	\N	\N	\N	\N	\N
+30	k	k@k.com	$2b$12$dHD5oh09Tp1a/5oI1Ommze1bK2B6TP3H52uuMPojk.zDkQL0ElDqq	k	k	k	k	k	\N	external	English	{English,Spanish}	\N	\N	\N	\N	\N
+31	hellokitty	hellokitty@hello.com	$2b$12$PbzarI4uf1bCOOoMl2J.CuDXBqLvUwHl91L.vHmczSoCAor5NjlXi	hello	d		1234567	1234567	email	external	English	{Spanish}	kitty	15	Nonbinary	school	i wanted to learn spanish
 \.
 
 
@@ -876,7 +897,7 @@ SELECT pg_catalog.setval('public.topic_topic_id_seq', 23, true);
 -- Name: user_assessment_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 20, true);
+SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 23, true);
 
 
 --
@@ -890,7 +911,7 @@ SELECT pg_catalog.setval('public.user_performance_performance_id_seq', 1, false)
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 23, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 31, true);
 
 
 --
