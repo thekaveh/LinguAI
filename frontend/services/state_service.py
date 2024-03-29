@@ -133,16 +133,16 @@ class StateService:
     @review_writing.setter
     def review_writing(self, value):
         st.session_state["review_writing"] = value
-        
+
+    @property
     def user_type(self):
         return st.session_state.get("user_type", None)
-    
+
     @user_type.setter
     def user_type(self, value):
         st.session_state["user_type"] = value
+
     @property
-
-
     def content_reading(self):
         return st.session_state["content_reading"]
 
