@@ -247,6 +247,20 @@ ALTER SEQUENCE public.language_id_seq OWNED BY public.language.language_id;
 
 
 --
+-- Name: llm; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.llm (
+    id integer NOT NULL,
+    is_default boolean DEFAULT false NOT NULL,
+    is_vision boolean DEFAULT false NOT NULL,
+    name character varying(100) NOT NULL,
+    provider character varying(20) NOT NULL,
+    is_active boolean DEFAULT true NOT NULL
+);
+
+
+--
 -- Name: persona; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -654,6 +668,22 @@ COPY public.language (language_id, language_name) FROM stdin;
 
 
 --
+-- Data for Name: llm; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.llm (id, is_default, is_vision, name, provider, is_active) FROM stdin;
+1	t	f	llama2:latest	ollama	t
+2	f	f	mistral:latest	ollama	t
+3	f	f	stablelm2:1.6b-zephyr-fp16	ollama	t
+4	f	f	yi	ollama	t
+6	f	f	gpt-3.5-turbo-0125	openai	t
+7	f	f	gpt-4-vision-preview	openai	t
+5	t	f	gpt-4	openai	t
+8	f	t	llava:13b	ollama	t
+\.
+
+
+--
 -- Data for Name: persona; Type: TABLE DATA; Schema: public; Owner: -
 --
 
@@ -958,6 +988,14 @@ ALTER TABLE ONLY public.language
 
 
 --
+-- Name: llm llm_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.llm
+    ADD CONSTRAINT llm_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: persona persona_persona_name_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1091,6 +1129,13 @@ GRANT ALL ON TABLE public.language TO linguai_app;
 --
 
 GRANT ALL ON SEQUENCE public.language_id_seq TO linguai_app;
+
+
+--
+-- Name: TABLE llm; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.llm TO linguai_app;
 
 
 --

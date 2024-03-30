@@ -16,7 +16,7 @@ def render():
     with st.expander("Chat", expanded=True):
         st.markdown("<hr>", unsafe_allow_html=True)
 
-        models = asyncio.run(LLMService.list_models())
+        models = [m.name for m in LLMService.get_all()]
         personas = asyncio.run(PersonaService.get_all_names())
 
         new_model = st.selectbox(

@@ -14,7 +14,7 @@ from services.text_to_speech_service import TextToSpeechService
 def render():
     state_service = StateService.instance()
 
-    vision_models = asyncio.run(LLMService.list_vision_models())
+    vision_models = [m.name for m in LLMService.get_all() if m.is_vision]
 
     st.title(f"Chat")
     st.write(f"Persona: {state_service.persona} - Model: {state_service.model}")
@@ -98,8 +98,9 @@ def render():
                 state_service.chat_append_message(chat_message=new_user_chat_message)
 
             for uploaded_image in uploaded_images:
-                if uploaded_image_to_base64_image_url := ImageUtils.uploaded_image_to_base64_image_url(
-                    uploaded_image
+                if (
+                    uploaded_image_to_base64_image_url
+                    := ImageUtils.uploaded_image_to_base64_image_url(uploaded_image)
                 ):
                     new_user_chat_message.append_image(
                         uploaded_image_to_base64_image_url
