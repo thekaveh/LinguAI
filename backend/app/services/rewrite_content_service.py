@@ -1,5 +1,6 @@
 from typing import AsyncIterable
 from sqlalchemy.orm import Session
+from sqlmodel import Session as SqlModelSession
 from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -14,9 +15,10 @@ from app.schema.rewrite_content import ContentRewriteReq
 
 class RewriteContentService:
     @log_decorator
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, sql_model_session: SqlModelSession):
         self.db = db
         self.prompt_service = PromptService(db)
+        self.sql_model_session = sql_model_session
 
     @log_decorator
     async def arewrite_content(self, request: ContentRewriteReq) -> AsyncIterable[str]:
@@ -30,14 +32,14 @@ class RewriteContentService:
         if request.temperature:
             temperature = request.temperature
         else:
-        # Use temperature from the request if provided, else use the default
+            # Use temperature from the request if provided, else use the default
             temperature = float(Config.DEFAULT_TEMPERATURE)
         model_name = Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
 
         if request.model:
             model_name = request.model
 
-        chat_runnable = LLMService.get_chat_runnable(
+        chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
             model=model_name, temperature=temperature
         )
         parser = StrOutputParser()
@@ -47,14 +49,12 @@ class RewriteContentService:
 
     @log_decorator
     def _generate_prompt(self, request: ContentRewriteReq) -> str:
-        
-        feedback_lang= request.user_base_language
-        skill_level=request.user_skill_level
+        feedback_lang = request.user_base_language
+        skill_level = request.user_skill_level
         if skill_level:
-            feedback_lang=request.language
+            feedback_lang = request.language
         else:
-            skill_level="beginner"
-
+            skill_level = "beginner"
 
         # Define the search criteria
         search_criteria = PromptSearch(

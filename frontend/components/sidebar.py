@@ -1,12 +1,12 @@
+import asyncio
 import streamlit as st
 from streamlit_option_menu import option_menu
-import asyncio
 
 from utils.logger import log_decorator
 from services.user_service import UserService
 from services.state_service import StateService
+from schema.authentication import AuthenticationRequest
 from services.notification_service import NotificationService
-from schema.authentication import AuthenticationRequest, AuthenticationResponse
 
 
 @log_decorator
@@ -58,7 +58,7 @@ def show(pages):
                     st.error(auth_response.message)
 
             st.markdown(
-                f"""Don't have an account?                         
+                """Don't have an account?                         
                         click  <b>New User Registration</b>""",
                 unsafe_allow_html=True,
             )

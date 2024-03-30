@@ -16,10 +16,7 @@ class Config:
     )
     DEFAULT_LANGUAGE = os.environ.get("DEFAULT_LANGUAGE", "")
 
-    LLM_SERVICE_LIST_MODELS_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llm/list_models"
-    LLM_SERVICE_LIST_VISION_MODELS_ENDPOINT = (
-        f"{BACKEND_ENDPOINT}/v1/llm/list_vision_models"
-    )
+    LLM_SERVICE_GET_ALL_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/"
 
     CHAT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/chat"
     PERSONA_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/personas/"
