@@ -2,9 +2,11 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.core.config import Config
+from app.services.llm_service import LLMService
 from app.api.v1.router import router as v1_router
 from app.services.dependency.db_service import init_db
 from app.utils.logger_config import setup_global_logging
+from app.services.dependency.db_service import db_engine
 
 # Setup global logging with a specific logger name
 setup_global_logging(

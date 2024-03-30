@@ -27,7 +27,7 @@ services:
       - db-dashboard-data:/var/lib/pgadmin
 
   ollama:
-    build: ./ollama
+    image: ollama/ollama:latest
     container_name: ollama
     restart: unless-stopped
     depends_on:
