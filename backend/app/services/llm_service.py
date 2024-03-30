@@ -94,9 +94,13 @@ class LLMService(CRUDService[LLM]):
                     model["model"] for model in ollama_client.list()["models"]
                 ]
 
-                for model_name in set(required_ollama_model_names) - set(
-                    exiting_ollama_model_names
-                ):
+                diff_model_names = [
+                    model_name
+                    for model_name in required_ollama_model_names
+                    if model_name not in exiting_ollama_model_names
+                ]
+                for model_name in diff_model_names:
+                    print(model_name)
                     ollama_client.pull(model=model_name, stream=True)
         except Exception as e:
             raise e
