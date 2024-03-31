@@ -675,11 +675,12 @@ COPY public.llm (id, is_default, is_vision, name, provider, is_active) FROM stdi
 1	t	f	llama2:latest	ollama	t
 2	f	f	mistral:latest	ollama	t
 3	f	f	stablelm2:1.6b-zephyr-fp16	ollama	t
-4	f	f	yi	ollama	t
+4	f	f	yi	ollama	f
 6	f	f	gpt-3.5-turbo-0125	openai	t
-7	f	f	gpt-4-vision-preview	openai	t
-5	t	f	gpt-4	openai	t
 8	f	t	llava:13b	ollama	f
+7	f	t	gpt-4-vision-preview	openai	t
+5	f	f	gpt-4	openai	t
+9	t	f	gpt-4-turbo-preview	openai	t
 \.
 
 
