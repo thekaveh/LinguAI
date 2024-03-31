@@ -1,14 +1,14 @@
 import streamlit as st
 from core.config import Config
 from utils.logger_config import setup_global_logging
-
+from services.user_service import UserService
 from services.state_service import StateService
 from components import (
     sidebar, 
     home, 
     settings, 
     chat, 
-    user, 
+    admin, 
     content_gen, 
     profile, 
     interest_selection, 
@@ -18,6 +18,7 @@ from components import (
     header,
     register,
 )
+import asyncio
 
 # Setup global logging with a specific logger name
 setup_global_logging(
@@ -36,20 +37,30 @@ def main():
     }
     
     if state_service.username is not None:
-        components_info = {
-            "Home": {"icon": "house", "page": home},
-            "Rewrite Content": {"icon": "pen", "page": rewrite_content},
-            "Review Writing": {"icon": "pencil-square", "page": review_writing},               
-            "Content Reading": {"icon": "body-text", "page": content_gen},            
-            "Chat": {"icon": "chat", "page": chat},
-            "Account": {"icon": "person-circle", "page": profile},
-            "Settings": {"icon": "gear", "page": settings},
-        }
-        if state_service.user_type == "admin":
-            components_info["User"] = {"icon": "person-gear", "page": user}
-            
-        # components_info.update(authenticated_components)
+        user = asyncio.run(UserService.get_user_by_username(state_service.username))
 
+        if user.user_type == "admin":
+            components_info = {
+                "Home": {"icon": "house", "page": home},
+                "Rewrite Content": {"icon": "pen", "page": rewrite_content},
+                "Review Writing": {"icon": "pencil-square", "page": review_writing},               
+                "Content Reading": {"icon": "body-text", "page": content_gen},            
+                "Chat": {"icon": "chat", "page": chat},
+                "Profile": {"icon": "person-circle", "page": profile},
+                "Admin": {"icon": "person-gear", "page": admin},
+                "Settings": {"icon": "gear", "page": settings},
+            }
+        else:
+            components_info = {
+                "Home": {"icon": "house", "page": home},
+                "Rewrite Content": {"icon": "pen", "page": rewrite_content},
+                "Review Writing": {"icon": "pencil-square", "page": review_writing},               
+                "Content Reading": {"icon": "body-text", "page": content_gen},            
+                "Chat": {"icon": "chat", "page": chat},
+                "Profile": {"icon": "person-circle", "page": profile},
+                "Settings": {"icon": "gear", "page": settings},
+            }
+            
     selected_page = sidebar.show(components_info)
     # Assuming sidebar.show() updates `st.session_state.current_page` based on the selected page
     selected_page.render()
