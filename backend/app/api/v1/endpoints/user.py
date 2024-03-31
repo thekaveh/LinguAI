@@ -11,6 +11,7 @@ from app.schema.password_change import PasswordChange
 from app.services.user_service import UserService
 from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
+from app.data_access.models.user import User as UserModel
 
 router = APIRouter()
 
@@ -166,3 +167,13 @@ def change_user_password(password_change: PasswordChange, username: str, db: Ses
         user_service.change_password(username, password_change.current_password, password_change.new_password)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+@log_decorator
+@router.delete("/users/{username}/delete")
+def delete_user(username: str, db: Session = Depends(get_db)):
+    db_user = db.query(UserModel).filter(UserModel.username == username).first()
+    if db_user:
+        db.delete(db_user)
+        db.commit()
+    else:
+        raise HTTPException(status_code=404, detail="User not found")

@@ -139,6 +139,15 @@ class UserService:
         except Exception as e:
             raise Exception(e)
         
-        
+    @log_decorator
+    @staticmethod
+    async def delete_user(username: str):
+        try:
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/delete"
+            await HttpUtils.delete(url)
+            return True
+        except Exception as e:
+            raise Exception(f"Failed to delete user '{username}: {e}")
+    
     
   
