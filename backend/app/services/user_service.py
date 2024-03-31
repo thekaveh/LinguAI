@@ -247,3 +247,11 @@ class UserService:
         
         self.db.commit()
         return db_user
+
+    @log_decorator
+    def change_password(self, username: str, current_password: str, new_password: str):
+        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        if not db_user or not self.verify_password(current_password, db_user.password_hash):
+            raise ValueError("Current password is incorrect")
+        db_user.password_hash = self.hash_password(new_password)
+        self.db.commit()

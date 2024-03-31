@@ -77,47 +77,72 @@ def render():
     if (len(options) > 0 and len(current_user_languages) != len(options)):
         asyncio.run(UserService.update_languages(options, state_service.username))
         st.experimental_rerun()
-        
+
     # get user to view/update their information     
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
-    with st.form("profile_info"):
-        st.subheader("General Information")
-        st.write(f"Username: {user.username}")
-        updated_first_name = st.text_input("First Name", user.first_name)
-        updated_middle_name = st.text_input("Middle Name", user.middle_name)
-        updated_last_name = st.text_input("Last Name", user.last_name)
-        updated_preferred_name = st.text_input("Preferred Name", user.preferred_name)
-        updated_base_language = _render_language_dropdown(_fetch_languages(), user.base_language)
-        updated_gender = st.selectbox("Gender*", options=[user.gender, "Male", "Female", "Nonbinary", "Prefer not to say"])            
+    with st.expander("Click to view/update your profile", expanded=False):
+        with st.form("profile_info"):
+            st.subheader("General Information")
+            st.write(f"Username: {user.username}")
+            updated_first_name = st.text_input("First Name", user.first_name)
+            updated_middle_name = st.text_input("Middle Name", user.middle_name)
+            updated_last_name = st.text_input("Last Name", user.last_name)
+            updated_preferred_name = st.text_input("Preferred Name", user.preferred_name)
+            updated_base_language = _render_language_dropdown(_fetch_languages(), user.base_language)
+            updated_gender = st.selectbox("Gender*", options=[user.gender, "Male", "Female", "Nonbinary", "Prefer not to say"])            
 
-        st.subheader("Contact Information")
-        updated_email = st.text_input("Email", user.email)
-        updated_phone = st.text_input("Registered Phone", user.mobile_phone)
-        contact_preference_entry = st.selectbox("Contact Preference:", options=[user.contact_preference, "Email", "Mobile"])
-        if (contact_preference_entry == "Mobile"):
-            updated_contact_preference = "mobile_phone"
-        else:
-            updated_contact_preference = "email"
+            st.subheader("Contact Information")
+            updated_email = st.text_input("Email", user.email)
+            updated_phone = st.text_input("Registered Phone", user.mobile_phone)
+            contact_preference_entry = st.selectbox("Contact Preference:", options=[user.contact_preference, "Email", "Mobile"])
+            if (contact_preference_entry == "Mobile"):
+                updated_contact_preference = "mobile_phone"
+            else:
+                updated_contact_preference = "email"
+                    
+            submit_button = st.form_submit_button("Update Profile")
             
-        submit_button = st.form_submit_button("Update Profile")
-        
-        if submit_button:
-            updated_user_data = UserCreate(
-                username=user.username, # username cannot be modified
-                email = updated_email,
-                user_type="external",
-                first_name = updated_first_name,
-                last_name = updated_last_name,
-                middle_name = updated_middle_name,
-                preferred_name = updated_preferred_name,
-                base_language = updated_base_language,
-                gender = updated_gender,
-                mobile_phone = updated_phone,
-                contact_preference = updated_contact_preference,
-                password_hash = "test", #hardcoded for now
-            )
-            try:
-                asyncio.run(UserService.update_user_profile(user.username, updated_user_data))
-                st.success("Profile updated successfully.")
-            except Exception as e:
-                st.error(f"Failed to updated profile: {e}")
+            if submit_button:
+                updated_user_data = UserCreate(
+                    username=user.username, # username cannot be modified
+                    email = updated_email,
+                    user_type="external",
+                    first_name = updated_first_name,
+                    last_name = updated_last_name,
+                    middle_name = updated_middle_name,
+                    preferred_name = updated_preferred_name,
+                    base_language = updated_base_language,
+                    gender = updated_gender,
+                    mobile_phone = updated_phone,
+                    contact_preference = updated_contact_preference,
+                    password_hash = "test", #hardcoded does not get updated here 
+                )
+                try:
+                    asyncio.run(UserService.update_user_profile(user.username, updated_user_data))
+                    st.success("Profile updated successfully.")
+                except Exception as e:
+                    st.error(f"Failed to updated profile: {e}")
+                    
+    with st.expander("Click to change your password", expanded=False):                
+        with st.form("change_password"):
+            st.subheader("Change Password")
+            current_password = st.text_input("Current Password", type="password")
+            new_password = st.text_input("New Password", type="password")
+            confirm_new_password = st.text_input("Confirm New Password", type="password")
+            
+            submit_password_change = st.form_submit_button("Change Password")
+            
+            if submit_password_change:
+                if new_password != confirm_new_password:
+                    st.error("New passwords do not match")
+                else:
+                    try:
+                        # Assuming UserService has a method to call the backend password change endpoint
+                        asyncio.run(UserService.change_password(
+                        user.username, current_password, new_password))
+                        st.success("Password changed successfully")
+                    except Exception as e:
+                        if "400 Bad Request" in str(e):
+                            st.error("Incorrect current password entered")
+                        else: 
+                            st.error(f"Failed to change password: {e}")

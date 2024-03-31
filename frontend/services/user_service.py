@@ -8,6 +8,7 @@ from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 from schema.user import User, UserCreate, UserTopicBase
+from schema.password_change import PasswordChange
 
 class UserService:
     @log_decorator
@@ -125,4 +126,19 @@ class UserService:
         except Exception as e:
             raise Exception(f"failed to update languages for user {username}: {e}")
         
+    @log_decorator
+    @staticmethod
+    async def change_password(username: str, current_password: str, new_password: str):
+        password_change = PasswordChange(
+            current_password=current_password,
+            new_password=new_password,
+        )
+        try: 
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/change-password"
+            return await HttpUtils.apost(url, password_change, response_model=None)
+        except Exception as e:
+            raise Exception(e)
+        
+        
+    
   

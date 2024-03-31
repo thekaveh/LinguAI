@@ -1,12 +1,13 @@
 import logging
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.data_access.session import get_db
 from app.schema.user import User, UserCreate
+from app.schema.password_change import PasswordChange
 from app.services.user_service import UserService
 from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
@@ -156,3 +157,12 @@ def update_user_profile(username: str, user_update: UserCreate, db: Session = De
         return updated_user
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+@log_decorator
+@router.post("/users/{username}/change-password")
+def change_user_password(password_change: PasswordChange, username: str, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    try:
+        user_service.change_password(username, password_change.current_password, password_change.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
