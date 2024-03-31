@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import AsyncMock, call
+from typing import Callable, Awaitable
 from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
@@ -9,57 +10,77 @@ from services.review_writing_service import ReviewWritingService
 class AsyncIteratorMock:
     def __init__(self, chunks):
         self.chunks = chunks
-        self.index = 0
+        self.call_args = None
 
-    async def __aiter__(self):
-        return self
+    def __call__(self, *args, **kwargs):
+        self.call_args = (args, kwargs)
 
-    async def __anext__(self):
-        if self.index < len(self.chunks):
-            chunk = self.chunks[self.index]
-            self.index += 1
-            return chunk
-        else:
-            raise StopAsyncIteration
+        class _AsyncIterator:
+            def __init__(self, chunks):
+                self.chunks = chunks
+                self.index = 0
 
-async def test_review_writing_success():
-    # Mock HttpUtils.apost_stream to return content chunks
-    HttpUtils.apost_stream = AsyncMock(return_value=AsyncIteratorMock(["chunk1", "chunk2"]))
-    
+            def __aiter__(self):
+                return self
+
+            async def __anext__(self):
+                if self.index < len(self.chunks):
+                    result = self.chunks[self.index]
+                    self.index += 1
+                    return result
+                else:
+                    raise StopAsyncIteration
+
+        return _AsyncIterator(self.chunks)
+
+@pytest.mark.asyncio
+async def test_areview_writing_success():
+    # Mock HttpUtils.apost_stream to return an instance of AsyncIteratorMock
+    HttpUtils.apost_stream = AsyncIteratorMock(["chunk1", "chunk2"])
+
     # Mock the callback functions
-    on_next_fn = AsyncMock()
+    on_changed_fn = AsyncMock()
     on_completed_fn = AsyncMock()
-    
+
     # Test
     await ReviewWritingService.areview_writing(
         request=ReviewWritingReq(
-            user_id=123,
-            language="Python",
-            curr_skill_level="Intermediate",
-            next_skill_level="Advanced",
-            strength="Problem solving",
-            weakness="Debugging",
-            input_content="Some content"
+            user_id=1,
+            language="English",
+            curr_skill_level="beginner",
+            next_skill_level="intermediate",
+            strength="creativity",
+            weakness="grammar",
+            input_content="This is a test content.",
+            model="gpt-3",
+            temperature=0.5
         ),
-        on_next_fn=on_next_fn,
+        on_changed_fn=on_changed_fn,
         on_completed_fn=on_completed_fn
     )
-    
+
     # Assertions
-    HttpUtils.apost_stream.assert_awaited_once_with(
-        url=Config.REVIEW_WRITING_SERVICE_ENDPOINT,
-        request=ReviewWritingReq(
-            user_id=123,
-            language="Python",
-            curr_skill_level="Intermediate",
-            next_skill_level="Advanced",
-            strength="Problem solving",
-            weakness="Debugging",
-            input_content="Some content"
-        )
+    assert HttpUtils.apost_stream.call_args == (
+        (),
+        {
+            "url": Config.REVIEW_WRITING_SERVICE_ENDPOINT,
+            "request": ReviewWritingReq(
+                user_id=1,
+                language="English",
+                curr_skill_level="beginner",
+                next_skill_level="intermediate",
+                strength="creativity",
+                weakness="grammar",
+                input_content="This is a test content.",
+                model="gpt-3",
+                temperature=0.5
+            ),
+        },
     )
-    on_next_fn.assert_has_awaits([
-        call("chunk1"),
-        call("chunk2")
+    on_changed_fn.assert_has_calls([
+        call("▌"),
+        call("chunk1▌"),
+        call("chunk1chunk2▌"),
+        call("chunk1chunk2")
     ])
-    on_completed_fn.assert_awaited_once()
+    on_completed_fn.assert_awaited_once_with("chunk1chunk2")
