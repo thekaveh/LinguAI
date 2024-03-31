@@ -76,6 +76,18 @@ class UserService:
         except Exception as e:
             raise e
         
+    @log_decorator
+    @staticmethod
+    async def update_user_profile(username: str, user_update_data: UserCreate) -> None:
+        try:
+            return await HttpUtils.apost(
+                f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/update",
+                user_update_data,
+                response_model=User,
+            )
+        except Exception as e:
+            raise e
+        
     @log_decorator    
     @staticmethod   
     async def update_topics(request: List[str], username:str):
@@ -113,3 +125,4 @@ class UserService:
         except Exception as e:
             raise Exception(f"failed to update languages for user {username}: {e}")
         
+  

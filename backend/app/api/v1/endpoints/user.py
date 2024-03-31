@@ -146,3 +146,13 @@ def update_user_languages(username: str, user: User, db: Session = Depends(get_d
         return updated_user
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+@log_decorator
+@router.post("/users/{username}/update", response_model=User)
+def update_user_profile(username: str, user_update: UserCreate, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    try:
+        updated_user = user_service.update_user_profile(username, user_update)
+        return updated_user
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

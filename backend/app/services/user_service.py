@@ -228,3 +228,22 @@ class UserService:
         if db_user:
             db_user.learning_languages = user.learning_languages
             self.db.commit()
+            
+    @log_decorator
+    def update_user_profile(self, username: str, user_update: UserCreate) -> User:
+        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        if not db_user:
+            raise ValueError("user not found")
+        # update fields 
+        db_user.first_name = user_update.first_name
+        db_user.middle_name = user_update.middle_name
+        db_user.last_name = user_update.last_name
+        db_user.preferred_name = user_update.preferred_name
+        db_user.base_language = user_update.base_language
+        db_user.gender = user_update.gender
+        db_user.email = user_update.email
+        db_user.mobile_phone = user_update.mobile_phone
+        db_user.contact_preference = user_update.contact_preference
+        
+        self.db.commit()
+        return db_user
