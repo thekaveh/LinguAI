@@ -30,7 +30,7 @@ services:
       - db-dashboard-data:/var/lib/pgadmin
 
   ollama:
-    build: ./ollama
+    image: ollama/ollama:latest
     container_name: ollama
     restart: unless-stopped
     ports:
@@ -45,8 +45,8 @@ services:
           devices:
             - driver: nvidia
               capabilities: [gpu]
-    cpus: 8
-    mem_limit: "20g"
+    cpus: ${PROD_ENV_CPUS}
+    mem_limit: "${PROD_ENV_MEM_LIMIT}"
 
   backend:
     build: ./backend
