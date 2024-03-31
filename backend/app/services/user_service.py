@@ -150,14 +150,6 @@ class UserService:
         else:
             print("User not found with username:", username)
 
-        # self.db.query(UserTopic).filter(UserTopic.user_id == user_id).delete()
-        # for topic_name in new_topics:
-        #     topic = self.db.query(Topic).filter(Topic.topic_name == topic_name).first()
-        #     if topic:
-        #         user_topic = UserTopic(user_id=user_id, topic_id=topic.topic_id)
-        #         self.db.add(user_topic)
-        # self.db.commit()
-
     @log_decorator
     def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:
         db_user = self.user_repo.find_by_id(user_id)
@@ -229,3 +221,37 @@ class UserService:
         if db_assessment:
             self.db.delete(db_assessment)
             self.db.commit()
+
+    @log_decorator
+    def update_user_languages(self, username: str, user: User):
+        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        if db_user:
+            db_user.learning_languages = user.learning_languages
+            self.db.commit()
+            
+    @log_decorator
+    def update_user_profile(self, username: str, user_update: UserCreate) -> User:
+        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        if not db_user:
+            raise ValueError("user not found")
+        # update fields 
+        db_user.first_name = user_update.first_name
+        db_user.middle_name = user_update.middle_name
+        db_user.last_name = user_update.last_name
+        db_user.preferred_name = user_update.preferred_name
+        db_user.base_language = user_update.base_language
+        db_user.gender = user_update.gender
+        db_user.email = user_update.email
+        db_user.mobile_phone = user_update.mobile_phone
+        db_user.contact_preference = user_update.contact_preference
+        
+        self.db.commit()
+        return db_user
+
+    @log_decorator
+    def change_password(self, username: str, current_password: str, new_password: str):
+        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        if not db_user or not self.verify_password(current_password, db_user.password_hash):
+            raise ValueError("Current password is incorrect")
+        db_user.password_hash = self.hash_password(new_password)
+        self.db.commit()

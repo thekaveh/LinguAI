@@ -151,7 +151,6 @@ def render():
             if errors:
                 st.error("\n".join(errors))
             else:
-                contact_preference="email" # hardcoded for testing 
                 user_language_list= create_user_language_list(selected_languages, language_list)
                 user_create = create_user_create_object(preferred_name, age, gender, discovery_method, motivation, contact_preference, first_name, last_name, middle_name, day_time_phone, email, username, password, selected_base_language, user_language_list, selected_topics)
                 user_create_in_db= asyncio.run(UserService.create_user(user_create))
@@ -202,8 +201,8 @@ def validate_registration_form(motivation, middle_name, first_name, last_name, u
         errors.append("First Name can only contain letters, hyphens, apostrophes, and spaces.")
     if not re.match(name_pattern, last_name):
         errors.append("Last Name can only contain letters, hyphens, apostrophes, and spaces.")
-    if not re.match(name_pattern, middle_name):
-        errors.append("Middle Name can only contain letters, hyphens, apostrophes, and spaces.")
+    # if not re.match(name_pattern, middle_name):
+    #     errors.append("Middle Name can only contain letters, hyphens, apostrophes, and spaces.")
     if not re.match(name_pattern, username):
         errors.append("Username can only contain letters, hyphens, apostrophes, and spaces.")
     if len(motivation) > 100:

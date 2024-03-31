@@ -1,17 +1,19 @@
 import logging
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
 
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.data_access.session import get_db
 from app.schema.user import User, UserCreate
+from app.schema.password_change import PasswordChange
 from app.services.user_service import UserService
 from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
+from app.data_access.models.user import User as UserModel
 
 router = APIRouter()
-
 
 @log_decorator
 @router.get("/users/list", response_model=list[User])
@@ -136,3 +138,42 @@ def delete_user_assessment(
     user_service = UserService(db)
     user_service.delete_user_assessment(assessment_id)
     return {"message": "User assessment deleted successfully"}
+
+@log_decorator
+@router.post("/users/{username}/languages", response_model=None)
+def update_user_languages(username: str, user: User, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    try: 
+        updated_user = user_service.update_user_languages(username, user)
+        return updated_user
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+@log_decorator
+@router.post("/users/{username}/update", response_model=User)
+def update_user_profile(username: str, user_update: UserCreate, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    try:
+        updated_user = user_service.update_user_profile(username, user_update)
+        return updated_user
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+@log_decorator
+@router.post("/users/{username}/change-password")
+def change_user_password(password_change: PasswordChange, username: str, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    try:
+        user_service.change_password(username, password_change.current_password, password_change.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    
+@log_decorator
+@router.delete("/users/{username}/delete")
+def delete_user(username: str, db: Session = Depends(get_db)):
+    db_user = db.query(UserModel).filter(UserModel.username == username).first()
+    if db_user:
+        db.delete(db_user)
+        db.commit()
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
