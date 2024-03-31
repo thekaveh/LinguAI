@@ -1,14 +1,14 @@
 import asyncio
 from typing import List, Optional
 from concurrent.futures import ThreadPoolExecutor
-
+import json
 from schema.user import User
 from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 from schema.user import User, UserCreate, UserTopicBase
-
+from schema.password_change import PasswordChange
 
 class UserService:
     @log_decorator
@@ -77,6 +77,18 @@ class UserService:
         except Exception as e:
             raise e
         
+    @log_decorator
+    @staticmethod
+    async def update_user_profile(username: str, user_update_data: UserCreate) -> None:
+        try:
+            return await HttpUtils.apost(
+                f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/update",
+                user_update_data,
+                response_model=User,
+            )
+        except Exception as e:
+            raise e
+        
     @log_decorator    
     @staticmethod   
     async def update_topics(request: List[str], username:str):
@@ -97,3 +109,45 @@ class UserService:
             )
         except Exception as e:
             raise e
+    
+    @log_decorator
+    @staticmethod
+    async def update_languages(languages: List[str], username:str):
+        current_user_data = await UserService.get_user_by_username(username)
+        if not current_user_data:
+            raise Exception(f"User {username} not found.")
+        
+        user_data_dict = current_user_data.dict(exclude_none=True)
+        user_data_dict['learning_languages'] = languages
+        try:
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/languages"
+            updated_user_data = User(**user_data_dict)
+            return await HttpUtils.apost(url, updated_user_data, response_model=None)
+        except Exception as e:
+            raise Exception(f"failed to update languages for user {username}: {e}")
+        
+    @log_decorator
+    @staticmethod
+    async def change_password(username: str, current_password: str, new_password: str):
+        password_change = PasswordChange(
+            current_password=current_password,
+            new_password=new_password,
+        )
+        try: 
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/change-password"
+            return await HttpUtils.apost(url, password_change, response_model=None)
+        except Exception as e:
+            raise Exception(e)
+        
+    @log_decorator
+    @staticmethod
+    async def delete_user(username: str):
+        try:
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/delete"
+            await HttpUtils.delete(url)
+            return True
+        except Exception as e:
+            raise Exception(f"Failed to delete user '{username}: {e}")
+    
+    
+  

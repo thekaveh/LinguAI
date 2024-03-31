@@ -81,3 +81,21 @@ class HttpUtils:
             raise Exception(f"HTTP error occurred: {e}") from e
         except Exception as e:
             raise Exception(f"An unexpected error occurred: {e}") from e
+        
+    @log_decorator
+    @staticmethod
+    async def delete(
+        url: str,
+        timeout: Optional[Timeout] = None,
+    ) -> None:
+        if timeout is None:
+            timeout = Timeout(100.0, connect=40.0, read=60.0)
+            
+        try:
+            async with httpx.AsyncClient(timeout=timeout) as client:
+                response = await client.delete(url=url)
+                response.raise_for_status()
+        except (HTTPStatusError, RequestError) as e:
+            raise Exception(f"HTTP error occurred: {e}") from e
+        except Exception as e:
+            raise Exception(f"An unexpected error occurred: {e}") from e

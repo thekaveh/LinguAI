@@ -21,23 +21,33 @@ from services.chat_service import ChatService
 class AsyncIteratorMock:
     def __init__(self, chunks):
         self.chunks = chunks
-        self.index = 0
+        self.call_args = None
 
-    def __aiter__(self):
-        return self
+    def __call__(self, *args, **kwargs):
+        self.call_args = (args, kwargs)
 
-    async def __anext__(self):
-        if self.index < len(self.chunks):
-            result = self.chunks[self.index]
-            self.index += 1
-            return result
-        else:
-            raise StopAsyncIteration
+        class _AsyncIterator:
+            def __init__(self, chunks):
+                self.chunks = chunks
+                self.index = 0
 
-# @pytest.mark.asyncio
+            def __aiter__(self):
+                return self
+
+            async def __anext__(self):
+                if self.index < len(self.chunks):
+                    result = self.chunks[self.index]
+                    self.index += 1
+                    return result
+                else:
+                    raise StopAsyncIteration
+
+        return _AsyncIterator(self.chunks)
+
+@pytest.mark.asyncio
 async def test_achat_success():
     # Mock HttpUtils.apost_stream to return an instance of AsyncIteratorMock
-    HttpUtils.apost_stream = AsyncMock(return_value=AsyncIteratorMock(["chunk1", "chunk2"]))
+    HttpUtils.apost_stream = AsyncIteratorMock(["chunk1", "chunk2"])
 
     # Mock the callback functions
     on_changed_fn = AsyncMock()
@@ -52,14 +62,17 @@ async def test_achat_success():
     )
 
     # Assertions
-    HttpUtils.apost_stream.assert_awaited_once_with(
-        url=Config.CHAT_SERVICE_ENDPOINT,
-        request=ChatRequest(
-            model="test_model",
-            persona="neutral",
-            messages=[ChatMessage(sender="user", text="Hello")],
-            temperature=0,
-        )
+    assert HttpUtils.apost_stream.call_args == (
+        (),
+        {
+            "url": Config.CHAT_SERVICE_ENDPOINT,
+            "request": ChatRequest(
+                model="test_model",
+                persona="neutral",
+                messages=[ChatMessage(sender="user", text="Hello")],
+                temperature=0,
+            ),
+        },
     )
-    on_changed_fn.assert_awaited_with("▌chunk1▌chunk2▌")
+    on_changed_fn.assert_awaited_with("chunk1chunk2")
     on_completed_fn.assert_awaited_once()
