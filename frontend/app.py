@@ -36,7 +36,7 @@ def main():
     }
     
     if state_service.username is not None:
-        authenticated_components = {
+        components_info = {
             "Home": {"icon": "house", "page": home},
             "Rewrite Content": {"icon": "pen", "page": rewrite_content},
             "Review Writing": {"icon": "pencil-square", "page": review_writing},               
@@ -46,9 +46,9 @@ def main():
             "Settings": {"icon": "gear", "page": settings},
         }
         if state_service.user_type == "admin":
-            authenticated_components["User"] = {"icon": "person-gear", "page": user}
+            components_info["User"] = {"icon": "person-gear", "page": user}
             
-        components_info.update(authenticated_components)
+        # components_info.update(authenticated_components)
 
     selected_page = sidebar.show(components_info)
     # Assuming sidebar.show() updates `st.session_state.current_page` based on the selected page
