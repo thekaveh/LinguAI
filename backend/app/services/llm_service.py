@@ -100,7 +100,6 @@ class LLMService(CRUDService[LLM]):
                     if model_name not in exiting_ollama_model_names
                 ]
                 for model_name in diff_model_names:
-                    print(model_name)
-                    ollama_client.pull(model=model_name, stream=True)
+                    ollama_client.pull(model=model_name, stream=False)
         except Exception as e:
             raise e
