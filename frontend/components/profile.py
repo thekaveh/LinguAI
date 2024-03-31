@@ -4,14 +4,15 @@ import asyncio
 from services.user_service import UserService
 from services.state_service import StateService
 from services.topic_service import TopicService
-
+from services.language_service import LanguageService
 from services.state_service import StateService
+
 
 @log_decorator
 def render():
     st.title("Profile")
     
-    ### add interest selection here 
+    ### interest selection
     st.write("")
 
     st.subheader("Interest Selection")
@@ -27,9 +28,25 @@ def render():
     if (len(options) > 0 and len(current_user_topics) != len(options)):
         asyncio.run(UserService.update_topics(options, state_service.username))
         st.experimental_rerun()
-    
+        
+    ### language selection 
+    st.write("")
+
+    st.subheader("Language Selection")
+
+    languages = asyncio.run(LanguageService.list())
+    languages = [language.language_name for language in languages]
+
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
+    current_user_languages = [language for language in user.learning_languages]
+    options = st.multiselect('Select your learning languages below', languages, current_user_languages)
     
+    if (len(options) > 0 and len(current_user_languages) != len(options)):
+        asyncio.run(UserService.update_languages(options, state_service.username))
+        st.experimental_rerun()
+        
+    # get user to view/update their information     
+    user = asyncio.run(UserService.get_user_by_username(state_service.username))
 
     st.subheader("General Information")
     st.write(f"Username: {user.username}")

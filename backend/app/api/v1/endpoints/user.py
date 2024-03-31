@@ -1,6 +1,7 @@
 import logging
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import List
 
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
@@ -11,7 +12,6 @@ from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
 router = APIRouter()
-
 
 @log_decorator
 @router.get("/users/list", response_model=list[User])
@@ -136,3 +136,13 @@ def delete_user_assessment(
     user_service = UserService(db)
     user_service.delete_user_assessment(assessment_id)
     return {"message": "User assessment deleted successfully"}
+
+@log_decorator
+@router.post("/users/{username}/languages", response_model=None)
+def update_user_languages(username: str, user: User, db: Session = Depends(get_db)):
+    user_service = UserService(db)
+    try: 
+        updated_user = user_service.update_user_languages(username, user)
+        return updated_user
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))

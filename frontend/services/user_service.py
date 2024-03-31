@@ -1,14 +1,13 @@
 import asyncio
 from typing import List, Optional
 from concurrent.futures import ThreadPoolExecutor
-
+import json
 from schema.user import User
 from core.config import Config
 from utils.logger import log_decorator
 from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 from schema.user import User, UserCreate, UserTopicBase
-
 
 class UserService:
     @log_decorator
@@ -97,3 +96,20 @@ class UserService:
             )
         except Exception as e:
             raise e
+    
+    @log_decorator
+    @staticmethod
+    async def update_languages(languages: List[str], username:str):
+        current_user_data = await UserService.get_user_by_username(username)
+        if not current_user_data:
+            raise Exception(f"User {username} not found.")
+        
+        user_data_dict = current_user_data.dict(exclude_none=True)
+        user_data_dict['learning_languages'] = languages
+        try:
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/languages"
+            updated_user_data = User(**user_data_dict)
+            return await HttpUtils.apost(url, updated_user_data, response_model=None)
+        except Exception as e:
+            raise Exception(f"failed to update languages for user {username}: {e}")
+        

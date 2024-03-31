@@ -150,14 +150,6 @@ class UserService:
         else:
             print("User not found with username:", username)
 
-        # self.db.query(UserTopic).filter(UserTopic.user_id == user_id).delete()
-        # for topic_name in new_topics:
-        #     topic = self.db.query(Topic).filter(Topic.topic_name == topic_name).first()
-        #     if topic:
-        #         user_topic = UserTopic(user_id=user_id, topic_id=topic.topic_id)
-        #         self.db.add(user_topic)
-        # self.db.commit()
-
     @log_decorator
     def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:
         db_user = self.user_repo.find_by_id(user_id)
@@ -228,4 +220,11 @@ class UserService:
         db_assessment = self.get_user_assessment(assessment_id)
         if db_assessment:
             self.db.delete(db_assessment)
+            self.db.commit()
+
+    @log_decorator
+    def update_user_languages(self, username: str, user: User):
+        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        if db_user:
+            db_user.learning_languages = user.learning_languages
             self.db.commit()
