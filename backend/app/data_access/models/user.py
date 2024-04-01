@@ -39,9 +39,9 @@ class User(Base):
     learning_languages = Column(ARRAY(String))
 
     # User topics relationship
-    user_topics = relationship("UserTopic", back_populates="user")
+    user_topics = relationship("UserTopic", back_populates="user", cascade='all, delete-orphan')
 
-    user_assessments = relationship("UserAssessment", back_populates="user")
+    user_assessments = relationship("UserAssessment", back_populates="user", cascade='all, delete-orphan')
 
     def __repr__(self):
         return f"<User(user_id={self.user_id}, username='{self.username}', email='{self.email}', user_type='{self.user_type}', first_name='{self.first_name}', last_name='{self.last_name}', contact_preference='{self.contact_preference}')>"
