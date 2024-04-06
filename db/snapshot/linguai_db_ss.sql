@@ -252,11 +252,12 @@ ALTER SEQUENCE public.language_id_seq OWNED BY public.language.language_id;
 
 CREATE TABLE public.llm (
     id integer NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
     is_default boolean DEFAULT false NOT NULL,
     is_vision boolean DEFAULT false NOT NULL,
+    is_translate boolean DEFAULT false NOT NULL,
     name character varying(100) NOT NULL,
-    provider character varying(20) NOT NULL,
-    is_active boolean DEFAULT true NOT NULL
+    provider character varying(20) NOT NULL
 );
 
 
@@ -671,16 +672,16 @@ COPY public.language (language_id, language_name) FROM stdin;
 -- Data for Name: llm; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.llm (id, is_default, is_vision, name, provider, is_active) FROM stdin;
-1	t	f	llama2:latest	ollama	t
-2	f	f	mistral:latest	ollama	t
-3	f	f	stablelm2:1.6b-zephyr-fp16	ollama	t
-4	f	f	yi	ollama	f
-6	f	f	gpt-3.5-turbo-0125	openai	t
-8	f	t	llava:13b	ollama	f
-7	f	t	gpt-4-vision-preview	openai	t
-5	f	f	gpt-4	openai	t
-9	t	f	gpt-4-turbo-preview	openai	t
+COPY public.llm (id, is_active, is_default, is_vision, is_translate, name, provider) FROM stdin;
+1	t	t	f	t	llama2:7b	ollama
+2	t	f	f	f	mistral:latest	ollama
+3	t	f	f	t	stablelm2:1.6b-zephyr-fp16	ollama
+4	f	f	f	f	yi	ollama
+6	t	f	f	t	gpt-3.5-turbo-0125	openai
+8	f	f	t	f	llava:13b	ollama
+7	t	f	t	f	gpt-4-vision-preview	openai
+5	t	f	f	t	gpt-4	openai
+9	t	t	f	t	gpt-4-turbo-preview	openai
 \.
 
 
