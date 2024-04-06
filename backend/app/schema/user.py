@@ -1,7 +1,8 @@
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from .user_topic import UserTopicBase
 from .user_assessment import UserAssessmentBase
+from datetime import date
 
 class UserBase(BaseModel):
     username: str
@@ -22,6 +23,9 @@ class UserBase(BaseModel):
     contact_preference: Optional[str] = None
     user_topics: Optional[List[UserTopicBase]] = None
     user_assessments: Optional[List[UserAssessmentBase]] = None
+    enrollment_date: Optional[date] = None
+    last_login_date: Optional[date] = None
+    consecutive_login_days: Optional[int] = Field(default=0, ge=0)
     
 
 class UserCreate(UserBase):
