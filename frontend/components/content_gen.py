@@ -111,14 +111,12 @@ def _build_content_gen_request(
 
 @log_decorator
 def _add_welcome(user):
-    if user.preferred_name:
-            user_first = user.preferred_name
-    else:
-        user_first = user.first_name
-
-    welcome_ = f"""
+    # if user.preferred_name:
+    #         user_first = user.preferred_name
+    # else:
+    #     user_first = user.first_name
     ### Hi, {user_first} {user.middle_name} {user.last_name}!
-    
+    welcome_ = f"""
     We're delighted to have you here. You're on the path to expanding your knowledge and skills. 
     Let's make today's learning session productive and engaging.
     """
@@ -218,14 +216,7 @@ def render():
         st.write("No user found")
         return
 
-    col1, col2 = st.columns([2, 1])
-
-    with col1:
-        _add_welcome(user)
-
-    with col2:
-        _add_skill_level_by_language(user)
-
+    _add_welcome(user)
     st.markdown("---")
 
     user_topics = _get_user_topics(user)

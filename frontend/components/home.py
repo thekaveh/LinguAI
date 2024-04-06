@@ -54,11 +54,11 @@ def render():
 		)
         if user.preferred_name:
             st.write(
-            f"Welcome back, {user.preferred_name} {user.last_name}.!"
+            f"#### :orange[Welcome back, {user.preferred_name} {user.last_name}.!]"
         )
         else:
             st.write(
-            f"Welcome back, {user.first_name} {user.last_name}.!"
+            f"#### :orange[Welcome back, {user.first_name} {user.last_name}.!]"
         )
         _add_linguai_note()
         # Add the rest of your application's components here

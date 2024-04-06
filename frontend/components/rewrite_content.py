@@ -19,13 +19,12 @@ from services.rewrite_content_service import RewriteContentService
 
 @log_decorator
 def _add_welcome(user):
-    if user.preferred_name:
-            user_first = user.preferred_name
-    else:
-        user_first = user.first_name
+    # if user.preferred_name:
+    #         user_first = user.preferred_name
+    # else:
+    #     user_first = user.first_name
+#    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!    
     welcome = f"""
-    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!
-
     To get started, simply paste the text you'd like to convert into the text area below. 
     LinguAI can convert it into content that matches your skill level and language selected.
 
@@ -121,8 +120,6 @@ def _render_language_dropdown(languages):
 def render():
     state_service = StateService.instance()
 
-    st.title("LinguAI")
-
     st.write("")
 
     st.subheader("Rewrite Content to Current Skill Level")
@@ -138,19 +135,15 @@ def render():
 
     _add_welcome(user)
     
-    state_service.rewrite_content = ""
-    
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        original_rewrite_content = st.text_area(
-            "",
-            height=400,
-            placeholder="Enter your text here...",
-            key="original_rewrite_content",
-            value="",
-        )
-    with col2:
-        _add_skill_level_by_language(user)
+    state_service.rewrite_content = ""    
+
+    original_rewrite_content = st.text_area(
+        "",
+        height=400,
+        placeholder="Enter your text here...",
+        key="original_rewrite_content",
+        value="",
+    )
 
     st.write("")
     st.write("")
