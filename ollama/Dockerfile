@@ -8,6 +8,9 @@ RUN apt-get install -y tzdata && \
     ln -snf /usr/share/zoneinfo/America/New_York /etc/localtime && \
     echo America/New_York > /etc/timezone
 
+# Install PostgreSQL client
+RUN apt-get install -y postgresql-client
+
 # Copy the start.sh script
 COPY start.sh /start.sh
 

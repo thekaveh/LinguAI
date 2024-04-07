@@ -37,11 +37,6 @@ class User(Base):
     user_type = Column(String(100), nullable=False)
     base_language = Column(String(100))
     learning_languages = Column(ARRAY(String))
-    
-    # Track user login 
-    enrollment_date = Column(Date)
-    last_login_date = Column(Date)
-    consecutive_login_days = Column(Integer, default=0)
 
     # User topics relationship
     user_topics = relationship("UserTopic", back_populates="user", cascade='all, delete-orphan')

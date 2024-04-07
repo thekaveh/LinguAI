@@ -24,6 +24,8 @@ class ChatService:
         assert len(request.messages) > 0, "messages must not be empty"
 
         persona_service = PersonaService(self.db_session)
+        llm_service = LLMService(self.db_session)
+
         persona = persona_service.get_by_name(name=request.persona)
 
         if persona is None:
@@ -37,7 +39,7 @@ class ChatService:
 
         prompt = ChatPromptTemplate.from_messages(chat_messages)
 
-        chat_runnable = LLMService.get_chat_runnable(
+        chat_runnable = llm_service.get_chat_runnable(
             model=request.model, temperature=request.temperature
         )
         parser = StrOutputParser()

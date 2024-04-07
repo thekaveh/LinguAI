@@ -1,5 +1,7 @@
 import asyncio
+import datetime
 import traceback
+
 import streamlit as st
 from typing import Optional
 from langdetect import detect
@@ -16,22 +18,23 @@ from services.state_service import StateService
 from services.skill_level_service import SkillLevelService
 from services.text_to_speech_service import TextToSpeechService
 from services.review_writing_service import ReviewWritingService
+from schema.user_content import UserContentBase, UserContentSearch
+from services.user_content_service import UserContentService
 
+
+CONTENT_TYPE=2 # trail purpose, need to move to enums
 
 @log_decorator
 def _add_welcome(user):
-    if user.preferred_name:
-            user_first = user.preferred_name
-    else:
-        user_first = user.first_name
-        
+    # if user.preferred_name:
+    #         user_first = user.preferred_name
+    # else:
+    #     user_first = user.first_name
+ #    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!       
     welcome = f"""
-    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!
-
     To get started, Write the content that you want feedback in the text area below. 
     LinguAI can provide feedback on your written content based on your skill level, 
     and recommend how it can be further improved to get you to the next level.
-
     """
     st.markdown(welcome, unsafe_allow_html=True)
 
@@ -179,7 +182,7 @@ def render():
     model= state_service.model
     temperature= state_service.temperature
     
-    st.title("LinguAI")
+ 
 
     st.write("")
 
@@ -196,24 +199,22 @@ def render():
 
     _add_welcome(user)
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        user_writing_content = st.text_area(
-            "",
-            height=400,
-            placeholder="Enter your text here...",
-            key="user_writing_content",
-            value="",            
-        )
-        announcement_placeholder = st.empty()
-        button_placeholder = st.empty()
-        audio_placeholder = st.empty()
+    user_writing_content = st.text_area(
+        "",
+        height=400,
+        placeholder="Enter your text here...",
+        key="user_writing_content",
+        value="",            
+    )
+    announcement_placeholder = st.empty()
+    col1, col2 = st.columns(2)
     with col2:
-        _add_skill_level_by_language(user)
+        button_placeholder = st.empty()
+    with col1:
+        audio_placeholder = st.empty()
+
+
     st.write("")
-
-
-    # Placeholders for different sections of the page
 
     #st.write("---")
     
@@ -276,6 +277,10 @@ def render():
                 or last_assessment is None
             )
             col3, col4 = st.columns([3, 1])
+            with col4:
+                if st.button("Clear", type="primary", use_container_width=True):
+                    state_service.review_writing = ""
+                    st.rerun()             
             with col3:
                 if st.button(
                     "Review Writing", use_container_width=True, disabled=cant_review , type="primary"):
@@ -309,12 +314,12 @@ def render():
                     async def _content_on_completed(content):
                         state_service.review_writing = content
 
-                        audio_data = await TextToSpeechService.agenerate(
-                            lang="en", text=content
-                        )
+                        # audio_data = await TextToSpeechService.agenerate(
+                        #     lang="en", text=content
+                        # )
 
-                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+                        # audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                        # audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
 
                     asyncio.run(
                         ReviewWritingService.areview_writing(
@@ -323,10 +328,79 @@ def render():
                             on_completed_fn=_content_on_completed,
                         )
                     )
-            with col4:
-                if st.button("Clear", type="primary", use_container_width=True):
-                    state_service.review_writing = ""
-                    st.rerun()                    
+                    if state_service.review_writing:
+                        _save_content_for_later(user, user_writing_content, state_service.review_writing, curr_skill_level, user_entered_language)
+                   
 
     except Exception:
         announcement_placeholder.write("Please input content in a supported language.")
+    _render_previous_delivered_contents(user)
+
+
+def _save_content_for_later(user, original_content, generated_content, level, language_name):
+    # Calculate the current time (created_date) and 7 days from now (expiry_date)
+    created_date = datetime.datetime.now(datetime.timezone.utc)
+    expiry_date = created_date + datetime.timedelta(days=7)
+
+    # Create the UserContentBase object with the calculated dates
+    user_content = UserContentBase(
+        user_id=user.user_id,
+        user_content=original_content,
+        gen_content=generated_content,
+        type=CONTENT_TYPE,
+        level=level,
+        language=language_name,
+        created_date=created_date,
+        expiry_date=expiry_date
+    )
+
+    try:
+        user_content_saved = asyncio.run(UserContentService.create_user_content(user_content))
+    except Exception as e:
+        pass
+
+def _render_previous_delivered_contents(user):
+    with st.container():
+        st.markdown(f"#### :orange[Stored Contents]")
+
+        try:
+            user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=CONTENT_TYPE)))
+            if not user_contents:
+                st.write("No Stored Content")
+                return
+
+            with st.expander(f":orange[Previously Stored Contents]"):
+                content_options = {
+                    f"Skill Level: {content.level} - Language {content.language} - Date:{content.created_date.strftime('%Y-%m-%d %H:%M')} - ID:{content.id}": content.id
+                    for content in user_contents
+                }
+                selected_option = st.selectbox("Select Content", list(content_options.keys()), index=0)
+
+                if selected_option:
+                    selected_content_id = content_options[selected_option]
+                    selected_content = next((content for content in user_contents if content.id == selected_content_id), None)
+                    
+                    st.write("---")
+                    if selected_content:
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.markdown("##### :orange[Your Content]")
+                            st.text_area("User Content", value=selected_content.user_content, height=300, disabled=True)
+                        with col2:
+                            st.markdown("##### :orange[App Created Content]")
+                            st.text_area("Generated Content", value=selected_content.gen_content, height=300, disabled=True)
+
+                        if st.button("Delete Content"):
+                            try:
+                                response = asyncio.run(UserContentService.delete_user_content(selected_content.id))
+                                #st.write(response)
+                                if response:
+                                    user_contents = [content for content in user_contents if content.id != selected_content.id]  # Remove deleted content
+                                    st.experimental_rerun()  # Rerun the app to refresh the content list
+                            except Exception as e:
+                                if not str(e).startswith("No object"):
+                                    #raise e  # Re-raise exception if it's not the specific "no object" error
+                                    pass
+                                st.success("Content deleted or already doesn't exist.")
+        except Exception as e:
+            pass
