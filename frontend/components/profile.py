@@ -1,3 +1,4 @@
+from datetime import date
 import streamlit as st
 from utils.logger import log_decorator
 import asyncio
@@ -39,7 +40,7 @@ def _render_language_dropdown(languages, current_lang):
         return selected_base_language.language_name
     else:
         return ""
-    
+
 @log_decorator
 def render_awards(user):
     today = date.today()
@@ -88,6 +89,7 @@ def render_awards_info():
 
         for award, description in awards_descriptions.items():
             st.markdown(f"**{award}**: {description}")
+
 
 @log_decorator
 def render():

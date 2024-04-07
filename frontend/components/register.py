@@ -14,8 +14,6 @@ from schema.language import Language
 from schema.user_language import UserLanguage
 from schema.topic import Topic
 from services.state_service import StateService
-from schema.user_assessment import UserAssessmentCreate
-from datetime import date
 
 def get_language_sync(language_name):
     loop = asyncio.new_event_loop()
@@ -309,7 +307,6 @@ def render():
 
                 #home.render()
                 #st.experimental_rerun()
-
 
 def create_user_language_list(selected_languages: List[str], language_list: List[Language]) -> List[UserLanguage]:
     user_languages = []
