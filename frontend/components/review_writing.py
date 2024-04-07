@@ -20,18 +20,15 @@ from services.review_writing_service import ReviewWritingService
 
 @log_decorator
 def _add_welcome(user):
-    if user.preferred_name:
-            user_first = user.preferred_name
-    else:
-        user_first = user.first_name
-        
+    # if user.preferred_name:
+    #         user_first = user.preferred_name
+    # else:
+    #     user_first = user.first_name
+ #    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!       
     welcome = f"""
-    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!
-
     To get started, Write the content that you want feedback in the text area below. 
     LinguAI can provide feedback on your written content based on your skill level, 
     and recommend how it can be further improved to get you to the next level.
-
     """
     st.markdown(welcome, unsafe_allow_html=True)
 
@@ -179,7 +176,7 @@ def render():
     model= state_service.model
     temperature= state_service.temperature
     
-    st.title("LinguAI")
+ 
 
     st.write("")
 
@@ -196,24 +193,19 @@ def render():
 
     _add_welcome(user)
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        user_writing_content = st.text_area(
-            "",
-            height=400,
-            placeholder="Enter your text here...",
-            key="user_writing_content",
-            value="",            
-        )
-        announcement_placeholder = st.empty()
-        button_placeholder = st.empty()
-        audio_placeholder = st.empty()
-    with col2:
-        _add_skill_level_by_language(user)
+    user_writing_content = st.text_area(
+        "",
+        height=400,
+        placeholder="Enter your text here...",
+        key="user_writing_content",
+        value="",            
+    )
+    announcement_placeholder = st.empty()
+    button_placeholder = st.empty()
+    audio_placeholder = st.empty()
+
+
     st.write("")
-
-
-    # Placeholders for different sections of the page
 
     #st.write("---")
     
