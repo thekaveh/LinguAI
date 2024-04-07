@@ -160,3 +160,5 @@ node_modules/
 db/snapshot/linguai_db_ss.sql
 /logs
 /logs
+
+.metals
