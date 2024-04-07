@@ -74,8 +74,8 @@ def render_quiz():
                     reset_quiz_state()
                     return  # Stop further execution to show the message
                 
-                # Button to proceed to next quiz or finish
-                if st.button("Proceed"):
+                # Button to proceed to next quiz
+                if st.button("Next Quiz"):
                     if current_index < len(selected_languages) - 1:
                         st.session_state.current_language_index += 1
                         clear_quiz_state(language)
