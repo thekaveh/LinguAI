@@ -256,8 +256,8 @@ CREATE TABLE public.llm (
     is_default boolean DEFAULT false NOT NULL,
     is_vision boolean DEFAULT false NOT NULL,
     is_translate boolean DEFAULT false NOT NULL,
-    name character varying(100) NOT NULL,
-    provider character varying(20) NOT NULL
+    provider character varying(20) NOT NULL,
+    name character varying(100) NOT NULL
 );
 
 
@@ -669,16 +669,16 @@ COPY public.language (language_id, language_name) FROM stdin;
 -- Data for Name: llm; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.llm (id, is_active, is_default, is_vision, is_translate, name, provider) FROM stdin;
-1	t	t	f	t	llama2:7b	ollama
-2	t	f	f	f	mistral:latest	ollama
-3	t	f	f	t	stablelm2:1.6b-zephyr-fp16	ollama
-4	f	f	f	f	yi	ollama
-6	t	f	f	t	gpt-3.5-turbo-0125	openai
-8	f	f	t	f	llava:13b	ollama
-7	t	f	t	f	gpt-4-vision-preview	openai
-5	t	f	f	t	gpt-4	openai
-9	t	t	f	t	gpt-4-turbo-preview	openai
+COPY public.llm (id, is_active, is_default, is_vision, is_translate, provider, name) FROM stdin;
+3	t	f	f	t	ollama	stablelm2:1.6b-zephyr-fp16
+4	f	f	f	f	ollama	yi
+6	t	f	f	t	openai	gpt-3.5-turbo-0125
+8	f	f	t	f	ollama	llava:13b
+7	t	f	t	f	openai	gpt-4-vision-preview
+5	t	f	f	t	openai	gpt-4
+9	t	t	f	t	openai	gpt-4-turbo-preview
+1	t	t	f	t	ollama	llama2:13b-chat
+2	t	f	f	f	ollama	mistral:7b-instruct
 \.
 
 
