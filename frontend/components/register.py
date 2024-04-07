@@ -11,10 +11,36 @@ from services.language_service import LanguageService
 from schema.user import UserCreate
 from schema.user_topic import UserTopicBase
 from services.user_service import UserService
+from services.language_service import LanguageService
 from schema.language import Language
 from schema.user_language import UserLanguage
 from schema.topic import Topic
 from services.state_service import StateService
+from schema.user_assessment import UserAssessmentCreate
+from datetime import date
+
+def get_language_sync(language_name):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    language_details = loop.run_until_complete(LanguageService.get_language_by_name(language_name))
+    loop.close()
+    return language_details
+
+
+def get_user_by_username_sync(username):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    user_details = loop.run_until_complete(UserService.get_user_id_by_username(username))
+    loop.close()
+    return user_details
+
+
+def create_user_assessment_sync(user_id, assessment_data):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(UserService.create_user_assessment(user_id, assessment_data))
+    loop.close()
+    return result
 
 @log_decorator
 def load_quiz_questions(language):
@@ -44,7 +70,7 @@ def render_quiz():
                 
                 # If it was the last quiz, show completion message
                 if current_index == len(selected_languages) - 1:
-                    st.info("You have completed all quizzes. Thank you! Login to the Platform from the sidebar.")
+                    st.info("You have completed all quizzes. Thank you! Please login using the sidebar :)")
                     reset_quiz_state()
                     return  # Stop further execution to show the message
                 
@@ -73,6 +99,27 @@ def render_quiz():
                 skill_level = determine_skill_level(total_points)
                 st.session_state[f'{language}_skill_level'] = skill_level
                 st.session_state[f'{language}_quiz_submitted'] = True
+                
+                # update the backend with the new assessment 
+                language_details = get_language_sync(language)
+                language_id = language_details.language_id
+                user_id = get_user_by_username_sync(st.session_state.new_username)
+                # user_id = user_details.user_id
+                
+                assessment_data = UserAssessmentCreate(
+                    user_id=user_id,
+                    language_id=language_id,
+                    assessment_date=date.today(),
+                    assessment_type="Starter",
+                    skill_level=skill_level.lower(),
+                    strength="Starter diagnostic quiz",
+                    weakness="Starter diagnostic quiz",
+                    language=language_details,
+                )
+                
+                # create_user_assessment_sync(user_id, assessment_data)
+                create_user_assessment_sync(user_id, assessment_data)
+                                
                 # Use rerun to refresh the page to show the skill level
                 st.experimental_rerun()
         else:
@@ -101,6 +148,8 @@ def reset_quiz_state():
     for key in list(st.session_state.keys()):
         if key.startswith("question_") or key.endswith("_quiz_submitted") or key.endswith("_skill_level"):
             del st.session_state[key]
+    if 'username' not in st.session_state:
+        st.session_state['username'] = st.session_state.new_username
 
 def determine_skill_level(total_points):
     if total_points <= 10:
@@ -166,6 +215,8 @@ def render():
         st.session_state['selected_languages'] = []
     if 'quiz_submitted' not in st.session_state:
         st.session_state['quiz_submitted'] = False
+    if 'new_username' not in st.session_state:
+        st.session_state['new_username'] = ""
     
     if not st.session_state.quiz_started:
         state_service = StateService.instance()
@@ -261,6 +312,7 @@ def render():
                     st.success("Registration Successful!")
                     st.session_state.quiz_started = True
                     st.session_state.selected_languages = selected_languages
+                    st.session_state.new_username = username
                     st.experimental_rerun()
     else:        
         render_quiz()

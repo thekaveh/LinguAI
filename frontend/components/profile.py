@@ -12,6 +12,26 @@ from datetime import date, datetime
 
 
 @log_decorator
+def render_language_mastery(user):
+    if not hasattr(user, 'user_assessments') or len(user.user_assessments) == 0:
+        st.write("No language assessments found.")
+        return
+    
+    for language in user.learning_languages:
+        assessments = [assessment for assessment in user.user_assessments if assessment.language.language_name == language]
+
+
+        if assessments:
+            # Sort assessments by date, descending, to get the most recent one
+            assessments.sort(key=lambda x: x.assessment_date, reverse=True)
+            most_recent_assessment = assessments[0]
+
+
+            st.write(f"**{language}:** Skill Level - {most_recent_assessment.skill_level.title()}")
+        else:
+            st.write(f"**{language}:** No assessments available")
+
+@log_decorator
 def _fetch_languages_sync():
     # Wrapper function to call the async function synchronously
     loop = asyncio.new_event_loop()
@@ -99,12 +119,14 @@ def render():
     st.title("Profile")
     state_service = StateService.instance()
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
-    
     ### user awards (gamification)
     st.subheader("Your Awards 🏆")
     render_awards(user)
     st.write(f"* Daily Streak: {user.consecutive_login_days}")
     
+    st.subheader("Your Mastery")
+    render_language_mastery(user)
+        
     ### interest selection
     st.subheader("Interest Selection")
 

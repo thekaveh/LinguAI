@@ -65,7 +65,7 @@ class UserService:
         
         self.db.flush() # flush to get the db_user.id for FK relationships without committing the transaction
         
-        # create initial default assessments 
+        # create initial default assessments (don't know if starter quiz should replace initial assessments)
         if user_create.learning_languages:
             for language_name in user_create.learning_languages:
                 language_schema = self.language_service.get_language_by_name(language_name=language_name)
@@ -203,10 +203,30 @@ class UserService:
         self.db.commit()
         return AuthenticationResponse.success(username=request.username)
 
-    def create_user_assessment(
-        self, user_id: int, assessment_data: UserAssessmentCreate
-    ) -> UserAssessment:
-        db_assessment = UserAssessment(**assessment_data.dict(), user_id=user_id)
+    # def create_user_assessment(
+    #     self, user_id: int, assessment_data: UserAssessmentCreate
+    # ) -> UserAssessment:
+    #     assessment_dict = assessment_data.dict()
+    #     assessment_dict.pop('user_id', None)
+        
+    #     db_assessment = UserAssessment(**assessment_dict, user_id=user_id)
+        
+    #     self.db.add(db_assessment)
+    #     self.db.commit()
+    #     self.db.refresh(db_assessment)
+    #     return db_assessment
+
+    def create_user_assessment(self, user_id: int, assessment_data: UserAssessmentCreate) -> UserAssessment:
+        db_assessment = UserAssessment(
+            user_id=user_id,
+            assessment_date=assessment_data.assessment_date,
+            assessment_type=assessment_data.assessment_type,
+            skill_level=assessment_data.skill_level,
+            strength=assessment_data.strength,
+            weakness=assessment_data.weakness,
+            language_id=assessment_data.language_id,
+        )
+        
         self.db.add(db_assessment)
         self.db.commit()
         self.db.refresh(db_assessment)
