@@ -218,6 +218,7 @@ def render():
     if 'new_username' not in st.session_state:
         st.session_state['new_username'] = ""
     
+    # first show the registration form before any quizzes 
     if not st.session_state.quiz_started:
         state_service = StateService.instance()
         states = {
@@ -235,7 +236,6 @@ def render():
         "VT": "Vermont", "VA": "Virginia", "WA": "Washington", "WV": "West Virginia",
         "WI": "Wisconsin", "WY": "Wyoming"
         }
-
 
         with st.form(key='register_form'):
             st.subheader("Register")
@@ -259,7 +259,6 @@ def render():
                 age = st.selectbox("Age*", options=list(range(15, 66)), index=0)
                 gender = st.selectbox("Gender*", options=["", "Male", "Female", "Nonbinary", "Prefer not to say"])            
 
-
             st.write("")        
             # Optional Information
             st.write("---")
@@ -278,8 +277,6 @@ def render():
                 
                 topic_names = [topic.topic_name for topic in fetch_topics_sync()]
                 selected_topics = st.multiselect("Choose topics:", options=topic_names)          
-
-                
                 
             with col4:
                 st.markdown("")
@@ -347,7 +344,6 @@ def create_user_create_object(preferred_name, age, gender, discovery_method, mot
         user_topics=user_topics,  
         password_hash=password
     )
-
 
 def validate_registration_form(motivation, middle_name, first_name, last_name, username, password, confirm_password, email, age, selected_base_language):
     errors = []

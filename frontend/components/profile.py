@@ -69,25 +69,21 @@ def render_awards(user):
     if user.consecutive_login_days and user.consecutive_login_days >= 30:
         awards.append("Consistent Learner 📅")
 
-
     # Check for the "New User" award
     if user.enrollment_date:
         days_since_enrollment = (today - user.enrollment_date).days
         if days_since_enrollment <= 10:
             awards.append("New User 🌟")
 
-
     # Check for the "Language Explorer" award
     if user.learning_languages and len(user.learning_languages) >= 3:
         awards.append("Language Explorer 🌍")
-
 
     # Check for the "Topic Master" award
     if user.enrollment_date:
         days_since_enrollment = (today - user.enrollment_date).days
         if days_since_enrollment >= 100:
             awards.append("Long Time User 🎓")
-
 
     # Display the awards
     if awards:
@@ -100,7 +96,6 @@ def render_awards(user):
 def render_awards_info():
     with st.expander("Awards Information", expanded=False):
         st.subheader("Understand Your Awards")
-
 
         # Descriptions for each award
         awards_descriptions = {
@@ -129,7 +124,6 @@ def render():
         
     ### interest selection
     st.subheader("Interest Selection")
-
 
     topics = asyncio.run(TopicService.list())
     topics = [topic.topic_name for topic in topics]
@@ -216,7 +210,6 @@ def render():
                     st.error("New passwords do not match")
                 else:
                     try:
-                        # Assuming UserService has a method to call the backend password change endpoint
                         asyncio.run(UserService.change_password(
                         user.username, current_password, new_password))
                         st.success("Password changed successfully")
