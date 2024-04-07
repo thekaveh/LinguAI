@@ -23,22 +23,22 @@ services:
       - .env
     ports:
       - "${DB_DASHBOARD_PORT}:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
-      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
     volumes:
       - db-dashboard-data:/var/lib/pgadmin
 
   ollama:
-    image: ollama/ollama:latest
+    build: ./ollama
     container_name: ollama
     restart: unless-stopped
+    depends_on:
+      - db
     ports:
       - "${OLLAMA_PORT}:11434"
     env_file:
       - .env
     environment:
-      NVIDIA_VISIBLE_DEVICES: all
+      - "NVIDIA_VISIBLE_DEVICES=all"
+      - "DATABASE_URL=postgresql://${POSTGRES_APP_USER}:${POSTGRES_APP_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB}"
     deploy:
       resources:
         reservations:
