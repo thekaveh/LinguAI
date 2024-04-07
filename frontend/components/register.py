@@ -14,7 +14,148 @@ from schema.language import Language
 from schema.user_language import UserLanguage
 from schema.topic import Topic
 from services.state_service import StateService
+from schema.user_assessment import UserAssessmentCreate
+from datetime import date
 
+def get_language_sync(language_name):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    language_details = loop.run_until_complete(LanguageService.get_language_by_name(language_name))
+    loop.close()
+    return language_details
+
+
+def get_user_by_username_sync(username):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    user_details = loop.run_until_complete(UserService.get_user_id_by_username(username))
+    loop.close()
+    return user_details
+
+
+def create_user_assessment_sync(user_id, assessment_data):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    result = loop.run_until_complete(UserService.create_user_assessment(user_id, assessment_data))
+    loop.close()
+    return result
+
+@log_decorator
+def load_quiz_questions(language):
+    try:
+        with open(f"./starter_quizzes/{language.lower()}_quiz.json", "r", encoding="utf-8") as file:
+            quiz = json.load(file)
+        return quiz[language]
+    except FileNotFoundError:
+        st.error(f"The quiz for {language} could not be found.")
+        return []
+
+@log_decorator
+def render_quiz():
+    if st.session_state.get('quiz_started', False):
+        current_index = st.session_state.get('current_language_index', 0)
+        selected_languages = st.session_state.get('selected_languages', [])
+       
+        if 0 <= current_index < len(selected_languages):
+            language = selected_languages[current_index]
+            st.title(f"Starter Quiz: {language}")
+            questions = load_quiz_questions(language)
+            
+            # If the quiz is submitted, calculate and display the skill level
+            if st.session_state.get(f'{language}_quiz_submitted', False):
+                skill_level = st.session_state.get(f'{language}_skill_level', "Not determined")
+                st.success(f"Your current skill level for {language} is: {skill_level}")
+                
+                # If it was the last quiz, show completion message
+                if current_index == len(selected_languages) - 1:
+                    st.info("You have completed all quizzes. Thank you! Please login using the sidebar :)")
+                    reset_quiz_state()
+                    return  # Stop further execution to show the message
+                
+                # Button to proceed to next quiz
+                if st.button("Next Quiz"):
+                    if current_index < len(selected_languages) - 1:
+                        st.session_state.current_language_index += 1
+                        clear_quiz_state(language)
+                    else:
+                        reset_quiz_state()
+                    return
+                
+            with st.form(key=f"{language}_quiz_form"):
+                total_points = 0
+                for i, question in enumerate(questions):
+                    st.write(question["question"])
+                    options = question["options"]
+                    answer = st.radio("Choose an option:", options, key=f"question_{i}", index=None)
+                    if answer == question["answer"]:
+                        total_points += question["points"]
+                
+                submitted = st.form_submit_button("Submit Quiz")
+            
+            if submitted:
+                # Calculate and temporarily store skill level for current language
+                skill_level = determine_skill_level(total_points)
+                st.session_state[f'{language}_skill_level'] = skill_level
+                st.session_state[f'{language}_quiz_submitted'] = True
+                
+                # update the backend with the new assessment 
+                language_details = get_language_sync(language)
+                language_id = language_details.language_id
+                user_id = get_user_by_username_sync(st.session_state.new_username)
+                # user_id = user_details.user_id
+                
+                assessment_data = UserAssessmentCreate(
+                    user_id=user_id,
+                    language_id=language_id,
+                    assessment_date=date.today(),
+                    assessment_type="Starter",
+                    skill_level=skill_level.lower(),
+                    strength="Starter diagnostic quiz",
+                    weakness="Starter diagnostic quiz",
+                    language=language_details,
+                )
+                
+                # create_user_assessment_sync(user_id, assessment_data)
+                create_user_assessment_sync(user_id, assessment_data)
+                                
+                # Use rerun to refresh the page to show the skill level
+                st.experimental_rerun()
+        else:
+            # Reset quiz state when all quizzes are completed
+            reset_quiz_state()
+
+
+def clear_quiz_state(language):
+    if f'{language}_quiz_submitted' in st.session_state:
+        del st.session_state[f'{language}_quiz_submitted']
+    if f'{language}_skill_level' in st.session_state:
+        del st.session_state[f'{language}_skill_level']
+    # Clear any question states for the language
+    for key in list(st.session_state.keys()):
+        if key.startswith("question_"):
+            del st.session_state[key]
+    st.experimental_rerun()
+
+
+def reset_quiz_state():
+    st.session_state.quiz_started = False
+    st.session_state.current_language_index = 0
+    if 'selected_languages' in st.session_state:
+        del st.session_state['selected_languages']
+    # Clear any lingering question answers and language-specific states
+    for key in list(st.session_state.keys()):
+        if key.startswith("question_") or key.endswith("_quiz_submitted") or key.endswith("_skill_level"):
+            del st.session_state[key]
+    if 'username' not in st.session_state:
+        st.session_state['username'] = st.session_state.new_username
+
+def determine_skill_level(total_points):
+    if total_points <= 10:
+        return "Beginner"
+    elif total_points <= 20:
+        return "Intermediate"
+    else:
+        return "Advanced"
 
 @log_decorator
 def fetch_topics_sync():
