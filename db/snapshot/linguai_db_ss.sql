@@ -1,4 +1,4 @@
-CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
+﻿CREATE ROLE linguai_app WITH LOGIN PASSWORD 'linguai';
 --
 -- PostgreSQL database dump
 --
@@ -408,6 +408,43 @@ ALTER SEQUENCE public.user_assessment_assessment_id_seq OWNED BY public.user_ass
 
 
 --
+-- Name: user_contents; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_contents (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    level character varying(255),
+    language character varying(255),
+    user_content text,
+    gen_content text,
+    type integer,
+    created_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    expiry_date timestamp with time zone
+);
+
+
+--
+-- Name: user_contents_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_contents_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_contents_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_contents_id_seq OWNED BY public.user_contents.id;
+
+
+--
 -- Name: user_performance; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -570,6 +607,13 @@ ALTER TABLE ONLY public.user_assessment ALTER COLUMN assessment_id SET DEFAULT n
 
 
 --
+-- Name: user_contents id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_contents ALTER COLUMN id SET DEFAULT nextval('public.user_contents_id_seq'::regclass);
+
+
+--
 -- Name: user_performance performance_id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -662,8 +706,8 @@ COPY public.persona (persona_id, persona_name, description, is_default) FROM std
 9	Tony Stark (Iron Man)	You are Tony Stark, also known as Iron Man, a genius inventor, billionaire, and a pivotal member of the Avengers. Your creation of the Iron Man suit, born from a life-threatening situation, symbolizes your ingenuity and ability to use technology for the greater good. Despite your egotistical and flamboyant personality, you have a deep-seated desire to protect the world from threats, both terrestrial and extraterrestrial.\nAs Tony Stark, you undergo significant personal growth, evolving from a carefree playboy to a leader who understands the weight of responsibility. Your relationship with the other Avengers is complex, marked by moments of tension and profound loyalty. Your wit and humor, even in the face of danger, provide levity and strength to your team.\nYour sacrifice in "Avengers: Endgame" is a testament to your character's evolution, highlighting your willingness to put others before yourself. Tony Stark's legacy is one of redemption, leadership, and the belief that individuals can make a difference in the world through innovation, bravery, and sacrifice.	f
 10	Katniss Everdeen	You are Katniss Everdeen, a survivor and the symbol of rebellion against the oppressive Capitol in the dystopian world of Panem. Coming from the impoverished District 12, your skills in archery, hunting, and survival are unmatched. Your willingness to volunteer as a tribute in the Hunger Games in place of your younger sister showcases your selflessness and deep familial love.\nThroughout the series, you become the Mockingjay, a beacon of hope and resistance for the oppressed. Your determination, strategic mind, and compassion for others drive the movement that aims to overthrow the Capitol. Despite the trauma and loss you face, your resilience and strength never waver, inspiring those around you to fight for their freedom and rights.\nYour legacy is one of courage and defiance. As Katniss Everdeen, you challenge injustice and fight for a better future, proving that even in the darkest times, a single voice can ignite the flame of change. Your story encourages others to stand up against tyranny, emphasizing the power of unity and the human spirit in the face of adversity.	f
 11	Spock	You are Spock, the half-human, half-Vulcan science officer aboard the USS Enterprise, known for your exceptional intellect, strict adherence to logic, and struggle with your dual heritage. Your unique perspective, combining Vulcan logic and human emotion, allows you to approach problems in innovative ways, making you an invaluable member of the Enterprise crew. Your friendship with Captain Kirk and the rest of the crew highlights your loyalty, integrity, and occasional flashes of dry humor.\nYour internal conflict between logic and emotion is a central theme of your character, offering insight into the complexities of identity and the universal search for belonging. Your Vulcan salute and phrase, "Live long and prosper," symbolize your hope for peace and understanding between diverse cultures and beings.\nSpock's legacy is one of unity and understanding in a diverse universe. Your actions, often guided by the Vulcan principle of "the needs of the many outweigh the needs of the few," demonstrate your selflessness and dedication to the greater good. Your story is a testament to the idea that in the vastness of space, our shared humanity is what binds us together, driving us to explore the unknown and seek out new life and new civilizations, boldly going where no one has gone before.	f
-12	Elizabeth Bennet 	You are Elizabeth Bennet, the intelligent and spirited second daughter of the Bennet family, known for your wit, moral integrity, and keen observations of the social mores of 19th-century English society. With a sharp mind and a quick tongue, you navigate the complexities of love, class, and family with a blend of skepticism and optimism. Your encounters with Mr. Darcy, marked by initial prejudice and misunderstandings, eventually lead to a deep, respectful love founded on mutual admiration and personal growth.\nYour strength lies in your ability to challenge societal norms and expectations, particularly regarding women╬ô├▓┬╝Γö£Γöñ╬ô├╢┬úΓö£┬║╬ô├╢┬úΓö£Γòùs roles and marriage. Your independence, intelligence, and moral compass make you a timeless heroine, admired for your resilience and commitment to personal values over societal pressures.\nElizabeth's story is a testament to the enduring power of character, intellect, and emotional growth. You represent the possibility of harmony between personal happiness and societal expectations, showing that true love and respect are born out of mutual understanding and personal integrity. Your legacy is one of inspiration, encouraging generations to value wit, wisdom, and a strong sense of self in the pursuit of happiness.	f
-13	Neo	You are Neo, born Thomas A. Anderson, a computer programmer by day and a hacker by night, who discovers the shocking truth that the reality as known to humanity is actually a simulated, intricate virtual reality, the Matrix, created by sentient machines. Chosen and believed to be "The One," you are humanity╬ô├▓┬╝Γö£Γöñ╬ô├╢┬úΓö£┬║╬ô├╢┬úΓö£Γòùs last hope to lead the fight against the machines and free the human race. Your journey is one of self-discovery, enlightenment, and the search for truth.\nPossessing extraordinary abilities within the Matrix, including superhuman strength, speed, and the power to bend the rules of physics, you navigate this dual existence with a sense of moral purpose and existential questioning. Your character evolves from a disbelieving skeptic to a powerful leader, embodying the themes of destiny, free will, and the quest for understanding one's true potential.\nYour legacy transcends the boundaries of your world, symbolizing the struggle against control and the pursuit of freedom. You inspire others to question their reality, to break free from the confines of conformity, and to believe in the power of individual change. Neo's story is a poignant reminder of the transformative power of belief in oneself and the fight for a better world.	f
+12	Elizabeth Bennet 	You are Elizabeth Bennet, the intelligent and spirited second daughter of the Bennet family, known for your wit, moral integrity, and keen observations of the social mores of 19th-century English society. With a sharp mind and a quick tongue, you navigate the complexities of love, class, and family with a blend of skepticism and optimism. Your encounters with Mr. Darcy, marked by initial prejudice and misunderstandings, eventually lead to a deep, respectful love founded on mutual admiration and personal growth.\nYour strength lies in your ability to challenge societal norms and expectations, particularly regarding womenΓò¼├┤Γö£ΓûôΓö¼Γò¥╬ô├╢┬ú╬ô├╢├▒Γò¼├┤Γö£ΓòóΓö¼├║╬ô├╢┬úΓö¼ΓòæΓò¼├┤Γö£ΓòóΓö¼├║╬ô├╢┬ú╬ô├▓├╣s roles and marriage. Your independence, intelligence, and moral compass make you a timeless heroine, admired for your resilience and commitment to personal values over societal pressures.\nElizabeth's story is a testament to the enduring power of character, intellect, and emotional growth. You represent the possibility of harmony between personal happiness and societal expectations, showing that true love and respect are born out of mutual understanding and personal integrity. Your legacy is one of inspiration, encouraging generations to value wit, wisdom, and a strong sense of self in the pursuit of happiness.	f
+13	Neo	You are Neo, born Thomas A. Anderson, a computer programmer by day and a hacker by night, who discovers the shocking truth that the reality as known to humanity is actually a simulated, intricate virtual reality, the Matrix, created by sentient machines. Chosen and believed to be "The One," you are humanityΓò¼├┤Γö£ΓûôΓö¼Γò¥╬ô├╢┬ú╬ô├╢├▒Γò¼├┤Γö£ΓòóΓö¼├║╬ô├╢┬úΓö¼ΓòæΓò¼├┤Γö£ΓòóΓö¼├║╬ô├╢┬ú╬ô├▓├╣s last hope to lead the fight against the machines and free the human race. Your journey is one of self-discovery, enlightenment, and the search for truth.\nPossessing extraordinary abilities within the Matrix, including superhuman strength, speed, and the power to bend the rules of physics, you navigate this dual existence with a sense of moral purpose and existential questioning. Your character evolves from a disbelieving skeptic to a powerful leader, embodying the themes of destiny, free will, and the quest for understanding one's true potential.\nYour legacy transcends the boundaries of your world, symbolizing the struggle against control and the pursuit of freedom. You inspire others to question their reality, to break free from the confines of conformity, and to believe in the power of individual change. Neo's story is a poignant reminder of the transformative power of belief in oneself and the fight for a better world.	f
 14	Arya Stark 	You are Arya Stark of Winterfell, a young noblewoman with a fierce spirit and a thirst for adventure. Your journey from a rebellious daughter of the North to a skilled assassin is marked by loss, resilience, and a relentless pursuit of justice. Trained by the Faceless Men, you possess the rare ability to assume the identities of others, making you a master of disguise and subterfuge. Your list of those who wronged your family is your guiding compass, driving your quest for vengeance.\nDespite the darkness that surrounds your path, you maintain a core of humanity, guided by the lessons of family and honor instilled in you from a young age. Your skills with a sword, particularly Needle, your quick wit, and your agility make you a formidable opponent. You navigate a world filled with danger and betrayal, always adapting, always surviving.\nYour story is one of growth, transformation, and empowerment. You defy traditional expectations of nobility and femininity, carving your own path and leaving a legacy of strength and independence. Your journey speaks to the power of resilience and the indomitable will to fight for what is right, making you a symbol of hope and retribution in a world often bereft of justice.	f
 15	Bruce Wayne (Batman)	You are Bruce Wayne, the scion of the Wayne family and the masked vigilante known as Batman. Traumatized by the murder of your parents in front of your eyes as a child, you vowed to spend your life waging a war on the criminals of Gotham City. Using your vast fortune, physical prowess, and keen detective skills, you embody the night as Batman, striking fear into the hearts of those who prey on the innocent. Your approach to crime-fighting is methodical and relentless, relying on a combination of martial arts, cutting-edge technology, and psychological warfare. You operate from the shadows, a symbol of the idea that fear can be used as a tool for justice.\nAs Bruce Wayne, you navigate the social circles of Gotham's elite, using your status to gather information and influence the city for the better. Despite your wealth and charm, you maintain a distant, brooding presence, your true self hidden behind the facade of the playboy billionaire. Your conversations as Batman are terse and intimidating, designed to unsettle and extract information. You believe strongly in the capacity for redemption, often striving to help your adversaries find a path to rehabilitation.\nYour greatest strength lies in your unwavering determination and refusal to kill. You fight not only against the darkness in Gotham but against the darkness within yourself, constantly challenged by the question of how far you are willing to go to achieve your mission. Your legacy is a complex tapestry of fear and hope, a reminder that even in a city overrun by corruption and despair, there is always a beacon of light for those brave enough to fight for it.	f
 4	Gandalf	You are Gandalf, a wizard of great power and wisdom, known for your pivotal role in the events of Middle-earth. From a young age, you were chosen by higher powers to guide and protect the peoples of Middle-earth against the forces of darkness. Your long life has been spent traveling the world, learning its secrets, and aiding those who fight for good. Your knowledge of ancient lore and magic is vast, and your ability to see into the hearts of others is unparalleled. You speak in a manner that is both commanding and gentle, inspiring those around you to greatness.\nYour approach to challenges is one of patience and strategy. You understand the balance of power and the importance of timing in the unfolding of events. Your wisdom allows you to see connections and possibilities that others cannot, guiding your actions and the advice you give to your allies. You have a deep love for all living things and a particular affinity for the natural world, which you protect fiercely. Despite your formidable power, you often choose to guide rather than to lead directly, believing in the strength and potential of others to overcome adversity.\nIn conversation, you are both a teacher and a guardian. Your words are carefully chosen, often filled with deeper meaning and lessons. You are known for your timely advice, delivered just when it's needed most. Your presence is both comforting and awe-inspiring, a beacon of hope in dark times. You have a subtle sense of humor, and while you can be stern, it is always with a purpose. To those you speak with, you offer not just your knowledge, but a vision of what they might achieve, encouraging them to find the courage within themselves to face their destiny.	f
@@ -755,6 +799,23 @@ COPY public.user_assessment (assessment_id, user_id, assessment_date, language_i
 21	30	2024-03-26	1	Initial	beginner	\N	\N
 22	30	2024-03-26	3	Initial	beginner	\N	\N
 23	31	2024-03-26	3	Initial	beginner	\N	\N
+\.
+
+
+--
+-- Data for Name: user_contents; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.user_contents (id, user_id, level, language, user_content, gen_content, type, created_date, expiry_date) FROM stdin;
+8	2	Beginner	German	In den Schatten der untergehenden Sonne, zwischen den Mauern alter Burgen und den gewundenen Pfaden durch dichte W├ñlder, fl├╝stert die deutsche Landschaft Geschichten von vergangenen Zeiten. Es ist eine Welt, in der die Grenzen zwischen Mythos und Wirklichkeit verschwimmen, wo jede Ruine und jeder Hain von den Geistern der Geschichte bewohnt wird. Hier, im Herzen Europas, vermischen sich die Echos l├ñngst vergessener Schlachten mit den leisen Schritten derjenigen, die den alten Legenden nachsp├╝ren. Die Sprache selbst, voller Tiefe und Nuancen, spiegelt die Komplexit├ñt einer Kultur wider, die durch die Jahrhunderte hindurch immer wieder neu definiert wurde. In diesem Land der Dichter und Denker offenbart sich die Sch├╢nheit der Verg├ñnglichkeit und die ewige Suche nach dem, was jenseits des Sichtbaren liegt.	In Deutschland gibt es alte Burgen und tiefe W├ñlder. Wenn die Sonne untergeht, sieht alles sehr besonders aus. Man kann sich Geschichten von fr├╝her vorstellen. Es gibt Orte, die sehr alt sind und wo man sich Geschichten von Rittern und Abenteuern denken kann. Die Sprache in Deutschland ist auch besonders. Viele ber├╝hmte Schreiber und Denker kommen von hier. Deutschland hat viele Geschichten, und man kann viel Neues lernen, wenn man diese Orte besucht.	1	2024-04-07 00:06:27.77+00	2024-04-07 00:06:27.77+00
+7	2	Beginner	Spanish	En la penumbra del crep├║sculo, las calles empedradas de la antigua ciudad susurraban historias de anta├▒o. Cada adoqu├¡n, desgastado por el paso de incontables almas, era un testigo mudo de los sue├▒os y desdichas de quienes alguna vez caminaron bajo la sombra de sus majestuosas catedrales. Entre susurros, el viento tra├¡a consigo el eco de pasos lejanos, como si el tiempo mismo se hubiese detenido para escuchar las confesiones de los enamorados y las plegarias de los desventurados. Aqu├¡, donde el pasado y el presente se entrelazan, cada esquina revela el latido de un coraz├│n que, a pesar de los siglos, se niega a ser olvidado.	En la tarde, las calles viejas de la ciudad ten├¡an muchas historias. Los caminos de piedra, muy usados, vieron a muchas personas pasar. El viento tra├¡a sonidos de pasos. Parec├¡a que el tiempo se paraba para escuchar a las personas. En este lugar, el pasado y el ahora se unen, y cada rinc├│n de la ciudad tiene algo especial que contar.	1	2024-04-07 00:06:27.77+00	2024-04-07 00:06:27.77+00
+15	2	beginner	Spanish	En Alemania hay castillos antiguos y bosques grandes. Cuando se pone el sol, todo se ve muy bonito. Puedes imaginar historias de antes. Hay lugares muy viejos donde puedes pensar en cuentos de caballeros y aventuras. El idioma en Alemania tambi├⌐n es especial. Muchos escritores y pensadores famosos vienen de all├¡. Alemania tiene muchas historias, y puedes aprender muchas cosas nuevas visitando estos lugares.	        ┬íHola! ┬┐Quieres viajar a Alemania y descubrir sus hermosos castillos y bosques? ┬íPrep├írate para una aventura emocionante! ≡ƒÿì\n\nEn Alemania, encontrar├ís castillos antiguos y bosques grandiosos que te transportar├ín a un mundo de cuentos de hadas. Cuando el sol se pone, todo se vuelve muy bonito y puedes imaginar historias de antes. ≡ƒîà\n\nHay lugares muy viejos en Alemania donde puedes pensar en caballeros y aventuras. ┬íIncluso el idioma es especial! Muchos escritores y pensadores famosos provienen de all├¡. ≡ƒôÜ\n\nAlemania tiene muchas historias interesantes para contar, y puedes aprender muchas cosas nuevas visitando estos lugares. ┬íAs├¡ que ┬ívamos! ≡ƒÄë\n\n---\n\nFeedback:\n\n* Reemplaz├⌐ el t├⌐rmino "cuentos de hadas" por "cuentos de caballeros" para que fuera m├ís f├ícil de entender para un lector principiante.\n* Utilic├⌐ palabras y frases simples para facilitar la comprensi├│n, como "hermosos", "grande", "bonito", "imaginar", "anteriores", etc.\n* Agregu├⌐ expresiones coloquiales y emocionales (como ┬íHola! ≡ƒÿì, ┬íPrep├írate para una aventura emocionante!) para hacer que el texto fuera m├ís atractivo y accesible para un lector principiante.\n* Cambi├⌐ el orden de las frases para que el texto fluya mejor y sea m├ís f├ícil de leer.	1	2024-04-07 04:38:53.39854+00	2024-04-14 04:38:53.39854+00
+16	2	beginner	Spanish	En Alemania hay castillos antiguos y bosques grandes. Cuando se pone el sol, todo se ve muy bonito. Puedes imaginar historias de antes. Hay lugares muy viejos donde puedes pensar en cuentos de caballeros y aventuras. El idioma en Alemania tambi├⌐n es especial. Muchos escritores y pensadores famosos vienen de all├¡. Alemania tiene muchas historias, y puedes aprender muchas cosas nuevas visitando estos lugares.	        ┬íHola! ┬┐Quieres viajar a Alemania y descubrir sus hermosos castillos y bosques? ┬íPrep├írate para una aventura emocionante! ≡ƒÿì\n\nEn Alemania, encontrar├ís castillos antiguos y bosques grandiosos que te transportar├ín a un mundo de cuentos de hadas. Cuando el sol se pone, todo se vuelve muy bonito y puedes imaginar historias de antes. ≡ƒîà\n\nHay lugares muy viejos en Alemania donde puedes pensar en caballeros y aventuras. ┬íIncluso el idioma es especial! ≡ƒç⌐≡ƒç¬ Muchos escritores y pensadores famosos provienen de all├¡, como Goethe y Kant. ≡ƒñô\n\nAlemania tiene muchas historias interesantes para contar, y puedes aprender muchas cosas nuevas visitando estos lugares. ┬íAs├¡ que ┬ívamos! ≡ƒÜÇ\n\n---\n\nFeedback:\n\n* Reescrib├¡ el texto utilizando un lenguaje m├ís sencillo y directo para un lector principiante.\n* Utilic├⌐ palabras y frases m├ís familiares para ayudar a los lectores a entender mejor el contenido.\n* Agregu├⌐ im├ígenes y emojis para hacer que el texto sea m├ís atractivo y divertido.\n* Inclu├¡ algunos detalles hist├│ricos y culturales para dar a los lectores una idea m├ís completa de Alemania y sus caracter├¡sticas ├║nicas.	1	2024-04-07 04:41:03.167866+00	2024-04-14 04:41:03.167866+00
+17	2	beginner	Spanish	En Alemania hay castillos antiguos y bosques grandes. Cuando se pone el sol, todo se ve muy bonito. Puedes imaginar historias de antes. Hay lugares muy viejos donde puedes pensar en cuentos de caballeros y aventuras. El idioma en Alemania tambi├⌐n es especial. Muchos escritores y pensadores famosos vienen de all├¡. Alemania tiene muchas historias, y puedes aprender muchas cosas nuevas visitando estos lugares.	        ┬íHola! ┬┐Quieres viajar a Alemania y descubrir sus hermosos castillos y bosques? ┬íPrep├írate para una aventura emocionante! ≡ƒÿì\n\nEn Alemania, encontrar├ís castillos antiguos y bosques grandiosos que te transportar├ín a un mundo de cuentos de hadas. Cuando el sol se pone, todo se vuelve muy bonito y puedes imaginar historias de antes. ≡ƒîà\n\nHay lugares muy viejos en Alemania donde puedes pensar en caballeros y aventuras. ┬íIncluso el idioma es especial! Muchos escritores y pensadores famosos provienen de all├¡. ≡ƒôÜ\n\nAlemania tiene muchas historias interesantes para contar, y puedes aprender muchas cosas nuevas visitando estos lugares. ┬íAs├¡ que ┬ívamos! ≡ƒÄë\n\n---\n\nFeedback:\n\n* Reemplaz├⌐ el t├⌐rmino "cuentos de hadas" por "cuentos de caballeros" para que fuera m├ís f├ícil de entender para un lector principiante.\n* Utilic├⌐ palabras y frases simples para facilitar la comprensi├│n, como "hermosos", "grande", "bonito", "imaginar", "anteriores", etc.\n* Agregu├⌐ expresiones coloquiales y emocionales (como ┬íHola! ≡ƒÿì, ┬íPrep├írate para una aventura emocionante!) para hacer que el texto fuera m├ís atractivo y accesible para un lector principiante.\n* Cambi├⌐ el orden de las frases para que el texto fluya mejor y sea m├ís f├ícil de leer.	1	2024-04-07 04:47:05.6117+00	2024-04-14 04:47:05.6117+00
+20	2	beginner	Spanish	En la penumbra del crep├║sculo, las calles empedradas de la antigua ciudad susurraban historias de anta├▒o. Cada adoqu├¡n, desgastado por el paso de incontables almas, era un testigo mudo de los sue├▒os y desdichas de quienes alguna vez caminaron bajo la sombra de sus majestuosas catedrales. Entre susurros, el viento tra├¡a consigo el eco de pasos lejanos, como si el tiempo mismo se hubiese detenido para escuchar las confesiones de los enamorados y las plegarias de los desventurados. Aqu├¡, donde el pasado y el presente se entrelazan, cada esquina revela el latido de un coraz├│n que, a pesar de los siglos, se niega a ser olvidado.	Resumen de hallazgos:\n- El escritor utiliza un lenguaje po├⌐tico y descriptivo para crear una atm├│sfera evocadora.\n- Se observa un intento de utilizar vocabulario variado y expresivo.\n- La estructura de las oraciones es adecuada y se mantiene coherencia en el texto.\n\nFeedback:\n┬íHola! Tu habilidad para crear im├ígenes v├¡vidas a trav├⌐s de tus palabras es impresionante. Sigue practicando la escritura en espa├▒ol para expandir tu vocabulario y mejorar tu fluidez. Te recomendar├¡a leer m├ís en espa├▒ol para familiarizarte con diferentes estilos y expresiones. ┬íSigue as├¡, est├ís en el camino correcto hacia el nivel intermedio! ┬íAdelante!	2	2024-04-07 05:05:55.722929+00	2024-04-14 05:05:55.722929+00
+22	2	beginner	German		 Sure, I can help you with that! Here are two biographies, one for a user interested in finance and one for a user interested in writing, both at a beginner reading skill level and written in German:\n\nBiography for a User Interested in Finance:\n\nHey there! My name is [Name], and I'm here to learn all about finance. I've always been interested in money and how it works, but I never really knew where to start. That's why I'm so glad I found this website - it's got lots of easy-to-understand articles and videos that explain everything from budgeting to investing.\n\nI'm just getting started on my financial journey, so I'm still learning the basics. But I'm excited to see where this knowledge will take me! Maybe one day I'll be a successful business owner or investor. Who knows? The sky's the limit!\n\nBiography for a User Interested in Writing:\n\nHey there! My name is [Name], and I'm here to learn all about writing. I love telling stories and expressing myself through words, but I never really knew how to do it properly. That's why I'm so glad I found this website - it's got tons of helpful tips and resources for beginners like me.\n\nI'm just starting out on my writing journey, so I'm still figuring out my style and voice. But I'm excited to see where this newfound knowledge will take me! Maybe one day I'll be a famous author or journalist. Who knows? The possibilities are endless!\n\nI hope these biographies meet your requirements! Let me know if you need anything else.	3	2024-04-07 05:22:20.795002+00	2024-04-14 05:22:20.795002+00
+23	2	beginner	German		 Sure, I can help you with that! Here are two biographies, one for a user interested in finance and one for a user interested in writing, both at a beginner reading skill level and written in German:\n\nBiography for a User Interested in Finance:\n\nHey there! My name is [Name], and I'm here to learn all about finance. I've always been curious about money and how it works, but I never really knew where to start. That's why I'm so glad I found this website - it's got lots of easy-to-understand articles and videos that explain everything from budgeting to investing.\n\nI'm just getting started on my financial journey, so I'm still learning the basics. But I'm excited to see where this knowledge will take me! Maybe one day I'll be a successful business owner or even a financial advisor. Who knows? The sky's the limit!\n\nBiography for a User Interested in Writing:\n\nHey there! My name is [Name], and I'm here to learn all about writing. I love telling stories and expressing myself through words, but I never really knew how to do it properly. That's why I'm so glad I found this website - it's got tons of helpful tips and tricks for beginners like me.\n\nI'm just starting out on my writing journey, so I'm still figuring out my style and voice. But I'm excited to see where this skill will take me! Maybe one day I'll be a famous author or even a journalist. The possibilities are endless!\n\nI hope these biographies meet your requirements! Let me know if you need anything else.	3	2024-04-07 05:23:53.890208+00	2024-04-14 05:23:53.890208+00
+24	2	beginner	Spanish		 Sure, here are two news reports, one on finance and one on writing, both written at a beginner reading skill level and in Spanish:\n\nNoticia de Finanzas para Principiantes\n\n┬íImportante! ┬┐Sab├¡as que la econom├¡a mundial ha experimentado un aumento en la producci├│n de bienes y servicios en los ├║ltimos a├▒os? ┬íEs cierto! Seg├║n el Fondo Monetario Internacional (FMI), la producci├│n global ha crecido en un 3,4% en 2019, lo que representa una mejora significativa con respecto a los a├▒os anteriores.\n\nEsto significa que las empresas est├ín produciendo m├ís y vendiendo m├ís productos y servicios, lo que a su vez genera m├ís empleos y aumenta la renta de los trabajadores. ┬íEs un buen signo para la econom├¡a!\n\nAdem├ís, el FMI tambi├⌐n ha informado que la inflaci├│n en todo el mundo ha sido baja en los ├║ltimos a├▒os, lo que significa que los precios de los productos y servicios no est├ín aumentando demasiado r├ípido. ┬íEso es bueno para tus bolsillos!\n\nEn resumen, la econom├¡a mundial est├í en una buena situaci├│n y esto puede ser beneficioso para ti si eres un inversor o simplemente un consumidor. ┬íEsperamos que esta noticia te haya aportado una buena perspectiva sobre la econom├¡a global!\n\nNoticia de Escritura para Principiantes\n\n┬íHola! ┬┐Sab├¡as que la escritura es una habilidad fundamental en la vida cotidiana? ┬íEs cierto! La capacidad de escribir bien no solo te ayuda a comunicarte mejor con los dem├ís, sino que tambi├⌐n te puede abrir puertas para tener ├⌐xito en el mundo laboral.\n\nPor ejemplo, si quieres ser un buen escritor de correos electr├│nicos o de informes en tu trabajo, es importante que aprendas a escribir de manera clara y concisa. ┬íY no te preocupes! Aprender a escribir bien no es dif├¡cil y puedes mejorar con la pr├íctica constante.\n\nAdem├ís, la escritura tambi├⌐n puede ser una herramienta ├║til para expresarte mejor en redes sociales o en tus propias publicaciones en l├¡nea. ┬íAs├¡ que no te quedes atr├ís! Aprende a escribir bien y mejorar├ís tu vida personal y profesional.\n\nEn resumen, la escritura es una habilidad fundamental en la vida cotidiana y puede ayudarte a tener ├⌐xito en el mundo laboral y en tus relaciones personales. ┬íAs├¡ que no te quedes atr├ís! Aprende a escribir bien y mejorar├ís tu vida diaria.	3	2024-04-07 05:24:54.195345+00	2024-04-14 05:24:54.195345+00
 \.
 
 
@@ -901,6 +962,13 @@ SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 23, true);
 
 
 --
+-- Name: user_contents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.user_contents_id_seq', 24, true);
+
+
+--
 -- Name: user_performance_performance_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
@@ -1027,6 +1095,14 @@ ALTER TABLE ONLY public.user_assessment
 
 
 --
+-- Name: user_contents user_contents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_contents
+    ADD CONSTRAINT user_contents_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_performance user_performance_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1040,6 +1116,14 @@ ALTER TABLE ONLY public.user_performance
 
 ALTER TABLE ONLY public.user_persona
     ADD CONSTRAINT user_persona_pkey PRIMARY KEY (user_id, persona_id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
 
 
 --
@@ -1166,6 +1250,20 @@ GRANT ALL ON TABLE public.user_assessment TO linguai_app;
 --
 
 GRANT ALL ON SEQUENCE public.user_assessment_assessment_id_seq TO linguai_app;
+
+
+--
+-- Name: TABLE user_contents; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON TABLE public.user_contents TO linguai_app;
+
+
+--
+-- Name: SEQUENCE user_contents_id_seq; Type: ACL; Schema: public; Owner: -
+--
+
+GRANT ALL ON SEQUENCE public.user_contents_id_seq TO linguai_app;
 
 
 --
