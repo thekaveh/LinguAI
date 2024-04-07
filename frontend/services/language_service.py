@@ -17,15 +17,3 @@ class LanguageService:
             return languages_list
         except Exception as e:
             raise e
-        
-    @log_decorator
-    @staticmethod
-    async def get_language_by_name(language_name: str) -> LanguageSchema:
-        try:
-            url = f"{Config.LANGUAGE_SERVICE_GET_ENDPOINT}/{language_name}"
-            return await HttpUtils.get(
-                url,
-                response_model=LanguageSchema,
-            )
-        except Exception as e:
-            raise Exception(f"Failed to fetch language '{language_name}: {e}")
