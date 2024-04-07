@@ -1,4 +1,3 @@
-from fastapi import Depends, FastAPI
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import Config

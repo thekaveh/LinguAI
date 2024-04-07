@@ -13,6 +13,7 @@ class StateService:
     def __init__(self):
         self._init_model()
         self._init_persona()
+
         st.session_state["temperature"] = 0.0
 
         st.session_state["chat_messages"] = []
@@ -34,10 +35,16 @@ class StateService:
 
     @log_decorator
     def _init_model(self):
-        models = asyncio.run(LLMService.list_models())
+        models = LLMService.get_all()
 
-        if models and len(models) > 0:
-            st.session_state["model"] = models[0]
+        if models:
+            st.session_state["model"] = next(
+                (m.name for m in models if m.is_default and m.provider == "ollama"),
+                next(
+                    (m.name for m in models if m.is_default and m.provider == "openai"),
+                    None,
+                ),
+            )
         else:
             st.session_state["model"] = None
 
@@ -74,7 +81,9 @@ class StateService:
 
     @model.setter
     def model(self, value):
-        if value and value != self.model:
+        if value and (
+            (not st.session_state["model"]) or (value != st.session_state["model"])
+        ):
             st.session_state["model"] = value
 
             NotificationService.success(f"LLM Model setting changed to {value}")
