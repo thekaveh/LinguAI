@@ -1,5 +1,7 @@
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr
+
+from .user_content import UserContentBase
 from .user_topic import UserTopicBase
 from .user_assessment import UserAssessmentBase
 from datetime import date
