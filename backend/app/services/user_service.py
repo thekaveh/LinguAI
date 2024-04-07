@@ -12,7 +12,7 @@ from app.data_access.models.user import User as DBUser, UserAssessment, UserTopi
 from app.data_access.models.topic import Topic
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
-
+from datetime import datetime
 import bcrypt
 
 from app.services.language_service import LanguageService
@@ -40,7 +40,7 @@ class UserService:
     @log_decorator
     def create_user(self, user_create: UserCreate) -> User:
         hashed_password = self.hash_password(user_create.password_hash)
-
+        
         db_user = DBUser(
             username=user_create.username.lower(), # convert username to lowercase
             email=user_create.email,
@@ -59,12 +59,13 @@ class UserService:
             mobile_phone=user_create.mobile_phone,
             landline_phone=user_create.landline_phone,
             contact_preference=user_create.contact_preference,
+            enrollment_date=datetime.today().date() # set enrollment date to today 
         )
         self.db.add(db_user)
         
         self.db.flush() # flush to get the db_user.id for FK relationships without committing the transaction
         
-        # create initial default assessments 
+        # create initial default assessments (don't know if starter quiz should replace initial assessments)
         if user_create.learning_languages:
             for language_name in user_create.learning_languages:
                 language_schema = self.language_service.get_language_by_name(language_name=language_name)
@@ -184,13 +185,48 @@ class UserService:
             return AuthenticationResponse.failure(
                 message="Incorrect username or password."
             )
-
+            
+        today = datetime.today().date()
+        if db_user.last_login_date:
+            if today == db_user.last_login_date:
+                # user has already logged in today
+                pass
+            elif (today - db_user.last_login_date).days == 1:
+                # consecutive login
+                db_user.consecutive_login_days += 1
+            else:
+                # not consecutive login => reset counter
+                db_user.consecutive_login_days = 1
+        else:
+            db_user.consecutive_login_days = 1 # user first login
+        db_user.last_login_date = today # update last login day
+        self.db.commit()
         return AuthenticationResponse.success(username=request.username)
 
-    def create_user_assessment(
-        self, user_id: int, assessment_data: UserAssessmentCreate
-    ) -> UserAssessment:
-        db_assessment = UserAssessment(**assessment_data.dict(), user_id=user_id)
+    # def create_user_assessment(
+    #     self, user_id: int, assessment_data: UserAssessmentCreate
+    # ) -> UserAssessment:
+    #     assessment_dict = assessment_data.dict()
+    #     assessment_dict.pop('user_id', None)
+        
+    #     db_assessment = UserAssessment(**assessment_dict, user_id=user_id)
+        
+    #     self.db.add(db_assessment)
+    #     self.db.commit()
+    #     self.db.refresh(db_assessment)
+    #     return db_assessment
+
+    def create_user_assessment(self, user_id: int, assessment_data: UserAssessmentCreate) -> UserAssessment:
+        db_assessment = UserAssessment(
+            user_id=user_id,
+            assessment_date=assessment_data.assessment_date,
+            assessment_type=assessment_data.assessment_type,
+            skill_level=assessment_data.skill_level,
+            strength=assessment_data.strength,
+            weakness=assessment_data.weakness,
+            language_id=assessment_data.language_id,
+        )
+        
         self.db.add(db_assessment)
         self.db.commit()
         self.db.refresh(db_assessment)
