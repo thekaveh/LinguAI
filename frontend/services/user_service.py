@@ -9,7 +9,6 @@ from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 from schema.user import User, UserCreate, UserTopicBase
 from schema.password_change import PasswordChange
-from schema.user_assessment import UserAssessmentCreate, UserAssessment
 
 class UserService:
     @log_decorator
@@ -29,22 +28,13 @@ class UserService:
     @staticmethod
     async def get_user_by_username(username: str) -> Optional[User]:
         try:
+            # Assuming Config.BASE_URL contains the base URL of your backend service
+            # and you need to append '/users/username/{username}' to it
             user_service_endpoint = f"{Config.USER_SERVICE_USERNAME_ENDPOINT}{username}"
             print("user_service_endpoint :", user_service_endpoint)
             return await HttpUtils.get(user_service_endpoint, response_model=User)
         except Exception as e:
             raise e
-        
-    @log_decorator
-    @staticmethod
-    async def get_user_id_by_username(username: str) -> Optional[User]:
-        try:
-            user_service_endpoint = f"{Config.USER_SERVICE_USERNAME_ENDPOINT}{username}/id"
-            # print("user_service_endpoint :", user_service_endpoint)
-            return await HttpUtils.get(user_service_endpoint, response_model=int)
-        except Exception as e:
-            raise e
-        
         
     @log_decorator
     def get_user_by_username_sync(username):
@@ -158,20 +148,6 @@ class UserService:
             return True
         except Exception as e:
             raise Exception(f"Failed to delete user '{username}: {e}")
-        
-    @log_decorator
-    @staticmethod
-    async def create_user_assessment(user_id: int, assessment_data: UserAssessmentCreate):
-        try:
-            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{user_id}/assessments/"
-            return await HttpUtils.apost(
-                url,
-                assessment_data,
-                response_model=UserAssessment,
-            )
-        except Exception as e:
-            raise Exception(f"failed to create assessment for user {user_id}: {e}")
-
     
     
   
