@@ -314,12 +314,12 @@ def render():
                     async def _content_on_completed(content):
                         state_service.review_writing = content
 
-                        audio_data = await TextToSpeechService.agenerate(
-                            lang="en", text=content
-                        )
+                        # audio_data = await TextToSpeechService.agenerate(
+                        #     lang="en", text=content
+                        # )
 
-                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+                        # audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                        # audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
 
                     asyncio.run(
                         ReviewWritingService.areview_writing(

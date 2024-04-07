@@ -1,6 +1,6 @@
+from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
-
+from pydantic import BaseModel, EmailStr, Field
 
 from .user_content import UserContentBase
 from .user_topic import UserTopicBase
