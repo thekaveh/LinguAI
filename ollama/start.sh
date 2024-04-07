@@ -15,6 +15,8 @@ until check_ollama_running; do
 done
 echo "Ollama service is ready."
 
+OLLAMA_MODELS=$(psql $DATABASE_URL -t -c "SELECT name FROM public.llm WHERE is_active = true AND provider = 'ollama';" | tr -d '\n' | tr -s ' ')
+
 IFS=' ' read -r -a image_array <<< "${OLLAMA_MODELS}"
 
 echo "Models to be pulled: ${image_array[*]}"
@@ -28,5 +30,6 @@ for image in "${image_array[@]}"; do
 		exit 1
 	fi
 done
-# Keep the container running by waiting on all background processes
+#Keep the container running by waiting on all background processes
 wait
+ #No newline at end of file

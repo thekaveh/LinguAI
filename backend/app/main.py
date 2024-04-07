@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from sqlmodel import SQLModel, create_engine
+from contextlib import asynccontextmanager
 
 from app.core.config import Config
 from app.api.v1.router import router as v1_router
@@ -13,9 +13,13 @@ setup_global_logging(
     log_level=Config.BACKEND_LOG_LEVEL,
 )
 
-app = FastAPI()
-app.include_router(v1_router)
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     init_db()
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
+app.include_router(v1_router)
