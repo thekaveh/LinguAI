@@ -1,5 +1,6 @@
 from typing import AsyncIterable
 from sqlalchemy.orm import Session
+from sqlmodel import Session as SqlModelSession
 from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -14,9 +15,10 @@ from app.services.prompt_service import PromptService
 
 class ContentGenService:
     @log_decorator
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, sql_model_session: SqlModelSession):
         self.db = db
         self.prompt_service = PromptService(db)
+        self.sql_model_session = sql_model_session
 
     @log_decorator
     async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
@@ -29,14 +31,14 @@ class ContentGenService:
 
         temperature = request.temperature
         if request.model_name:
-            model_name=request.model_name
+            model_name = request.model_name
         else:
-            model_name=Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
+            model_name = Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
 
         # Use temperature from the request if provided, else use the default
-        #temperature = float(Config.DEFAULT_TEMPERATURE)
+        # temperature = float(Config.DEFAULT_TEMPERATURE)
 
-        chat_runnable = LLMService.get_chat_runnable(
+        chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
             model=model_name, temperature=temperature
         )
         parser = StrOutputParser()
@@ -64,7 +66,7 @@ class ContentGenService:
             return f"""Generate a {request.content.content_name} for a user at {request.skill_level} reading skill level, 
                        for the following topics: {', '.join(request.user_topics)}. 
                        
-                       \n Content should be generated only in {request.language.language_name} language."""            
+                       \n Content should be generated only in {request.language.language_name} language."""
         else:
             # Handle cases where no matching prompt is found
             return f"""Generate a {request.content.content_name} for a user at {request.skill_level} reading skill level, 

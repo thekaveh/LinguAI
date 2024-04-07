@@ -226,7 +226,32 @@ class UserService:
     def update_user_languages(self, username: str, user: User):
         db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
         if db_user:
+            # get current languages 
+            current_languages = set(db_user.learning_languages)
+            new_languages = set(user.learning_languages)
+            # determine the newly added languages
+            added_languages = new_languages - current_languages
+            # update learning languages
             db_user.learning_languages = user.learning_languages
+            # add initial assessments for the newly added languages 
+            for language_name in added_languages:
+                language_schema = self.language_service.get_language_by_name(language_name)
+                if language_schema:
+                    existing_assessment = (
+                        self.db.query(UserAssessment)
+                        .filter(UserAssessment.user_id == db_user.user_id,
+                                UserAssessment.language_id == language_schema.language_id)
+                        .first()
+                    )
+                    if not existing_assessment:
+                        default_assessment = UserAssessment(
+                            user_id=db_user.user_id,
+                            assessment_date=date.today(),
+                            assessment_type="Initial",
+                            skill_level="beginner",
+                            language_id=language_schema.language_id,
+                        )
+                        self.db.add(default_assessment)
             self.db.commit()
             
     @log_decorator

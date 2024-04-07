@@ -1,5 +1,6 @@
 from typing import AsyncIterable
 from sqlalchemy.orm import Session
+from sqlmodel import Session as SqlModelSession
 from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -15,9 +16,10 @@ from app.services.skill_level_service import SkillLevelService
 
 class ReviewWritingService:
     @log_decorator
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, sql_model_session: SqlModelSession):
         self.db = db
         self.prompt_service = PromptService(db)
+        self.sql_model_session = sql_model_session
         self.skill_level_service = SkillLevelService(db)
 
     @log_decorator
@@ -29,16 +31,16 @@ class ReviewWritingService:
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
 
-        model_name=Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
+        model_name = Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
         temperature = float(Config.DEFAULT_TEMPERATURE)
 
         if not request.model:
-            model_name=request.model
-        
-        if request.temperature:
-            temperature=request.temperature
+            model_name = request.model
 
-        chat_runnable = LLMService.get_chat_runnable(
+        if request.temperature:
+            temperature = request.temperature
+
+        chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
             model=model_name, temperature=temperature
         )
         parser = StrOutputParser()
@@ -54,9 +56,9 @@ class ReviewWritingService:
         )
         # Fetch the prompt based on the defined criteria
         db_prompt = self.prompt_service.get_prompt_by_search_criteria(search_criteria)
-        
-        #The last feedback provided as strengths is {request.strength} and the weakness is {request.weakness}.
-        
+
+        # The last feedback provided as strengths is {request.strength} and the weakness is {request.weakness}.
+
         if db_prompt:
             # Assuming the prompt text in the database is a template that needs to be formatted
             return f"""
