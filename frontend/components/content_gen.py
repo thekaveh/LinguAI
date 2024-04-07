@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import streamlit as st
 from typing import List
 
@@ -15,7 +16,12 @@ from services.state_service import StateService
 from services.content_service import ContentService
 from services.content_gen_service import ContentGenService
 from services.text_to_speech_service import TextToSpeechService
+from schema.user_content import UserContentBase, UserContentSearch
+from services.user_content_service import UserContentService
 
+
+
+CONTENT_TYPE=3 # move to enums later, tells this content is about the reading page content
 
 @log_decorator
 def _render_content_types(content_types):
@@ -243,7 +249,7 @@ def render():
 
     st.markdown("---")
 
-    col_btn_gen, col_btn_clear, col_tts = st.columns([3, 2, 3])
+    col_tts, col_btn_gen, col_btn_clear,  = st.columns([4, 3, 2])
     content_gen_placeholder = st.empty()
 
     state_service.content_reading = ""
@@ -251,7 +257,7 @@ def render():
     with col_tts:
         audio_placeholder = st.empty()
     with col_btn_gen:
-        if st.button("Click to Get Your Content", type="primary"):
+        if st.button("Click to Get Your Content", type="primary",use_container_width=True):
             error = []
             if not selected_topic_options:
                 error.append("You have to Select at least one topic.")
@@ -300,7 +306,83 @@ def render():
                     on_completed_fn=_content_on_completed,
                 )
             )
+            if last_assessment:
+                level=last_assessment.skill_level
+            else:
+                level="beginner"
+            if selected_language:
+                content_lang=selected_language.language_name
+            else:
+                content_lang="English"
+            if state_service.content_reading:
+                _save_content_for_later(user, "", state_service.content_reading, level, content_lang)     
+
     with col_btn_clear:
-        if st.button("Clear", type="primary"):
+        if st.button("Clear", type="primary",use_container_width=True ):
             state_service.content_reading = ""
             st.rerun()
+    st.markdown("---")
+    _render_previous_delivered_contents(user)
+
+
+def _save_content_for_later(user, original_content, generated_content, level, language_name):
+    # Calculate the current time (created_date) and 7 days from now (expiry_date)
+    created_date = datetime.datetime.now(datetime.timezone.utc)
+    expiry_date = created_date + datetime.timedelta(days=7)
+
+    # Create the UserContentBase object with the calculated dates
+    user_content = UserContentBase(
+        user_id=user.user_id,
+        user_content=original_content,
+        gen_content=generated_content,
+        type=CONTENT_TYPE,
+        level=level,
+        language=language_name,
+        created_date=created_date,
+        expiry_date=expiry_date
+    )
+
+    try:
+        user_content_saved = asyncio.run(UserContentService.create_user_content(user_content))
+    except Exception as e:
+        pass
+
+def _render_previous_delivered_contents(user):
+    with st.container():
+        st.markdown(f"#### :orange[Stored Contents]")
+
+        try:
+            user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=CONTENT_TYPE)))
+            if not user_contents:
+                st.write("No Stored Content")
+                return
+
+            with st.expander(f":orange[Previously Stored Contents]"):
+                content_options = {
+                    f"Skill Level: {content.level} - Language {content.language} - Date:{content.created_date.strftime('%Y-%m-%d %H:%M')} - ID:{content.id}": content.id
+                    for content in user_contents
+                }
+                selected_option = st.selectbox("Select Content", list(content_options.keys()), index=0)
+
+                if selected_option:
+                    selected_content_id = content_options[selected_option]
+                    selected_content = next((content for content in user_contents if content.id == selected_content_id), None)
+                    
+                    st.write("---")
+                    if selected_content:
+                        st.markdown("##### :orange[App Created Content]")
+                        st.text_area("Generated Content", value=selected_content.gen_content, height=300, disabled=True)
+                        if st.button("Delete Content"):
+                            try:
+                                response = asyncio.run(UserContentService.delete_user_content(selected_content.id))
+                                #st.write(response)
+                                if response:
+                                    user_contents = [content for content in user_contents if content.id != selected_content.id]  # Remove deleted content
+                                    st.experimental_rerun()  # Rerun the app to refresh the content list
+                            except Exception as e:
+                                if not str(e).startswith("No object"):
+                                    #raise e  # Re-raise exception if it's not the specific "no object" error
+                                    pass
+                                st.success("Content deleted or already doesn't exist.")
+        except Exception as e:
+            pass
