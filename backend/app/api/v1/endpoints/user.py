@@ -48,14 +48,6 @@ def read_user_by_username(username: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@log_decorator
-@router.get("/users/username/{username}/id", response_model=int)
-def read_user_id_by_username(username:str, db: Session = Depends(get_db)):
-    user_service = UserService(db)
-    user = user_service.get_user_by_username(username)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user.user_id
 
 @log_decorator
 @router.post("/users/{username}/topics", response_model=None)

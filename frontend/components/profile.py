@@ -8,28 +8,8 @@ from services.language_service import LanguageService
 from services.state_service import StateService
 from concurrent.futures import ThreadPoolExecutor
 from schema.user import UserCreate
-from datetime import date, datetime
 
 
-@log_decorator
-def render_language_mastery(user):
-    if not hasattr(user, 'user_assessments') or len(user.user_assessments) == 0:
-        st.write("No language assessments found.")
-        return
-    
-    for language in user.learning_languages:
-        assessments = [assessment for assessment in user.user_assessments if assessment.language.language_name == language]
-
-
-        if assessments:
-            # Sort assessments by date, descending, to get the most recent one
-            assessments.sort(key=lambda x: x.assessment_date, reverse=True)
-            most_recent_assessment = assessments[0]
-
-
-            st.write(f"**{language}:** Skill Level - {most_recent_assessment.skill_level.title()}")
-        else:
-            st.write(f"**{language}:** No assessments available")
 
 @log_decorator
 def _fetch_languages_sync():
@@ -112,21 +92,17 @@ def render_awards_info():
 @log_decorator
 def render():
     st.title("Profile")
-    state_service = StateService.instance()
-    user = asyncio.run(UserService.get_user_by_username(state_service.username))
-    ### user awards (gamification)
-    st.subheader("Your Awards 🏆")
-    render_awards(user)
-    st.write(f"* Daily Streak: {user.consecutive_login_days}")
     
-    st.subheader("Your Mastery")
-    render_language_mastery(user)
-        
     ### interest selection
+    st.write("")
+
     st.subheader("Interest Selection")
+
+    state_service = StateService.instance()
 
     topics = asyncio.run(TopicService.list())
     topics = [topic.topic_name for topic in topics]
+    user = asyncio.run(UserService.get_user_by_username(state_service.username))
     current_user_topics = [topic.topic_name for topic in user.user_topics]
     options = st.multiselect('Select your interests below', topics, current_user_topics)
     
@@ -142,6 +118,7 @@ def render():
     languages = asyncio.run(LanguageService.list())
     languages = [language.language_name for language in languages]
 
+    user = asyncio.run(UserService.get_user_by_username(state_service.username))
     current_user_languages = [language for language in user.learning_languages]
     options = st.multiselect('Select your learning languages below', languages, current_user_languages)
     
@@ -149,10 +126,8 @@ def render():
         asyncio.run(UserService.update_languages(options, state_service.username))
         st.experimental_rerun()
 
-    ### User Information 
-    st.subheader("User Profile/Security")
-
-    # view/update user information     
+    # get user to view/update their information     
+    user = asyncio.run(UserService.get_user_by_username(state_service.username))
     with st.expander("Click to view/update your profile", expanded=False):
         with st.form("profile_info"):
             st.subheader("General Information")
@@ -218,8 +193,3 @@ def render():
                             st.error("Incorrect current password entered")
                         else: 
                             st.error(f"Failed to change password: {e}")
-                            
-    ### Extra Information 
-    st.subheader("Extra Info")
-    render_awards_info()
-
