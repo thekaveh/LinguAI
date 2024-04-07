@@ -28,57 +28,79 @@ def load_quiz_questions(language):
 
 @log_decorator
 def render_quiz():
-    if st.session_state.quiz_started and not st.session_state.quiz_submitted:
-        if 0 <= st.session_state.current_language_index < len(st.session_state.selected_languages):
-            language = st.session_state.selected_languages[st.session_state.current_language_index]
+    if st.session_state.get('quiz_started', False):
+        current_index = st.session_state.get('current_language_index', 0)
+        selected_languages = st.session_state.get('selected_languages', [])
+       
+        if 0 <= current_index < len(selected_languages):
+            language = selected_languages[current_index]
             st.title(f"Starter Quiz: {language}")
             questions = load_quiz_questions(language)
             
-            # Start a form for the quiz
+            # If the quiz is submitted, calculate and display the skill level
+            if st.session_state.get(f'{language}_quiz_submitted', False):
+                skill_level = st.session_state.get(f'{language}_skill_level', "Not determined")
+                st.success(f"Your current skill level for {language} is: {skill_level}")
+                
+                # If it was the last quiz, show completion message
+                if current_index == len(selected_languages) - 1:
+                    st.info("You have completed all quizzes. Thank you! Login to the Platform from the sidebar.")
+                    reset_quiz_state()
+                    return  # Stop further execution to show the message
+                
+                # Button to proceed to next quiz or finish
+                if st.button("Proceed"):
+                    if current_index < len(selected_languages) - 1:
+                        st.session_state.current_language_index += 1
+                        clear_quiz_state(language)
+                    else:
+                        reset_quiz_state()
+                    return
+                
             with st.form(key=f"{language}_quiz_form"):
                 total_points = 0
-                for question in questions:
+                for i, question in enumerate(questions):
                     st.write(question["question"])
                     options = question["options"]
-                    # Use None for index to ensure no option is preselected
-                    answer = st.radio("Choose an option:", options, key=f"option_{questions.index(question)}", index=None)
+                    answer = st.radio("Choose an option:", options, key=f"question_{i}", index=None)
                     if answer == question["answer"]:
                         total_points += question["points"]
                 
                 submitted = st.form_submit_button("Submit Quiz")
             
             if submitted:
+                # Calculate and temporarily store skill level for current language
                 skill_level = determine_skill_level(total_points)
-                st.success(f"Your current skill level for {language} is: {skill_level}")
-                
-                # Set quiz as submitted to prevent resubmission
-                st.session_state.quiz_submitted = True
-                handle_quiz_completion()
+                st.session_state[f'{language}_skill_level'] = skill_level
+                st.session_state[f'{language}_quiz_submitted'] = True
+                # Use rerun to refresh the page to show the skill level
+                st.experimental_rerun()
         else:
             # Reset quiz state when all quizzes are completed
             reset_quiz_state()
 
 
-def handle_quiz_completion():
-    if st.session_state.current_language_index < len(st.session_state.selected_languages) - 1:
-        if st.button("Next Language Quiz"):
-            # Increase the index to move to the next language quiz
-            st.session_state.current_language_index += 1
-            # Reset quiz_submitted flag for the next quiz
-            st.session_state.quiz_submitted = False
-            # Rerun the app to update the page with the next quiz
-            st.experimental_rerun()
-    else:
-        st.info("You have completed all quizzes. Thank you!")
-        # Reset quiz state for a potential new registration or quiz session
-        reset_quiz_state()
+def clear_quiz_state(language):
+    if f'{language}_quiz_submitted' in st.session_state:
+        del st.session_state[f'{language}_quiz_submitted']
+    if f'{language}_skill_level' in st.session_state:
+        del st.session_state[f'{language}_skill_level']
+    # Clear any question states for the language
+    for key in list(st.session_state.keys()):
+        if key.startswith("question_"):
+            del st.session_state[key]
+    st.experimental_rerun()
 
 
 def reset_quiz_state():
     st.session_state.quiz_started = False
     st.session_state.current_language_index = 0
-    st.session_state.selected_languages = []
-    st.session_state.quiz_submitted = False
+    if 'selected_languages' in st.session_state:
+        del st.session_state['selected_languages']
+    # Clear any lingering question answers and language-specific states
+    for key in list(st.session_state.keys()):
+        if key.startswith("question_") or key.endswith("_quiz_submitted") or key.endswith("_skill_level"):
+            del st.session_state[key]
 
 def determine_skill_level(total_points):
     if total_points <= 10:
@@ -236,13 +258,11 @@ def render():
                     user_language_list= create_user_language_list(selected_languages, language_list)
                     user_create = create_user_create_object(preferred_name, age, gender, discovery_method, motivation, contact_preference, first_name, last_name, middle_name, day_time_phone, email, username, password, selected_base_language, user_language_list, selected_topics)
                     user_create_in_db= asyncio.run(UserService.create_user(user_create))
-                    st.success("Registration Successful!, Login to the Platform from the sidebar.")
+                    st.success("Registration Successful!")
                     st.session_state.quiz_started = True
                     st.session_state.selected_languages = selected_languages
                     st.experimental_rerun()
-                    #home.render()
-                    #st.experimental_rerun()
-    else:
+    else:        
         render_quiz()
 
 def create_user_language_list(selected_languages: List[str], language_list: List[Language]) -> List[UserLanguage]:
