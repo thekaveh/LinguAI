@@ -1,3 +1,4 @@
+from datetime import date
 import streamlit as st
 from utils.logger import log_decorator
 import asyncio
@@ -39,6 +40,55 @@ def _render_language_dropdown(languages, current_lang):
         return selected_base_language.language_name
     else:
         return ""
+
+@log_decorator
+def render_awards(user):
+    today = date.today()
+    awards = []
+
+    # Check for the "Consistent Learner" award
+    if user.consecutive_login_days and user.consecutive_login_days >= 30:
+        awards.append("Consistent Learner 📅")
+
+    # Check for the "New User" award
+    if user.enrollment_date:
+        days_since_enrollment = (today - user.enrollment_date).days
+        if days_since_enrollment <= 10:
+            awards.append("New User 🌟")
+
+    # Check for the "Language Explorer" award
+    if user.learning_languages and len(user.learning_languages) >= 3:
+        awards.append("Language Explorer 🌍")
+
+    # Check for the "Topic Master" award
+    if user.enrollment_date:
+        days_since_enrollment = (today - user.enrollment_date).days
+        if days_since_enrollment >= 100:
+            awards.append("Long Time User 🎓")
+
+    # Display the awards
+    if awards:
+        for award in awards:
+            st.markdown(f"* {award}")
+    else:
+        st.write("No awards yet. Keep engaging with the app to earn your first award!")
+        
+@log_decorator
+def render_awards_info():
+    with st.expander("Awards Information", expanded=False):
+        st.subheader("Understand Your Awards")
+
+        # Descriptions for each award
+        awards_descriptions = {
+            "Consistent Learner 📅": "Awarded for logging in and engaging with the app for 30 consecutive days.",
+            "New User 🌟": "A warm welcome award for joining our community today! Let's embark on this learning journey together.",
+            "Language Explorer 🌍": "Granted to language aficionados who are learning 3 or more languages. Keep exploring!",
+            "Topic Master 🎓": "Earned by users who've been with us for over 100 days, showing dedication and mastery over their learning topics."
+        }
+
+
+        for award, description in awards_descriptions.items():
+            st.markdown(f"**{award}**: {description}")
 
 
 @log_decorator
@@ -137,7 +187,6 @@ def render():
                     st.error("New passwords do not match")
                 else:
                     try:
-                        # Assuming UserService has a method to call the backend password change endpoint
                         asyncio.run(UserService.change_password(
                         user.username, current_password, new_password))
                         st.success("Password changed successfully")
