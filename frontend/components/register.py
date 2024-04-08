@@ -3,6 +3,7 @@ import asyncio
 from typing import List
 from concurrent.futures import ThreadPoolExecutor
 import re
+import json
 
 from utils.logger import log_decorator
 from services.topic_service import TopicService
@@ -10,10 +11,13 @@ from services.language_service import LanguageService
 from schema.user import UserCreate
 from schema.user_topic import UserTopicBase
 from services.user_service import UserService
+from services.language_service import LanguageService
 from schema.language import Language
 from schema.user_language import UserLanguage
 from schema.topic import Topic
 from services.state_service import StateService
+from schema.user_assessment import UserAssessmentCreate
+from datetime import date
 
 def get_language_sync(language_name):
     loop = asyncio.new_event_loop()
@@ -70,8 +74,8 @@ def render_quiz():
                     reset_quiz_state()
                     return  # Stop further execution to show the message
                 
-                # Button to proceed to next quiz
-                if st.button("Next Quiz"):
+                # Button to proceed to next quiz or finish
+                if st.button("Proceed"):
                     if current_index < len(selected_languages) - 1:
                         st.session_state.current_language_index += 1
                         clear_quiz_state(language)
@@ -201,7 +205,6 @@ def _render_language_dropdown(languages):
     else:
         return ""
 
-
 def render():
     # Initialize session state for managing quiz progress
     if 'quiz_started' not in st.session_state:
@@ -215,7 +218,6 @@ def render():
     if 'new_username' not in st.session_state:
         st.session_state['new_username'] = ""
     
-    # first show the registration form before any quizzes 
     if not st.session_state.quiz_started:
         state_service = StateService.instance()
         states = {
@@ -234,27 +236,29 @@ def render():
         "WI": "Wisconsin", "WY": "Wyoming"
         }
 
-    with st.form(key='register_form'):
-        st.subheader("Register")
 
-        # Split the form into columns
-        col1, col2 = st.columns(2)
+        with st.form(key='register_form'):
+            st.subheader("Register")
 
-        # Column 1: Personal Details
-        with col1:
-            first_name = st.text_input("First Name*", placeholder="Your first name", max_chars=20)
-            last_name = st.text_input("Last Name*", placeholder="Your last name", max_chars=20)
-            middle_name = st.text_input("Middle Name", placeholder="Your middle name (optional)", max_chars=20)
-            preferred_name = st.text_input("Preferred Name", placeholder="What should we call you?", max_chars=20)
-            email = st.text_input("Email*", placeholder="Enter your email")
-            
-        # Column 2: Account & Security
-        with col2:
-            username = st.text_input("Username*", placeholder="Choose a username", max_chars=20)
-            password = st.text_input("Password*", placeholder="Create a password", type="password", max_chars=20)
-            confirm_password = st.text_input("Confirm Password*", placeholder="Confirm your password", type="password", max_chars=20)
-            age = st.selectbox("Age*", options=list(range(15, 66)), index=0)
-            gender = st.selectbox("Gender*", options=["", "Male", "Female", "Nonbinary", "Prefer not to say"])            
+            # Split the form into columns
+            col1, col2 = st.columns(2)
+
+            # Column 1: Personal Details
+            with col1:
+                first_name = st.text_input("First Name*", placeholder="Your first name", max_chars=20)
+                last_name = st.text_input("Last Name*", placeholder="Your last name", max_chars=20)
+                middle_name = st.text_input("Middle Name", placeholder="Your middle name (optional)", max_chars=20)
+                preferred_name = st.text_input("Preferred Name", placeholder="What should we call you?", max_chars=20)
+                email = st.text_input("Email*", placeholder="Enter your email")
+                
+            # Column 2: Account & Security
+            with col2:
+                username = st.text_input("Username*", placeholder="Choose a username", max_chars=20)
+                password = st.text_input("Password*", placeholder="Create a password", type="password", max_chars=20)
+                confirm_password = st.text_input("Confirm Password*", placeholder="Confirm your password", type="password", max_chars=20)
+                age = st.selectbox("Age*", options=list(range(15, 66)), index=0)
+                gender = st.selectbox("Gender*", options=["", "Male", "Female", "Nonbinary", "Prefer not to say"])            
+
 
             st.write("")        
             # Optional Information
@@ -274,6 +278,8 @@ def render():
                 
                 topic_names = [topic.topic_name for topic in fetch_topics_sync()]
                 selected_topics = st.multiselect("Choose topics:", options=topic_names)          
+
+                
                 
             with col4:
                 st.markdown("")
@@ -282,31 +288,34 @@ def render():
                 st.markdown("")
                 selected_base_language=_render_language_dropdown(_fetch_languages())
 
-            motivation = st.text_area("Your Motivation to Use the Platform", height=172, placeholder="Share what motivates you to use this platform", max_chars=100)
+                motivation = st.text_area("Your Motivation to Use the Platform", height=172, placeholder="Share what motivates you to use this platform", max_chars=100)
 
-            contact_preference_entry = st.selectbox("Contact Preference:", options=["", "Email", "Mobile"])
-            if (contact_preference_entry == "Mobile"):
-                contact_preference = "mobile_phone"
-            else:
-                contact_preference = "email"
-        
-        submit_button = st.form_submit_button(label='Register')
+                contact_preference_entry = st.selectbox("Contact Preference:", options=["", "Email", "Mobile"])
+                if (contact_preference_entry == "Mobile"):
+                    contact_preference = "mobile_phone"
+                else:
+                    contact_preference = "email"
+            
+            submit_button = st.form_submit_button(label='Register')
 
-        if submit_button:
-            # Validate form
-            errors = validate_registration_form(motivation, middle_name, first_name, last_name, username, password, confirm_password, email, age,selected_base_language)
+            if submit_button:
+                # Validate form
+                errors = validate_registration_form(motivation, middle_name, first_name, last_name, username, password, confirm_password, email, age,selected_base_language)
 
-            # Display errors or success message
-            if errors:
-                st.error("\n".join(errors))
-            else:
-                user_language_list= create_user_language_list(selected_languages, language_list)
-                user_create = create_user_create_object(preferred_name, age, gender, discovery_method, motivation, contact_preference, first_name, last_name, middle_name, day_time_phone, email, username, password, selected_base_language, user_language_list, selected_topics)
-                user_create_in_db= asyncio.run(UserService.create_user(user_create))
-                st.success("Registration Successful!, Login to the Platform from the sidebar.")
-
-                #home.render()
-                #st.experimental_rerun()
+                # Display errors or success message
+                if errors:
+                    st.error("\n".join(errors))
+                else:
+                    user_language_list= create_user_language_list(selected_languages, language_list)
+                    user_create = create_user_create_object(preferred_name, age, gender, discovery_method, motivation, contact_preference, first_name, last_name, middle_name, day_time_phone, email, username, password, selected_base_language, user_language_list, selected_topics)
+                    user_create_in_db= asyncio.run(UserService.create_user(user_create))
+                    st.success("Registration Successful!")
+                    st.session_state.quiz_started = True
+                    st.session_state.selected_languages = selected_languages
+                    st.session_state.new_username = username
+                    st.experimental_rerun()
+    else:        
+        render_quiz()
 
 def create_user_language_list(selected_languages: List[str], language_list: List[Language]) -> List[UserLanguage]:
     user_languages = []
@@ -338,6 +347,7 @@ def create_user_create_object(preferred_name, age, gender, discovery_method, mot
         user_topics=user_topics,  
         password_hash=password
     )
+
 
 def validate_registration_form(motivation, middle_name, first_name, last_name, username, password, confirm_password, email, age, selected_base_language):
     errors = []

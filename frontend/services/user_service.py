@@ -9,6 +9,7 @@ from utils.http_utils import HttpUtils
 from schema.authentication import AuthenticationRequest, AuthenticationResponse
 from schema.user import User, UserCreate, UserTopicBase
 from schema.password_change import PasswordChange
+from schema.user_assessment import UserAssessmentCreate, UserAssessment
 
 class UserService:
     @log_decorator
@@ -24,6 +25,16 @@ class UserService:
         except Exception as e:
             raise e
 
+    @log_decorator
+    @staticmethod
+    async def get_user_id_by_username(username: str) -> Optional[User]:
+        try:
+            user_service_endpoint = f"{Config.USER_SERVICE_USERNAME_ENDPOINT}{username}/id"
+            # print("user_service_endpoint :", user_service_endpoint)
+            return await HttpUtils.get(user_service_endpoint, response_model=int)
+        except Exception as e:
+            raise e
+        
     @log_decorator
     @staticmethod
     async def get_user_by_username(username: str) -> Optional[User]:
@@ -149,5 +160,17 @@ class UserService:
         except Exception as e:
             raise Exception(f"Failed to delete user '{username}: {e}")
     
+    @log_decorator
+    @staticmethod
+    async def create_user_assessment(user_id: int, assessment_data: UserAssessmentCreate):
+        try:
+            url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{user_id}/assessments/"
+            return await HttpUtils.apost(
+                url,
+                assessment_data,
+                response_model=UserAssessment,
+            )
+        except Exception as e:
+            raise Exception(f"failed to create assessment for user {user_id}: {e}")
     
   

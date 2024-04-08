@@ -32,6 +32,7 @@ class Config:
     FRONTEND_LOG_FILE = os.getenv("FRONTEND_LOG_FILE", "/app/logs/front-app.log")
 
     LANGUAGE_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/languages/list"
+    LANGUAGE_SERVICE_GET_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/languages"
     REWRITE_CONTENT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/rewrite_content/"
     REVIEW_WRITING_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/review_writing/"
 
