@@ -1,8 +1,12 @@
+from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
+
+from .user_content import UserContentBase
+from .user_topic import UserTopicBase
 
 from .user_assessment import UserAssessmentBase
-from .user_topic import UserTopicBase
+
 from .user_language import UserLanguage
 
 
@@ -25,6 +29,14 @@ class UserBase(BaseModel):
     landline_phone: Optional[str] = None
     contact_preference: Optional[str] = None
     user_topics: Optional[List[UserTopicBase]] = None
+
+    user_assessments: Optional[List[UserAssessmentBase]] = None    
+    user_contents: Optional[List[UserContentBase]] = None
+
+    enrollment_date: Optional[date] = None
+    last_login_date: Optional[date] = None
+    consecutive_login_days: Optional[int] = Field(default=0, ge=0)
+
     user_assessments: Optional[List[UserAssessmentBase]] = None
     user_languages: Optional[List[UserLanguage]] = None    
 
@@ -38,4 +50,3 @@ class User(UserBase):
 
     class Config:
         from_attributes = True
-        populate_by_name = True

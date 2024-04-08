@@ -1,5 +1,6 @@
+from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from .user_content import UserContentBase
 from .user_topic import UserTopicBase
@@ -25,6 +26,13 @@ class UserBase(BaseModel):
     user_topics: Optional[List[UserTopicBase]] = None
     user_assessments: Optional[List[UserAssessmentBase]] = None    
     user_contents: Optional[List[UserContentBase]] = None
+
+
+    enrollment_date: Optional[date] = None
+    last_login_date: Optional[date] = None
+    consecutive_login_days: Optional[int] = Field(default=0, ge=0)
+    
+
 
 class UserCreate(UserBase):
     password_hash: str
