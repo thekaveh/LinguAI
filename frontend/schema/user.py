@@ -35,7 +35,7 @@ class UserBase(BaseModel):
 
     enrollment_date: Optional[date] = None
     last_login_date: Optional[date] = None
-    consecutive_login_days: Optional[int] = Field(default=0, ge=0)
+    consecutive_login_days: Optional[int] = None
 
     user_assessments: Optional[List[UserAssessmentBase]] = None
     user_languages: Optional[List[UserLanguage]] = None    
