@@ -1,0 +1,71 @@
+{
+    "German": [
+      {
+        "question": "Wie sagt man 'hello' auf Deutsch?",
+        "options": ["Hallo", "Auf Wiedersehen", "Bitte", "Danke"],
+        "answer": "Hallo",
+        "points": 1
+      },
+      {
+        "question": "Wie heißt 'dog' auf Deutsch?",
+        "options": ["Katze", "Hund", "Maus", "Vogel"],
+        "answer": "Hund",
+        "points": 1
+      },
+      {
+        "question": "Was bedeutet 'danke'?",
+        "options": ["Hello", "Please", "Thank you", "Goodbye"],
+        "answer": "Thank you",
+        "points": 2
+      },
+      {
+        "question": "Wie fragt man nach dem Namen?",
+        "options": ["Wie heißt du?", "Wie alt bist du?", "Woher kommst du?", "Was machst du?"],
+        "answer": "Wie heißt du?",
+        "points": 2
+      },
+      {
+        "question": "Wählen Sie das korrekte Wort für 'the book'.",
+        "options": ["Der Buch", "Die Buch", "Das Buch", "Ein Buch"],
+        "answer": "Das Buch",
+        "points": 3
+      },
+      {
+        "question": "Was ist die Vergangenheitsform von 'gehen'?",
+        "options": ["Ging", "Geht", "Gehen", "Gegangen"],
+        "answer": "Ging",
+        "points": 3
+      },
+      {
+        "question": "Wie sagt man 'I would like a coffee' auf Deutsch?",
+        "options": ["Ich möchte einen Kaffee", "Ich habe einen Kaffee", "Ich mag einen Kaffee", "Ich trinke einen Kaffee"],
+        "answer": "Ich möchte einen Kaffee",
+        "points": 4
+      },
+      {
+        "question": "Welches Wort bedeutet 'important'?",
+        "options": ["Wichtig", "Schwer", "Leicht", "Schnell"],
+        "answer": "Wichtig",
+        "points": 4
+      },
+      {
+        "question": "Vervollständigen Sie den Satz: 'Wenn ich du ______, würde ich mehr lernen.'",
+        "options": ["wäre", "bist", "bin", "sei"],
+        "answer": "wäre",
+        "points": 5
+      },
+      {
+        "question": "Was bedeutet der Satz 'Ich hätte lieber Tee als Kaffee'?",
+        "options": ["I would rather have tea than coffee.", "I like tea more than coffee.", "I drink tea and coffee.", "I have tea and coffee."],
+        "answer": "I would rather have tea than coffee.",
+        "points": 5
+      }
+    ]
+  }
+  
+  
+  
+  
+  
+  
+  
