@@ -27,10 +27,12 @@ class UserBase(BaseModel):
     user_assessments: Optional[List[UserAssessmentBase]] = None    
     user_contents: Optional[List[UserContentBase]] = None
 
+
     enrollment_date: Optional[date] = None
     last_login_date: Optional[date] = None
     consecutive_login_days: Optional[int] = Field(default=0, ge=0)
     
+
 
 class UserCreate(UserBase):
     password_hash: str
