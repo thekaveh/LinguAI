@@ -22,7 +22,7 @@ def render():
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
+            align-items: left;
             width: 33.33%;
         }
         .footer-column.right {

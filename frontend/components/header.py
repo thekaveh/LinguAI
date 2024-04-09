@@ -47,7 +47,7 @@ def render():
     state_service = StateService.instance()
     col1, col2 = st.columns([1, 4])
     with col1:
-        st.image("./static/logo.png", width=175)
+        st.image("./static/logo3.png", width=160)
     with col2:
         if state_service.username is not None:
                 user = asyncio.run(UserService.get_user_by_username(state_service.username))
