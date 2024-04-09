@@ -180,14 +180,9 @@ def render():
     state_service.review_writing = ""    
     
     model= state_service.model
-    temperature= state_service.temperature
-    
- 
+    temperature= state_service.temperature 
 
-    st.write("")
-
-    st.subheader("Review your writing and get feedback on how to improve it.")
-
+    #st.subheader("Review your writing and get feedback on how to improve it.")
     st.write("")
 
     username = state_service.username
@@ -230,6 +225,7 @@ def render():
             f"""{state_service.review_writing}""", unsafe_allow_html=True
         )
 
+    _render_previous_delivered_contents(user)
     if user_writing_content is None or user_writing_content.strip() == "":
         return
 
@@ -314,12 +310,12 @@ def render():
                     async def _content_on_completed(content):
                         state_service.review_writing = content
 
-                        # audio_data = await TextToSpeechService.agenerate(
-                        #     lang="en", text=content
-                        # )
+                        audio_data = await TextToSpeechService.agenerate(
+                            lang="en", text=content
+                        )
 
-                        # audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                        # audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
 
                     asyncio.run(
                         ReviewWritingService.areview_writing(
@@ -334,7 +330,8 @@ def render():
 
     except Exception:
         announcement_placeholder.write("Please input content in a supported language.")
-    _render_previous_delivered_contents(user)
+
+
 
 
 def _save_content_for_later(user, original_content, generated_content, level, language_name):
@@ -361,12 +358,12 @@ def _save_content_for_later(user, original_content, generated_content, level, la
 
 def _render_previous_delivered_contents(user):
     with st.container():
-        st.markdown(f"#### :orange[Stored Contents]")
+        st.markdown(f"#### :orange[History]")
 
         try:
             user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=CONTENT_TYPE)))
             if not user_contents:
-                st.write("No Stored Content")
+                st.write("No History Found.")
                 return
 
             with st.expander(f":orange[Previously Stored Contents]"):
@@ -387,7 +384,7 @@ def _render_previous_delivered_contents(user):
                             st.markdown("##### :orange[Your Content]")
                             st.text_area("User Content", value=selected_content.user_content, height=300, disabled=True)
                         with col2:
-                            st.markdown("##### :orange[App Created Content]")
+                            st.markdown("##### :orange[Writing Feedback]")
                             st.text_area("Generated Content", value=selected_content.gen_content, height=300, disabled=True)
 
                         if st.button("Delete Content"):

@@ -16,7 +16,7 @@ def render():
 
     vision_models = [m.name for m in LLMService.get_all() if m.is_vision]
 
-    st.title(f"Chat")
+    #st.title(f"Chat")
     st.write(f"Persona: {state_service.persona} - Model: {state_service.model}")
 
     def _render_chat_messages():

@@ -1,6 +1,7 @@
 import streamlit as st
 
 def render():
+    #st.image("./static/logo.png", width=100)
     # Footer notes rendering with a visual style
     st.markdown(
         """
@@ -21,7 +22,7 @@ def render():
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
+            align-items: left;
             width: 33.33%;
         }
         .footer-column.right {
@@ -32,9 +33,10 @@ def render():
         .footer-column.center p {
             font-size: 24px;
             font-weight: bold;
+            text-align: left;
         }
         .footer-column.right p {
-            font-size: 12px;
+            font-size: 16px;
             font-weight: normal;
         }
         .content {
@@ -42,7 +44,7 @@ def render():
         }
         </style>
         <div class="footer">
-            <div class="footer-column left">
+            <div class="footer-column left">                
                 <!-- Left column intentionally left empty -->
             </div>
             <div class="footer-column center">

@@ -124,10 +124,7 @@ def _render_language_dropdown(languages):
 @log_decorator
 def render():
     state_service = StateService.instance()
-
-    st.write("")
-
-    st.subheader("Rewrite Content to Current Skill Level")
+    #st.subheader("Rewrite Content to Current Skill Level")
 
     st.write("")
 
@@ -286,12 +283,12 @@ def _save_content_for_later(user, original_content, generated_content, level, la
 
 def _render_previous_delivered_contents(user):
     with st.container():
-        st.markdown(f"#### :orange[Stored Contents]")
+        st.markdown(f"#### :orange[History]")
 
         try:
             user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=1)))
             if not user_contents:
-                st.write("No Stored Content")
+                st.write("No History Found.")
                 return
 
             with st.expander(f":orange[Previously Stored Contents]"):
