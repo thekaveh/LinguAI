@@ -1,71 +1,70 @@
 {
-    "German": [
-      {
-        "question": "Wie sagt man 'hello' auf Deutsch?",
-        "options": ["Hallo", "Auf Wiedersehen", "Bitte", "Danke"],
-        "answer": "Hallo",
-        "points": 1
-      },
-      {
-        "question": "Wie heißt 'dog' auf Deutsch?",
-        "options": ["Katze", "Hund", "Maus", "Vogel"],
-        "answer": "Hund",
-        "points": 1
-      },
-      {
-        "question": "Was bedeutet 'danke'?",
-        "options": ["Hello", "Please", "Thank you", "Goodbye"],
-        "answer": "Thank you",
-        "points": 2
-      },
-      {
-        "question": "Wie fragt man nach dem Namen?",
-        "options": ["Wie heißt du?", "Wie alt bist du?", "Woher kommst du?", "Was machst du?"],
-        "answer": "Wie heißt du?",
-        "points": 2
-      },
-      {
-        "question": "Wählen Sie das korrekte Wort für 'the book'.",
-        "options": ["Der Buch", "Die Buch", "Das Buch", "Ein Buch"],
-        "answer": "Das Buch",
-        "points": 3
-      },
-      {
-        "question": "Was ist die Vergangenheitsform von 'gehen'?",
-        "options": ["Ging", "Geht", "Gehen", "Gegangen"],
-        "answer": "Ging",
-        "points": 3
-      },
-      {
-        "question": "Wie sagt man 'I would like a coffee' auf Deutsch?",
-        "options": ["Ich möchte einen Kaffee", "Ich habe einen Kaffee", "Ich mag einen Kaffee", "Ich trinke einen Kaffee"],
-        "answer": "Ich möchte einen Kaffee",
-        "points": 4
-      },
-      {
-        "question": "Welches Wort bedeutet 'important'?",
-        "options": ["Wichtig", "Schwer", "Leicht", "Schnell"],
-        "answer": "Wichtig",
-        "points": 4
-      },
-      {
-        "question": "Vervollständigen Sie den Satz: 'Wenn ich du ______, würde ich mehr lernen.'",
-        "options": ["wäre", "bist", "bin", "sei"],
-        "answer": "wäre",
-        "points": 5
-      },
-      {
-        "question": "Was bedeutet der Satz 'Ich hätte lieber Tee als Kaffee'?",
-        "options": ["I would rather have tea than coffee.", "I like tea more than coffee.", "I drink tea and coffee.", "I have tea and coffee."],
-        "answer": "I would rather have tea than coffee.",
-        "points": 5
-      }
-    ]
-  }
-  
-  
-  
-  
-  
-  
-  
+  "German": [
+    {
+      "question": "Wie begrüßt man sich auf Deutsch am Morgen?",
+      "options": ["Hallo", "Auf Wiedersehen", "Bitte", "Danke"],
+      "answer": "Hallo",
+      "points": 1
+    },
+    {
+      "question": "Wie nennt man ein Haustier, das bellt?",
+      "options": ["Katze", "Hund", "Maus", "Vogel"],
+      "answer": "Hund",
+      "points": 1
+    },
+    {
+      "question": "Wie drückt man auf Deutsch Dankbarkeit aus?",
+      "options": ["Hallo", "Bitte", "Danke", "Auf Wiedersehen"],
+      "answer": "Danke",
+      "points": 2
+    },
+    {
+      "question": "Welche Frage stellt man, um den Namen zu erfahren?",
+      "options": ["Wie heißt du?", "Wie alt bist du?", "Woher kommst du?", "Was machst du?"],
+      "answer": "Wie heißt du?",
+      "points": 2
+    },
+    {
+      "question": "Wählen Sie das richtige Wort für ein Lesemittel aus Papier.",
+      "options": ["Der Buch", "Die Buch", "Das Buch", "Ein Buch"],
+      "answer": "Das Buch",
+      "points": 3
+    },
+    {
+      "question": "Wie lautet die Vergangenheitsform von 'gehen'?",
+      "options": ["Ging", "Geht", "Gehen", "Gegangen"],
+      "answer": "Ging",
+      "points": 3
+    },
+    {
+      "question": "Wie äußert man den Wunsch nach einem Kaffee?",
+      "options": ["Ich möchte einen Kaffee", "Ich habe einen Kaffee", "Ich mag einen Kaffee", "Ich trinke einen Kaffee"],
+      "answer": "Ich möchte einen Kaffee",
+      "points": 4
+    },
+    {
+      "question": "Wählen Sie das Adjektiv, das 'von großer Bedeutung' bedeutet.",
+      "options": ["Wichtig", "Schwer", "Leicht", "Schnell"],
+      "answer": "Wichtig",
+      "points": 4
+    },
+    {
+      "question": "Vervollständigen Sie den Satz korrekt: 'Wenn ich du wäre, würde ich mehr ______.'",
+      "options": ["wäre", "bist", "bin", "lernen"],
+      "answer": "lernen",
+      "points": 5
+    },
+    {
+      "question": "Was bedeutet der Ausdruck 'Ich würde lieber Tee statt Kaffee trinken'?",
+      "options": ["Ich würde Tee dem Kaffee vorziehen.", "Ich mag Tee mehr als Kaffee.", "Ich trinke Tee und Kaffee.", "Ich habe Tee und Kaffee."],
+      "answer": "Ich würde Tee dem Kaffee vorziehen.",
+      "points": 5
+    }
+  ]
+}
+
+
+
+
+
+
