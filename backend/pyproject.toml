@@ -24,6 +24,8 @@ bcrypt = "^4.1.2"
 
 pytz = "^2024.1"
 apscheduler = "^3.10.4"
+scikit-learn = "^1.4.1.post1"
+numpy = "^1.26.4"
 
 
 [build-system]

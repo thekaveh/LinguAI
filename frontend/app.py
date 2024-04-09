@@ -4,19 +4,19 @@ from utils.logger_config import setup_global_logging
 from services.user_service import UserService
 from services.state_service import StateService
 from components import (
-    sidebar, 
-    home, 
-    settings, 
-    chat, 
-    admin, 
-    content_gen, 
-    profile, 
-    interest_selection, 
-    rewrite_content, 
-    review_writing , 
+    sidebar,
+    home,
+    settings,
+    chat,
+    admin,
+    content_gen,
+    profile,
+    rewrite_content,
+    review_writing,
     foot_notes,
     header,
     register,
+    embeddings,
 )
 import asyncio
 
@@ -26,6 +26,7 @@ setup_global_logging(
     log_filename=Config.FRONTEND_LOG_FILE,
     log_level=Config.FRONTEND_LOG_LEVEL,
 )
+
 
 def _get_last_assessment_by_language(user, language):
     latest_assessment = None
@@ -42,7 +43,7 @@ def _get_last_assessment_by_language(user, language):
 def _add_skill_level_by_language(user):
     with st.expander(f":orange[Your Current Skill Levels]"):
         # Your original Markdown line needs to be converted as it won't render emojis correctly in HTML context
-        #st.markdown("<h5 style='color: orange;'>Your Current Skills</h5>", unsafe_allow_html=True)
+        # st.markdown("<h5 style='color: orange;'>Your Current Skills</h5>", unsafe_allow_html=True)
         if not user or not user.user_assessments or not user.learning_languages:
             st.write("No user or user assessments or learning languages found")
             return
@@ -63,16 +64,18 @@ def _welcome(user):
             else:
                 st.markdown(f"### :orange[Hi, {user.username}]")
         with col2:
-             _add_skill_level_by_language(user)         
+            _add_skill_level_by_language(user)
     st.write("---")
+
+
 def main():
     state_service = StateService.instance()
     header.render()
     components_info = {
         "Home": {"icon": "house", "page": home},
-        "New User Registration": {"icon": "person-plus", "page": register}
+        "New User Registration": {"icon": "person-plus", "page": register},
     }
-    
+
     if state_service.username is not None:
         user = asyncio.run(UserService.get_user_by_username(state_service.username))
        # _welcome(user)
@@ -81,8 +84,9 @@ def main():
             components_info = {
                 "Home": {"icon": "house", "page": home},
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
-                "Review Writing": {"icon": "pencil-square", "page": review_writing},               
-                "Content Reading": {"icon": "body-text", "page": content_gen},            
+                "Review Writing": {"icon": "pencil-square", "page": review_writing},
+                "Content Reading": {"icon": "body-text", "page": content_gen},
+                "Embeddings": {"icon": "puzzle", "page": embeddings},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Admin": {"icon": "person-gear", "page": admin},
@@ -92,15 +96,21 @@ def main():
             components_info = {
                 "Home": {"icon": "house", "page": home},
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
-                "Review Writing": {"icon": "pencil-square", "page": review_writing},               
-                "Content Reading": {"icon": "body-text", "page": content_gen},            
+                "Review Writing": {"icon": "pencil-square", "page": review_writing},
+                "Content Reading": {"icon": "body-text", "page": content_gen},
+                "Embeddings": {"icon": "puzzle", "page": embeddings},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Settings": {"icon": "gear", "page": settings},
             }
+<<<<<<< Updated upstream
     
     selected_component_name, selected_component = sidebar.show(components_info)
     st.subheader(selected_component_name)
+=======
+
+    selected_page = sidebar.show(components_info)
+>>>>>>> Stashed changes
     # Assuming sidebar.show() updates `st.session_state.current_page` based on the selected page
     selected_component.render()
 
@@ -108,6 +118,6 @@ def main():
     if selected_component != chat:
         foot_notes.render()
 
-    
+
 if __name__ == "__main__":
     main()
