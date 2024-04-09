@@ -78,7 +78,7 @@ def main():
 
     if state_service.username is not None:
         user = asyncio.run(UserService.get_user_by_username(state_service.username))
-       # _welcome(user)
+        # _welcome(user)
 
         if user.user_type == "admin":
             components_info = {
@@ -103,14 +103,9 @@ def main():
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Settings": {"icon": "gear", "page": settings},
             }
-<<<<<<< Updated upstream
-    
+
     selected_component_name, selected_component = sidebar.show(components_info)
     st.subheader(selected_component_name)
-=======
-
-    selected_page = sidebar.show(components_info)
->>>>>>> Stashed changes
     # Assuming sidebar.show() updates `st.session_state.current_page` based on the selected page
     selected_component.render()
 
