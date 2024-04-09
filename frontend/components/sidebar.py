@@ -62,6 +62,5 @@ def show(pages):
                         click  <b>New User Registration</b>""",
                 unsafe_allow_html=True,
             )
-            # register.render()
 
-        return pages[selected]["page"]
+        return selected, pages[selected]["page"]

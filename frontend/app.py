@@ -54,7 +54,6 @@ def _add_skill_level_by_language(user):
 
 
 def _welcome(user):
-    st.title(f":orange[LinguAI]")
     welcome_container = st.container()
     with welcome_container:
         col1, col2 = st.columns([2, 1])
@@ -76,7 +75,7 @@ def main():
     
     if state_service.username is not None:
         user = asyncio.run(UserService.get_user_by_username(state_service.username))
-        _welcome(user)
+       # _welcome(user)
 
         if user.user_type == "admin":
             components_info = {
@@ -99,13 +98,14 @@ def main():
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Settings": {"icon": "gear", "page": settings},
             }
-            
-    selected_page = sidebar.show(components_info)
+    
+    selected_component_name, selected_component = sidebar.show(components_info)
+    st.subheader(selected_component_name)
     # Assuming sidebar.show() updates `st.session_state.current_page` based on the selected page
-    selected_page.render()
+    selected_component.render()
 
     # Conditionally render foot_notes based on the current page
-    if selected_page != chat:
+    if selected_component != chat:
         foot_notes.render()
 
     

@@ -9,7 +9,7 @@ from services.persona_service import PersonaService
 
 @log_decorator
 def render():
-    st.title("Settings")
+    #st.title("Settings")
 
     state_service = StateService.instance()
 
