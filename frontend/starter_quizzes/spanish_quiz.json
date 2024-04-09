@@ -1,64 +1,70 @@
 {
   "Spanish": [
     {
-      "question": "¿Cómo te llamas?",
-      "options": ["What is your name?", "How old are you?", "How are you?", "Where are you from?"],
-      "answer": "What is your name?",
+      "question": "¿Cómo se dice 'libro' en plural?",
+      "options": ["Libros", "Libroes", "Libra", "Libres"],
+      "answer": "Libros",
       "points": 1
     },
     {
-      "question": "¿Cuántos años tienes?",
-      "options": ["I am 20 years old.", "I have 20 years.", "I am 20.", "20 years I have."],
-      "answer": "I am 20 years old.",
+      "question": "Selecciona el sinónimo de 'rápido'.",
+      "options": ["Lento", "Veloz", "Pesado", "Débil"],
+      "answer": "Veloz",
       "points": 1
     },
     {
-      "question": "¿Qué día es hoy?",
-      "options": ["What time is it?", "What day is it today?", "What is the date?", "What month is it?"],
-      "answer": "What day is it today?",
+      "question": "Completa la oración: 'Si yo _____ rico, viajaría por el mundo.'",
+      "options": ["era", "seré", "fuera", "soy"],
+      "answer": "fuera",
       "points": 2
     },
     {
-      "question": "¿Dónde está la biblioteca?",
-      "options": ["Where is the library?", "Where is the bathroom?", "Where is the supermarket?", "Where is the bank?"],
-      "answer": "Where is the library?",
+      "question": "¿Cuál es el pretérito perfecto simple del verbo 'escribir' en primera persona del singular?",
+      "options": ["Escribo", "Escribí", "Escribía", "Escribiré"],
+      "answer": "Escribí",
       "points": 2
     },
     {
-      "question": "¿Puedo tener la cuenta, por favor?",
-      "options": ["Can I have the bill, please?", "Can I have a glass of water?", "Can I pay here?", "Can you help me?"],
-      "answer": "Can I have the bill, please?",
+      "question": "Identifica la palabra que está mal escrita.",
+      "options": ["Hambiente", "Ambiente", "Ambas", "Hacer"],
+      "answer": "Hambiente",
       "points": 3
     },
     {
-      "question": "¿Cuál es tu libro favorito?",
-      "options": ["What is your favorite color?", "What is your favorite book?", "Who is your best friend?", "Where is your house?"],
-      "answer": "What is your favorite book?",
+      "question": "¿Qué figura literaria se utiliza en 'Tus ojos son dos luceros'?",
+      "options": ["Metáfora", "Hipérbole", "Símil", "Anáfora"],
+      "answer": "Símil",
       "points": 3
     },
     {
-      "question": "Si pudieras viajar a cualquier parte, ¿a dónde irías?",
-      "options": ["If you could eat anything, what would you eat?", "If you could travel anywhere, where would you go?", "If you could meet anyone, who would you meet?", "If you had a million dollars, what would you do?"],
-      "answer": "If you could travel anywhere, where would you go?",
+      "question": "Selecciona la oración que utiliza correctamente el subjuntivo:",
+      "options": ["Es cierto que ella viene", "Dudo que venga", "Es verdad que está aquí", "Sé que lo hizo"],
+      "answer": "Dudo que venga",
       "points": 4
     },
     {
-      "question": "Cuando era joven, solía jugar en el parque.",
-      "options": ["When I was young, I used to play in the park.", "When I am old, I will play in the park.", "I play in the park every day.", "I never played in a park."],
-      "answer": "When I was young, I used to play in the park.",
+      "question": "¿Cuál es el antónimo de 'benevolente'?",
+      "options": ["Malévolo", "Generoso", "Bondadoso", "Amable"],
+      "answer": "Malévolo",
       "points": 4
     },
     {
-      "question": "Es importante que todos reciclemos.",
-      "options": ["It is important that we all recycle.", "It's important to be recycled.", "Recycling is not important.", "Who is recycling?"],
-      "answer": "It is important that we all recycle.",
+      "question": "Transforma la voz activa a pasiva: 'El gato persiguió al ratón.'",
+      "options": ["El ratón fue perseguido por el gato", "El ratón perseguía al gato", "El gato fue perseguido por el ratón", "El ratón fue persiguiendo al gato"],
+      "answer": "El ratón fue perseguido por el gato",
       "points": 5
     },
     {
-      "question": "Antes de que salgas, apaga las luces.",
-      "options": ["Before you leave, turn off the lights.", "After you leave, turn on the lights.", "Before you eat, turn off the lights.", "After you arrive, close the door."],
-      "answer": "Before you leave, turn off the lights.",
+      "question": "Analiza y elige la opción que correctamente identifica el uso de 'se' en la siguiente oración: 'Se venden casas aquí.'",
+      "options": ["Pronombre reflexivo", "Pronombre recíproco", "Marca de pasiva refleja", "Indicativo de impersonalidad"],
+      "answer": "Marca de pasiva refleja",
       "points": 5
     }
   ]
-}  
+}
+
+
+
+
+
+

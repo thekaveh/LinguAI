@@ -393,7 +393,7 @@ ALTER SEQUENCE public.topic_topic_id_seq OWNED BY public.topic.topic_id;
 CREATE TABLE public.user_assessment (
     assessment_id integer NOT NULL,
     user_id integer,
-    assessment_date date,
+    assessment_date timestamp without time zone,
     language_id integer,
     assessment_type character varying(100),
     skill_level character varying(100),
@@ -815,35 +815,41 @@ COPY public.topic (topic_id, topic_name) FROM stdin;
 --
 
 COPY public.user_assessment (assessment_id, user_id, assessment_date, language_id, assessment_type, skill_level, strength, weakness) FROM stdin;
-1	1	2023-01-01	2	reading	intermediate	Good comprehension	Occasional difficulty with complex texts
-2	1	2023-01-01	3	reading	intermediate	Can understand most sentences	Needs improvement in grammar
-6	3	2023-01-01	3	reading	advanced	Fluent reader	Occasional difficulty with idiomatic expressions
-7	3	2023-01-01	4	reading	intermediate	Good understanding of grammar	Needs to expand vocabulary
-8	4	2023-01-01	5	reading	beginner	Eager to learn	Limited reading comprehension
-9	5	2023-01-01	2	reading	intermediate	Can understand basic texts	Difficulty with character recognition
-10	5	2023-01-01	3	reading	beginner	Motivated to improve	Limited vocabulary
-12	1	2024-03-05	3	reading	intermediate	Good vocabulary	Difficulty with grammar
-16	3	2024-03-05	3	reading	advanced	Fluent reader	Occasional difficulty with idiomatic expressions
-17	3	2024-03-05	4	reading	intermediate	Good understanding of grammar	Needs to expand vocabulary
-18	4	2024-03-05	5	reading	beginner	Eager to learn	Limited reading comprehension
-19	5	2024-03-05	2	reading	intermediate	Can understand basic texts	Difficulty with character recognition
-20	5	2024-03-05	3	reading	beginner	Motivated to improve	Limited vocabulary
-4	2	2023-01-01	3	reading	beginner	Motivated to learn	Limited vocabulary
-5	2	2023-01-01	4	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
-14	2	2024-03-05	3	reading	beginner	Motivated to learn	Limited vocabulary
-15	2	2024-03-05	4	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
-3	1	2023-01-01	4	reading	beginner	Starting to recognize basic words	Struggles with reading fluency
-13	1	2024-03-05	4	reading	intermediate	Can understand basic sentences	Struggles with complex texts
-24	32	2024-04-08	1	Initial	beginner	\N	\N
-25	32	2024-04-08	2	Initial	beginner	\N	\N
-26	32	2024-04-08	3	Initial	beginner	\N	\N
-27	32	2024-04-08	4	Initial	beginner	\N	\N
-28	32	2024-04-08	5	Initial	beginner	\N	\N
-29	32	2024-04-08	1	Starter	intermediate	Starter diagnostic quiz	Starter diagnostic quiz
-30	32	2024-04-08	2	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
-31	32	2024-04-08	3	Starter	advanced	Starter diagnostic quiz	Starter diagnostic quiz
-32	32	2024-04-08	4	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
-33	32	2024-04-08	5	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
+1	1	2023-01-01 00:00:00	2	reading	intermediate	Good comprehension	Occasional difficulty with complex texts
+2	1	2023-01-01 00:00:00	3	reading	intermediate	Can understand most sentences	Needs improvement in grammar
+6	3	2023-01-01 00:00:00	3	reading	advanced	Fluent reader	Occasional difficulty with idiomatic expressions
+7	3	2023-01-01 00:00:00	4	reading	intermediate	Good understanding of grammar	Needs to expand vocabulary
+8	4	2023-01-01 00:00:00	5	reading	beginner	Eager to learn	Limited reading comprehension
+9	5	2023-01-01 00:00:00	2	reading	intermediate	Can understand basic texts	Difficulty with character recognition
+10	5	2023-01-01 00:00:00	3	reading	beginner	Motivated to improve	Limited vocabulary
+12	1	2024-03-05 00:00:00	3	reading	intermediate	Good vocabulary	Difficulty with grammar
+16	3	2024-03-05 00:00:00	3	reading	advanced	Fluent reader	Occasional difficulty with idiomatic expressions
+17	3	2024-03-05 00:00:00	4	reading	intermediate	Good understanding of grammar	Needs to expand vocabulary
+18	4	2024-03-05 00:00:00	5	reading	beginner	Eager to learn	Limited reading comprehension
+19	5	2024-03-05 00:00:00	2	reading	intermediate	Can understand basic texts	Difficulty with character recognition
+20	5	2024-03-05 00:00:00	3	reading	beginner	Motivated to improve	Limited vocabulary
+4	2	2023-01-01 00:00:00	3	reading	beginner	Motivated to learn	Limited vocabulary
+5	2	2023-01-01 00:00:00	4	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
+14	2	2024-03-05 00:00:00	3	reading	beginner	Motivated to learn	Limited vocabulary
+15	2	2024-03-05 00:00:00	4	reading	intermediate	Can understand simple sentences	Needs practice with verb conjugation
+3	1	2023-01-01 00:00:00	4	reading	beginner	Starting to recognize basic words	Struggles with reading fluency
+13	1	2024-03-05 00:00:00	4	reading	intermediate	Can understand basic sentences	Struggles with complex texts
+24	32	2024-04-08 00:00:00	1	Initial	beginner	\N	\N
+25	32	2024-04-08 00:00:00	2	Initial	beginner	\N	\N
+26	32	2024-04-08 00:00:00	3	Initial	beginner	\N	\N
+27	32	2024-04-08 00:00:00	4	Initial	beginner	\N	\N
+28	32	2024-04-08 00:00:00	5	Initial	beginner	\N	\N
+29	32	2024-04-08 00:00:00	1	Starter	intermediate	Starter diagnostic quiz	Starter diagnostic quiz
+30	32	2024-04-08 00:00:00	2	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
+31	32	2024-04-08 00:00:00	3	Starter	advanced	Starter diagnostic quiz	Starter diagnostic quiz
+32	32	2024-04-08 00:00:00	4	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
+33	32	2024-04-08 00:00:00	5	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
+34	33	2024-04-09 00:00:00	3	Initial	beginner	\N	\N
+35	33	2024-04-09 00:00:00	2	Initial	beginner	\N	\N
+36	33	2024-04-09 00:00:00	3	Starter	advanced	Starter diagnostic quiz	Starter diagnostic quiz
+37	33	2024-04-09 00:00:00	2	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
+38	34	2024-04-09 18:04:55.71714	3	Initial	beginner	\N	\N
+39	34	2024-04-09 18:05:18.668561	3	Starter	advanced	Starter diagnostic quiz	Starter diagnostic quiz
 \.
 
 
@@ -913,6 +919,8 @@ COPY public.user_topics (user_id, topic_name) FROM stdin;
 6	speaking
 23	movies
 32	finance
+33	technology
+34	finance
 \.
 
 
@@ -927,8 +935,10 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 2	kumar	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}	\N	\N	\N	\N	\N	\N	\N	0
 6	spiderman	peter.parker@marvel.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Peter	Parker	Ben	+1 212 914 2124	+1 212 914 2124	\N	external	English	{Mandarin}	\N	\N	\N	\N	\N	\N	\N	0
 23	captainamerica	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	kumar	govindaraju				\N	external	English	{Spanish}	\N	\N	\N	\N	\N	\N	\N	0
-1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}	\N	\N	\N	\N	\N	\N	2024-04-08	1
 32	hellokitty	hello@kitty.com	$2b$12$IUyX5an.Q7mxHxIBf.fnwuwhAFCf.7p..PjZsjj8571nSFbyiXciO	hello	kitty				email	external	English	{English,Mandarin,Spanish,German,French}		15	Nonbinary			2024-04-08	2024-04-08	1
+1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}	\N	\N	\N	\N	\N	\N	2024-04-09	2
+33	bluesclues	blues@clues.com	$2b$12$cx7ZmrjoJD3I9xizd9LcU.Id0mYVlnsboKMOec2SpWK1CbHIa4cv6	blues	clues				email	external	English	{Spanish,Mandarin}		15	Nonbinary			2024-04-09	2024-04-09	1
+34	testuser	test@user.com	$2b$12$gweCRW6hOrUYXoqd0kGTwupRujenEL/j1eLERrl8u9SMuV3qocjGm	test	user				email	external	English	{Spanish}		15	Nonbinary			2024-04-09	2024-04-09	1
 \.
 
 
@@ -992,7 +1002,7 @@ SELECT pg_catalog.setval('public.topic_topic_id_seq', 23, true);
 -- Name: user_assessment_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 33, true);
+SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 39, true);
 
 
 --
@@ -1013,7 +1023,7 @@ SELECT pg_catalog.setval('public.user_performance_performance_id_seq', 1, false)
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 32, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 34, true);
 
 
 --

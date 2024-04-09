@@ -71,7 +71,7 @@ class UserService:
                 if language_schema:
                     default_assessment = UserAssessment(
                         user_id=db_user.user_id,
-                        assessment_date=date.today(),
+                        assessment_date=datetime.today(),
                         assessment_type="Initial",
                         skill_level="beginner",
                         language_id=language_schema.language_id,
@@ -267,7 +267,7 @@ class UserService:
                     if not existing_assessment:
                         default_assessment = UserAssessment(
                             user_id=db_user.user_id,
-                            assessment_date=date.today(),
+                            assessment_date=datetime.today(),
                             assessment_type="Initial",
                             skill_level="beginner",
                             language_id=language_schema.language_id,
