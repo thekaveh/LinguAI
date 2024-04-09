@@ -17,7 +17,7 @@ from schema.user_language import UserLanguage
 from schema.topic import Topic
 from services.state_service import StateService
 from schema.user_assessment import UserAssessmentCreate
-from datetime import date
+from datetime import date, datetime
 
 def get_language_sync(language_name):
     loop = asyncio.new_event_loop()
@@ -109,7 +109,7 @@ def render_quiz():
                 assessment_data = UserAssessmentCreate(
                     user_id=user_id,
                     language_id=language_id,
-                    assessment_date=date.today(),
+                    assessment_date=datetime.today(),
                     assessment_type="Starter",
                     skill_level=skill_level.lower(),
                     strength="Starter diagnostic quiz",
