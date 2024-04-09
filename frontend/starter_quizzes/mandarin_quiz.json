@@ -1,64 +1,70 @@
 {
-    "Mandarin": [
-      {
-        "question": "What does '你好 (nǐ hǎo)' mean?",
-        "options": ["Goodbye", "Thank you", "Hello", "How are you?"],
-        "answer": "Hello",
-        "points": 1
-      },
-      {
-        "question": "Which character means 'water'?",
-        "options": ["火 (huǒ)", "水 (shuǐ)", "木 (mù)", "金 (jīn)"],
-        "answer": "水 (shuǐ)",
-        "points": 1
-      },
-      {
-        "question": "How do you say 'I am a student'?",
-        "options": ["我是学生 (wǒ shì xuéshēng)", "你是学生 (nǐ shì xuéshēng)", "他是学生 (tā shì xuéshēng)", "我是老师 (wǒ shì lǎoshī)"],
-        "answer": "我是学生 (wǒ shì xuéshēng)",
-        "points": 2
-      },
-      {
-        "question": "Choose the correct way to say 'She eats an apple' in Mandarin:",
-        "options": ["她吃苹果 (tā chī píngguǒ)", "他吃苹果 (tā chī píngguǒ)", "她喝苹果 (tā hē píngguǒ)", "她是苹果 (tā shì píngguǒ)"],
-        "answer": "她吃苹果 (tā chī píngguǒ)",
-        "points": 2
-      },
-      {
-        "question": "What is the correct question word for 'where'?",
-        "options": ["什么 (shénme)", "怎么 (zěnme)", "哪里 (nǎlǐ)", "几时 (jǐ shí)"],
-        "answer": "哪里 (nǎlǐ)",
-        "points": 3
-      },
-      {
-        "question": "How do you express 'I love you'?",
-        "options": ["我爱你 (wǒ ài nǐ)", "我喜欢你 (wǒ xǐhuān nǐ)", "我恨你 (wǒ hèn nǐ)", "我知道 (wǒ zhīdào)"],
-        "answer": "我爱你 (wǒ ài nǐ)",
-        "points": 3
-      },
-      {
-        "question": "Select the correct sentence structure for 'Yesterday, I went to the park.'",
-        "options": ["我昨天去了公园 (wǒ zuótiān qùle gōngyuán)", "昨天我去公园了 (zuótiān wǒ qù gōngyuánle)", "公园我昨天去了 (gōngyuán wǒ zuótiān qùle)", "我去公园昨天了 (wǒ qù gōngyuán zuótiānle)"],
-        "answer": "昨天我去公园了 (zuótiān wǒ qù gōngyuánle)",
-        "points": 4
-      },
-      {
-        "question": "Choose the option that correctly matches the phrase 'to make a phone call':",
-        "options": ["打电话 (dǎ diànhuà)", "打篮球 (dǎ lánqiú)", "做饭 (zuò fàn)", "写字 (xiě zì)"],
-        "answer": "打电话 (dǎ diànhuà)",
-        "points": 4
-      },
-      {
-        "question": "Which phrase means 'Excuse me, where is the subway?'",
-        "options": ["请问，地铁在哪里？(qǐngwèn, dìtiě zài nǎlǐ?)", "请问，你好吗？(qǐngwèn, nǐ hǎo ma?)", "请问，你是哪国人？(qǐngwèn, nǐ shì nǎ guó rén?)", "请问，你叫什么名字？(qǐngwèn, nǐ jiào shénme míngzì?)"],
-        "answer": "请问，地铁在哪里？(qǐngwèn, dìtiě zài nǎlǐ?)",
-        "points": 5
-      },
-      {
-        "question": "How do you say 'My birthday is in October'?",
-        "options": ["我的生日在十月 (wǒ de shēngrì zài shí yuè)", "我的生日是十月 (wǒ de shēngrì shì shí yuè)", "我在十月有生日 (wǒ zài shí yuè yǒu shēngrì)", "十月是我的生日 (shí yuè shì wǒ de shēngrì)"],
-        "answer": "我的生日在十月 (wǒ de shēngrì zài shí yuè)",
-        "points": 5
-      }
-    ]
-  }  
+  "Mandarin": [
+    {
+      "question": "“你好”代表什么意思？",
+      "options": ["再见", "谢谢", "你好", "你好吗？"],
+      "answer": "你好",
+      "points": 1
+    },
+    {
+      "question": "哪个字代表“水”？",
+      "options": ["火", "水", "木", "金"],
+      "answer": "水",
+      "points": 1
+    },
+    {
+      "question": "如何表达“我是学生”？",
+      "options": ["我是学生", "你是学生", "他是学生", "我是老师"],
+      "answer": "我是学生",
+      "points": 2
+    },
+    {
+      "question": "如何用中文询问某人的名字？",
+      "options": ["你叫什么名字？", "你多大了？", "你来自哪里？", "你在做什么？"],
+      "answer": "你叫什么名字？",
+      "points": 2
+    },
+    {
+      "question": "“哪里”是什么意思的正确问法？",
+      "options": ["什么", "怎么", "哪里", "几时"],
+      "answer": "哪里",
+      "points": 3
+    },
+    {
+      "question": "“我爱你”如何表达？",
+      "options": ["我爱你", "我喜欢你", "我恨你", "我知道"],
+      "answer": "我爱你",
+      "points": 3
+    },
+    {
+      "question": "选择正确的句子结构：“昨天，我去了公园。”",
+      "options": ["我昨天去了公园", "昨天我去了公园", "公园我昨天去了", "我去公园昨天了"],
+      "answer": "昨天我去了公园",
+      "points": 4
+    },
+    {
+      "question": "选择与“打电话”相匹配的选项：",
+      "options": ["打电话", "打篮球", "做饭", "写字"],
+      "answer": "打电话",
+      "points": 4
+    },
+    {
+      "question": "哪个短语意味着“请问，地铁在哪里？”",
+      "options": ["请问，地铁在哪里？", "请问，你好吗？", "请问，你是哪国人？", "请问，你叫什么名字？"],
+      "answer": "请问，地铁在哪里？",
+      "points": 5
+    },
+    {
+      "question": "如何说“我的生日在十月”？",
+      "options": ["我的生日在十月", "我的生日是十月", "我在十月有生日", "十月是我的生日"],
+      "answer": "我的生日在十月",
+      "points": 5
+    }
+  ]
+}
+
+
+
+
+
+
