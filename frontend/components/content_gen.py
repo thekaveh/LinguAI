@@ -214,7 +214,7 @@ def render():
     username = state_service.username
     temperature = state_service.temperature
 
-    st.title("Content For You")
+    #st.subheader("Content For You")
 
     user = UserService.get_user_by_username_sync(username)
 
@@ -349,12 +349,12 @@ def _save_content_for_later(user, original_content, generated_content, level, la
 
 def _render_previous_delivered_contents(user):
     with st.container():
-        st.markdown(f"#### :orange[Stored Contents]")
+        st.markdown(f"#### :orange[History]")
 
         try:
             user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=CONTENT_TYPE)))
             if not user_contents:
-                st.write("No Stored Content")
+                st.write("No History Found.")
                 return
 
             with st.expander(f":orange[Previously Stored Contents]"):

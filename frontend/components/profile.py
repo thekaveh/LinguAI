@@ -116,19 +116,19 @@ def render_awards_info():
 
 @log_decorator
 def render():
-    st.title("Profile")
+    #st.title("Profile")
     state_service = StateService.instance()
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
     ### user awards (gamification)
-    st.subheader("Your Awards 🏆")
+    st.markdown("#### Your Awards 🏆")
     render_awards(user)
     st.write(f"* Daily Streak: {user.consecutive_login_days}")
     
-    st.subheader("Your Mastery")
+    st.markdown("#### Your Mastery")
     render_language_mastery(user)
         
     ### interest selection
-    st.subheader("Interest Selection")
+    st.markdown("#### Interest Selection")
 
 
     topics = asyncio.run(TopicService.list())
@@ -143,7 +143,7 @@ def render():
     ### language selection 
     st.write("")
 
-    st.subheader("Language Selection")
+    st.markdown("#### Language Selection")
 
     languages = asyncio.run(LanguageService.list())
     languages = [language.language_name for language in languages]
@@ -156,7 +156,7 @@ def render():
         st.experimental_rerun()
 
     ### User Information 
-    st.subheader("User Profile/Security")
+    st.markdown("#### User Profile/Security")
 
     # view/update user information     
     with st.expander("Click to view/update your profile", expanded=False):
@@ -227,5 +227,5 @@ def render():
                             st.error(f"Failed to change password: {e}")
                             
     ### Extra Information 
-    st.subheader("Extra Info")
+    st.markdown("#### Extra Info")
     render_awards_info()
