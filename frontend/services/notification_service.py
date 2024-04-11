@@ -42,3 +42,14 @@ class NotificationService:
             message,
             icon="⚠️",
         )
+
+    @staticmethod
+    async def agreet(message: str):
+        st.toast(
+            message,
+            icon="👋",
+        )
+
+    @staticmethod
+    def greet(message: str):
+        asyncio.run(NotificationService.agreet(message))

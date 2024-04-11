@@ -39,6 +39,9 @@ class StateService:
         self._vision_llm = LLMService.get_vision()[0]
         self._embeddings_llm = LLMService.get_embeddings()[0]
 
+        self._just_logged_in = False
+        self._just_logged_out = False
+
     @log_decorator
     def _init_persona(self):
         personas = PersonaService.get_all()
@@ -209,6 +212,22 @@ class StateService:
     @embeddings_llm.setter
     def embeddings_llm(self, value: LLM) -> None:
         self._embeddings_llm = value
+
+    @property
+    def just_logged_in(self) -> bool:
+        return self._just_logged_in
+
+    @just_logged_in.setter
+    def just_logged_in(self, value: bool) -> None:
+        self._just_logged_in = value
+
+    @property
+    def just_logged_out(self) -> bool:
+        return self._just_logged_out
+
+    @just_logged_out.setter
+    def just_logged_out(self, value: bool) -> None:
+        self._just_logged_out = value
 
     @log_decorator
     @staticmethod

@@ -1,14 +1,13 @@
-import asyncio
 import streamlit as st
 from utils.logger import log_decorator
 
 from services.user_service import UserService
 from services.state_service import StateService
-from schema.authentication import AuthenticationRequest, AuthenticationResponse
+from services.notification_service import NotificationService
 
 
 def _add_linguai_note():
-    st.markdown(f"""
+    st.markdown("""
     LinguAI stands out in the realm of language education by offering personalized learning experiences tailored to 
     individuals who have mastered the basics and are eager to advance their skills further. 
     Recognizing the unique challenges and goals of each learner, LinguAI leverages cutting-edge AI technology 
@@ -17,17 +16,25 @@ def _add_linguai_note():
     This approach not only enhances comprehension but also ensures that learners remain engaged and motivated throughout 
     their language learning journey. 
     """)
+
+
 @log_decorator
 def render():
     state_service = StateService.instance()
 
-    #st.image("./static/logo.png", width=100)
+    # st.image("./static/logo.png", width=100)
     st.subheader("Personalized language learning for intermediate learners")
     st.image("./static/different-languages.jpeg", width=704)
     st.write("")
 
     if state_service.username is None:
         # User is not authenticated; show login or registration option
+        if state_service.just_logged_out:
+            NotificationService.greet(
+                "Hope to see you again soon back here at LinguAI!"
+            )
+            state_service.just_logged_out = False
+
         col1, col2 = st.columns(2)
 
         with col1:
@@ -37,7 +44,7 @@ def render():
             )
             st.write("- Rewrite existing content to match your skill level")
             st.write("- Progress tracking to monitor your improvement.")
-            st.markdown(f"""
+            st.markdown("""
                         With LinguAI, students can look forward to a seamless transition from basic understanding 
                         to advanced proficiency, making it an invaluable tool for anyone serious about language mastery.
                         """)
@@ -46,37 +53,40 @@ def render():
             st.write("")
             _add_linguai_note()
 
-
     else:
         # User is authenticated; show the rest of the content
-        user = UserService.get_user_by_username_sync(
-			state_service.username
-		)
+        user = UserService.get_user_by_username_sync(state_service.username)
+
         if user.preferred_name:
-            st.write(
-            f"#### :orange[Welcome back, {user.preferred_name} {user.last_name}.!]"
-        )
+            logged_in_user_display_name = f"{user.preferred_name} {user.last_name}"
         else:
-            st.write(
-            f"#### :orange[Welcome back, {user.first_name} {user.last_name}.!]"
+            logged_in_user_display_name = f"{user.first_name} {user.last_name}"
+
+        st.write(
+            f"#### :orange[Welcome back to LinguAI, {logged_in_user_display_name}!]"
         )
+
+        if state_service.just_logged_in:
+            NotificationService.greet(
+                message=f"Welcome back to LinguAI, {logged_in_user_display_name}!"
+            )
+            state_service.just_logged_in = False
+
         _add_linguai_note()
         # Add the rest of your application's components here
 
     col1, col2 = st.columns([2, 1])
 
     with col1:
-         if state_service.username is None:
-            st.image("./static/language.jpg")   
+        if state_service.username is None:
+            st.image("./static/language.jpg")
     with col2:
-
         if state_service.username is None:
             st.write(
                 "_LinguAI provides customized language learning for learners who are looking to take the next step to improve their comprehension after learning the basics. Sign up today to continue your learning and try out our personalized features!_"
-            )    
+            )
 
-    #st.markdown("---")
-
+    # st.markdown("---")
 
     styling = """
         <style>
