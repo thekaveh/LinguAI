@@ -439,6 +439,7 @@ def _render_sidebar_settings():
             label="Content LLM:",
             key="content_llm",
             disabled=not content_llms,
+            help="Content Generation LLM Engine",
             format_func=lambda llm: llm.display_name(),
             options=content_llms if content_llms else ["No LLMs available!"],
             index=0
@@ -465,6 +466,7 @@ def _render_sidebar_settings():
             label="Content Temperature:",
             key="content_temperature",
             value=state_service.content_temperature,
+            help="Content Generation LLM Engine Temperature",
         )
         state_service.content_temperature = new_content_temperature
 
@@ -472,5 +474,6 @@ def _render_sidebar_settings():
             key="content_tts",
             label="Content TTS",
             value=state_service.content_tts,
+            help="Content Generation Text-to-Speech",
         )
         state_service.content_tts = new_content_tts
