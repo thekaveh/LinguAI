@@ -128,9 +128,10 @@ def render():
     with st.sidebar.expander("⚙️", expanded=True):
         chat_llms = LLMService.get_chat()
         new_chat_llm = st.selectbox(
-            label="Chat LLM:",
             key="chat_llm",
             disabled=not chat_llms,
+            label="Large Language Model:",
+            help="Content Generation LLM Engine",
             format_func=lambda llm: llm.display_name(),
             options=chat_llms if chat_llms else ["No LLMs available!"],
             index=0
@@ -150,17 +151,19 @@ def render():
             step=0.1,
             min_value=0.0,
             max_value=1.0,
-            label="Chat Temperature:",
+            label="Creativity:",
             key="chat_temperature",
             value=state_service.chat_temperature,
+            help="Content Generation LLM Engine Temperature",
         )
         state_service.chat_temperature = new_chat_temperature
 
         chat_personas = PersonaService.get_all()
         new_chat_persona = st.selectbox(
-            label="Chat Persona:",
+            label="Persona:",
             key="chat_persona",
             disabled=not chat_personas,
+            help="Content Generation Persona",
             format_func=lambda persona: persona.persona_name,
             options=chat_personas if chat_personas else ["No personas available!"],
             index=0
@@ -182,7 +185,8 @@ def render():
 
         new_chat_tts = st.checkbox(
             key="chat_tts",
-            label="Chat TTS",
+            label="Voiceover",
             value=state_service.chat_tts,
+            help="Content Generation Text-to-Speech",
         )
         state_service.chat_tts = new_chat_tts
