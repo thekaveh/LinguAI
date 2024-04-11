@@ -26,7 +26,7 @@ class ChatMessage(BaseModel):
 
 
 class ChatRequest(BaseModel):
-    model: str
+    llm_id: int
 
     messages: List[ChatMessage]
 

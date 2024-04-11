@@ -10,7 +10,7 @@ class ChatService:
     @log_decorator
     @staticmethod
     async def achat(
-        model: str,
+        llm_id: int,
         messages: List[ChatMessage],
         on_changed_fn: Callable[[str], Awaitable[None]],
         on_completed_fn: Callable[[ChatMessage], Awaitable[None]],
@@ -24,7 +24,7 @@ class ChatService:
         async for message_text_chunk in HttpUtils.apost_stream(
             url=Config.CHAT_SERVICE_ENDPOINT,
             request=ChatRequest(
-                model=model,
+                llm_id=llm_id,
                 persona=persona,
                 messages=messages,
                 temperature=temperature,

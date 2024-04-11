@@ -11,8 +11,9 @@ class ContentGenReq(BaseModel):
     content: Content
     language: Language
     skill_level: str
-    model_name: str    
+    llm_id: int
     temperature: float
+
 
 class ContentGenRes(BaseModel):
     generated_content: str
