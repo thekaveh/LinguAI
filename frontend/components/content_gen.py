@@ -301,7 +301,6 @@ def render():
                         lang="en",
                         text=content,
                     )
-
                     audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
                     audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
 
@@ -332,49 +331,7 @@ def render():
     st.markdown("---")
     _render_previous_delivered_contents(user)
 
-    st.sidebar.write("---")
-
-    with st.sidebar.expander("⚙️", expanded=True):
-        content_llms = LLMService.get_content()
-        new_content_llm = st.selectbox(
-            label="Content LLM:",
-            key="content_llm",
-            disabled=not content_llms,
-            format_func=lambda llm: llm.display_name(),
-            options=content_llms if content_llms else ["No LLMs available!"],
-            index=0
-            if not (content_llms or state_service.content_llm)
-            else content_llms.index(
-                next(
-                    (
-                        llm
-                        for llm in content_llms
-                        if llm.id == state_service.content_llm.id
-                    ),
-                    content_llms[0],
-                )
-            ),
-        )
-        state_service.content_llm = (
-            new_content_llm if new_content_llm != "No LLMs available!" else None
-        )
-
-        new_content_temperature = st.slider(
-            step=0.1,
-            min_value=0.0,
-            max_value=1.0,
-            label="Content Temperature:",
-            key="content_temperature",
-            value=state_service.content_temperature,
-        )
-        state_service.content_temperature = new_content_temperature
-
-        new_content_tts = st.checkbox(
-            key="content_tts",
-            label="Content TTS",
-            value=state_service.content_tts,
-        )
-        state_service.content_tts = new_content_tts
+    _render_sidebar_settings()
 
 
 def _save_content_for_later(
@@ -469,3 +426,51 @@ def _render_previous_delivered_contents(user):
                                 st.success("Content deleted or already doesn't exist.")
         except Exception as e:
             pass
+
+
+def _render_sidebar_settings():
+    state_service = StateService.instance()
+
+    st.sidebar.write("---")
+
+    with st.sidebar.expander("⚙️", expanded=True):
+        content_llms = LLMService.get_content()
+        new_content_llm = st.selectbox(
+            label="Content LLM:",
+            key="content_llm",
+            disabled=not content_llms,
+            format_func=lambda llm: llm.display_name(),
+            options=content_llms if content_llms else ["No LLMs available!"],
+            index=0
+            if not (content_llms or state_service.content_llm)
+            else content_llms.index(
+                next(
+                    (
+                        llm
+                        for llm in content_llms
+                        if llm.id == state_service.content_llm.id
+                    ),
+                    content_llms[0],
+                )
+            ),
+        )
+        state_service.content_llm = (
+            new_content_llm if new_content_llm != "No LLMs available!" else None
+        )
+
+        new_content_temperature = st.slider(
+            step=0.1,
+            min_value=0.0,
+            max_value=1.0,
+            label="Content Temperature:",
+            key="content_temperature",
+            value=state_service.content_temperature,
+        )
+        state_service.content_temperature = new_content_temperature
+
+        new_content_tts = st.checkbox(
+            key="content_tts",
+            label="Content TTS",
+            value=state_service.content_tts,
+        )
+        state_service.content_tts = new_content_tts

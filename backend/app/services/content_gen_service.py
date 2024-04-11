@@ -5,7 +5,6 @@ from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from app.core.config import Config
 from app.utils.logger import log_decorator
 from app.schema.prompt import PromptSearch
 from app.services.llm_service import LLMService
