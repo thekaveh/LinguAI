@@ -25,6 +25,7 @@ langchain-groq = "^0.1.0"
 langchain-community = "^0.0.32"
 langchain-openai = "^0.1.2"
 langchain-core = "^0.1.41"
+langchain = "^0.1.15"
 
 [build-system]
 requires = ["poetry-core"]

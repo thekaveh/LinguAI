@@ -9,15 +9,13 @@ from services.persona_service import PersonaService
 
 @log_decorator
 def render():
-    #st.title("Settings")
-
     state_service = StateService.instance()
 
     with st.expander("Chat", expanded=True):
         st.markdown("<hr>", unsafe_allow_html=True)
 
         models = [m.name for m in LLMService.get_all()]
-        personas = asyncio.run(PersonaService.get_all_names())
+        personas = PersonaService.get_all_names()
 
         new_model = st.selectbox(
             label="Model:",

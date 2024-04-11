@@ -1,6 +1,8 @@
 import asyncio
 import streamlit as st
 
+from models.llm import LLM
+from models.persona import Persona
 from schema.chat import ChatMessage
 from utils.logger import log_decorator
 from services.llm_service import LLMService
@@ -16,8 +18,10 @@ class StateService:
 
         st.session_state["temperature"] = 0.0
 
+        self._chat_tts = False
+        self._chat_temperature = 0.0
         st.session_state["chat_messages"] = []
-        st.session_state["chat_messages"] = []
+        self._chat_llm = LLMService.get_chat()[0]
         st.session_state["chat_file_upload_key"] = 0
 
         st.session_state["username"] = None
@@ -26,6 +30,10 @@ class StateService:
         st.session_state["review_writing"] = ""
         st.session_state["rewrite_content"] = ""
         st.session_state["content_reading"] = ""
+
+        st.session_state["vision_llm"] = LLMService.get_vision()[0]
+        st.session_state["translate_llm"] = LLMService.get_translate()[0]
+        st.session_state["embeddings_llm"] = LLMService.get_embeddings()[0]
 
     @log_decorator
     def clear_session_state(self):
@@ -39,23 +47,21 @@ class StateService:
 
         if models:
             st.session_state["model"] = next(
-                (m.name for m in models if m.is_default and m.provider == "ollama"),
-                next(
-                    (m.name for m in models if m.is_default and m.provider == "openai"),
-                    None,
-                ),
+                (m.name for m in models if m.translate > 0), None
             )
         else:
             st.session_state["model"] = None
 
     @log_decorator
     def _init_persona(self):
-        personas = asyncio.run(PersonaService.get_all())
+        personas = PersonaService.get_all()
 
         if personas:
-            st.session_state["persona"] = next(
-                (p.persona_name for p in personas if p.is_default), personas[0]
-            )
+            default_persona = next((p for p in personas if p.is_default), personas[0])
+
+            self._chat_persona = default_persona
+            st.session_state["persona"] = default_persona.persona_name
+
         else:
             st.session_state["persona"] = None
 
@@ -158,6 +164,74 @@ class StateService:
     @content_reading.setter
     def content_reading(self, value):
         st.session_state["content_reading"] = value
+
+    @property
+    def chat_llm(self) -> LLM:
+        return self._chat_llm
+
+    @chat_llm.setter
+    def chat_llm(self, value: LLM) -> None:
+        if value != self._chat_llm:
+            self._chat_llm = value
+
+            NotificationService.success(f"Chat LLM changed to {value.display_name()}")
+
+    @property
+    def chat_temperature(self) -> float:
+        return self._chat_temperature
+
+    @chat_temperature.setter
+    def chat_temperature(self, value: float) -> None:
+        if value != self._chat_temperature:
+            self._chat_temperature = value
+
+            NotificationService.success(f"Chat Temperature changed to {value}")
+
+    @property
+    def chat_persona(self) -> Persona:
+        return self._chat_persona
+
+    @chat_persona.setter
+    def chat_persona(self, value: Persona) -> None:
+        if value != self._chat_persona:
+            self._chat_persona = value
+
+            NotificationService.success(f"Chat Persona changed to {value.persona_name}")
+
+    @property
+    def chat_tts(self) -> bool:
+        return self._chat_tts
+
+    @chat_tts.setter
+    def chat_tts(self, value: bool) -> None:
+        if value != self._chat_tts:
+            self._chat_tts = value
+
+            NotificationService.success(f"Chat TTS changed to {value}")
+
+    @property
+    def vision_llm(self) -> LLM:
+        return st.session_state["vision_llm"]
+
+    @vision_llm.setter
+    def vision_llm(self, value: LLM) -> None:
+        st.session_state["vision_llm"] = value
+
+    @property
+    def translate_llm(self) -> LLM:
+        return st.session_state["translate_llm"]
+
+    @translate_llm.setter
+    def translate_llm(self, value: LLM) -> None:
+        st.session_state["translate_llm"] = value
+
+    @property
+    def embeddings_llm(self) -> LLM:
+        return st.session_state["embeddings_llm"]
+
+    @embeddings_llm.setter
+    def embeddings_llm(self, value: LLM) -> None:
+        st.session_state["embeddings_llm"] = value
 
     @log_decorator
     @staticmethod
