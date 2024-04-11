@@ -253,10 +253,10 @@ ALTER SEQUENCE public.language_id_seq OWNED BY public.language.language_id;
 CREATE TABLE public.llm (
     id integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
-	chat integer DEFAULT -1 NOT NULL,
-    vision integer DEFAULT -1 NOT NULL,
-    content integer DEFAULT -1 NOT NULL,
-	embeddings integer DEFAULT -1 NOT NULL,
+    chat integer DEFAULT '-1'::integer NOT NULL,
+    vision integer DEFAULT '-1'::integer NOT NULL,
+    content integer DEFAULT '-1'::integer NOT NULL,
+    embeddings integer DEFAULT '-1'::integer NOT NULL,
     provider character varying(20) NOT NULL,
     name character varying(100) NOT NULL
 );
@@ -854,6 +854,7 @@ COPY public.user_assessment (assessment_id, user_id, assessment_date, language_i
 37	33	2024-04-09 00:00:00	2	Starter	beginner	Starter diagnostic quiz	Starter diagnostic quiz
 38	34	2024-04-09 18:04:55.71714	3	Initial	beginner	\N	\N
 39	34	2024-04-09 18:05:18.668561	3	Starter	advanced	Starter diagnostic quiz	Starter diagnostic quiz
+40	1	2024-04-11 16:41:16.324209	1	Initial	beginner	\N	\N
 \.
 
 
@@ -871,6 +872,7 @@ COPY public.user_contents (id, user_id, level, language, user_content, gen_conte
 22	2	beginner	German		 Sure, I can help you with that! Here are two biographies, one for a user interested in finance and one for a user interested in writing, both at a beginner reading skill level and written in German:\n\nBiography for a User Interested in Finance:\n\nHey there! My name is [Name], and I'm here to learn all about finance. I've always been interested in money and how it works, but I never really knew where to start. That's why I'm so glad I found this website - it's got lots of easy-to-understand articles and videos that explain everything from budgeting to investing.\n\nI'm just getting started on my financial journey, so I'm still learning the basics. But I'm excited to see where this knowledge will take me! Maybe one day I'll be a successful business owner or investor. Who knows? The sky's the limit!\n\nBiography for a User Interested in Writing:\n\nHey there! My name is [Name], and I'm here to learn all about writing. I love telling stories and expressing myself through words, but I never really knew how to do it properly. That's why I'm so glad I found this website - it's got tons of helpful tips and resources for beginners like me.\n\nI'm just starting out on my writing journey, so I'm still figuring out my style and voice. But I'm excited to see where this newfound knowledge will take me! Maybe one day I'll be a famous author or journalist. Who knows? The possibilities are endless!\n\nI hope these biographies meet your requirements! Let me know if you need anything else.	3	2024-04-07 05:22:20.795002+00	2024-04-14 05:22:20.795002+00
 23	2	beginner	German		 Sure, I can help you with that! Here are two biographies, one for a user interested in finance and one for a user interested in writing, both at a beginner reading skill level and written in German:\n\nBiography for a User Interested in Finance:\n\nHey there! My name is [Name], and I'm here to learn all about finance. I've always been curious about money and how it works, but I never really knew where to start. That's why I'm so glad I found this website - it's got lots of easy-to-understand articles and videos that explain everything from budgeting to investing.\n\nI'm just getting started on my financial journey, so I'm still learning the basics. But I'm excited to see where this knowledge will take me! Maybe one day I'll be a successful business owner or even a financial advisor. Who knows? The sky's the limit!\n\nBiography for a User Interested in Writing:\n\nHey there! My name is [Name], and I'm here to learn all about writing. I love telling stories and expressing myself through words, but I never really knew how to do it properly. That's why I'm so glad I found this website - it's got tons of helpful tips and tricks for beginners like me.\n\nI'm just starting out on my writing journey, so I'm still figuring out my style and voice. But I'm excited to see where this skill will take me! Maybe one day I'll be a famous author or even a journalist. The possibilities are endless!\n\nI hope these biographies meet your requirements! Let me know if you need anything else.	3	2024-04-07 05:23:53.890208+00	2024-04-14 05:23:53.890208+00
 24	2	beginner	Spanish		 Sure, here are two news reports, one on finance and one on writing, both written at a beginner reading skill level and in Spanish:\n\nNoticia de Finanzas para Principiantes\n\n┬íImportante! ┬┐Sab├¡as que la econom├¡a mundial ha experimentado un aumento en la producci├│n de bienes y servicios en los ├║ltimos a├▒os? ┬íEs cierto! Seg├║n el Fondo Monetario Internacional (FMI), la producci├│n global ha crecido en un 3,4% en 2019, lo que representa una mejora significativa con respecto a los a├▒os anteriores.\n\nEsto significa que las empresas est├ín produciendo m├ís y vendiendo m├ís productos y servicios, lo que a su vez genera m├ís empleos y aumenta la renta de los trabajadores. ┬íEs un buen signo para la econom├¡a!\n\nAdem├ís, el FMI tambi├⌐n ha informado que la inflaci├│n en todo el mundo ha sido baja en los ├║ltimos a├▒os, lo que significa que los precios de los productos y servicios no est├ín aumentando demasiado r├ípido. ┬íEso es bueno para tus bolsillos!\n\nEn resumen, la econom├¡a mundial est├í en una buena situaci├│n y esto puede ser beneficioso para ti si eres un inversor o simplemente un consumidor. ┬íEsperamos que esta noticia te haya aportado una buena perspectiva sobre la econom├¡a global!\n\nNoticia de Escritura para Principiantes\n\n┬íHola! ┬┐Sab├¡as que la escritura es una habilidad fundamental en la vida cotidiana? ┬íEs cierto! La capacidad de escribir bien no solo te ayuda a comunicarte mejor con los dem├ís, sino que tambi├⌐n te puede abrir puertas para tener ├⌐xito en el mundo laboral.\n\nPor ejemplo, si quieres ser un buen escritor de correos electr├│nicos o de informes en tu trabajo, es importante que aprendas a escribir de manera clara y concisa. ┬íY no te preocupes! Aprender a escribir bien no es dif├¡cil y puedes mejorar con la pr├íctica constante.\n\nAdem├ís, la escritura tambi├⌐n puede ser una herramienta ├║til para expresarte mejor en redes sociales o en tus propias publicaciones en l├¡nea. ┬íAs├¡ que no te quedes atr├ís! Aprende a escribir bien y mejorar├ís tu vida personal y profesional.\n\nEn resumen, la escritura es una habilidad fundamental en la vida cotidiana y puede ayudarte a tener ├⌐xito en el mundo laboral y en tus relaciones personales. ┬íAs├¡ que no te quedes atr├ís! Aprende a escribir bien y mejorar├ís tu vida diaria.	3	2024-04-07 05:24:54.195345+00	2024-04-14 05:24:54.195345+00
+25	1	beginner	German		Es war einmal ein kleiner Junge namens Tim. Tim liebte Technologie. Er war fasziniert von allem, was mit Computern, Tablets und Smartphones zu tun hatte. Eines Tages bekam Tim ein ganz besonderes Geschenk von seinen Eltern: einen brandneuen Laptop.\n\nTim war überglücklich. Er konnte es kaum erwarten, seinen neuen Laptop zu benutzen. Er drückte den Einschaltknopf und der Bildschirm leuchtete auf. Tim fühlte sich, als hätte er eine magische Tür zu einer neuen Welt geöffnet.\n\nZuerst lernte Tim, wie man den Laptop benutzt. Er lernte, wie man Programme öffnet und schließt, im Internet surft und Spiele spielt. Tim war sehr stolz auf sich, weil er alles so schnell lernte.\n\nDann entdeckte Tim etwas noch Spannenderes: Programmieren. Er fand heraus, dass er mit ein bisschen Übung seine eigenen kleinen Spiele und Programme erstellen konnte. Tim war begeistert. Er verbrachte Stunden damit, zu lernen und zu experimentieren.\n\nMit der Zeit wurde Tim immer besser im Umgang mit seinem Laptop. Er half sogar seinen Freunden und seiner Familie, wenn sie Probleme mit ihren Computern hatten. Tim war sehr glücklich, weil er durch Technologie so viel Neues lernen und entdecken konnte.\n\nUnd so wurde Tim, der kleine Junge, der Technologie liebte, zu einem kleinen Experten. Er wusste, dass es noch so viel mehr zu lernen gab, und freute sich auf jedes neue Abenteuer, das die Technologie für ihn bereithielt.\n\nUnd sie lebten alle glücklich und zufrieden, während Tim weiterhin die wunderbare Welt der Technologie erkundete.	3	2024-04-11 20:38:23.736206+00	2024-04-18 20:38:23.736206+00
 \.
 
 
@@ -899,11 +901,6 @@ COPY public.user_persona (user_id, persona_id) FROM stdin;
 --
 
 COPY public.user_topics (user_id, topic_name) FROM stdin;
-1	sports
-1	nutrition
-1	movies
-1	technology
-1	business
 2	education
 2	finance
 2	writing
@@ -925,6 +922,10 @@ COPY public.user_topics (user_id, topic_name) FROM stdin;
 32	finance
 33	technology
 34	finance
+1	nutrition
+1	movies
+1	technology
+1	business
 \.
 
 
@@ -940,9 +941,9 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 6	spiderman	peter.parker@marvel.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Peter	Parker	Ben	+1 212 914 2124	+1 212 914 2124	\N	external	English	{Mandarin}	\N	\N	\N	\N	\N	\N	\N	0
 23	captainamerica	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	kumar	govindaraju				\N	external	English	{Spanish}	\N	\N	\N	\N	\N	\N	\N	0
 32	hellokitty	hello@kitty.com	$2b$12$IUyX5an.Q7mxHxIBf.fnwuwhAFCf.7p..PjZsjj8571nSFbyiXciO	hello	kitty				email	external	English	{English,Mandarin,Spanish,German,French}		15	Nonbinary			2024-04-08	2024-04-08	1
-1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,Spanish}	\N	\N	\N	\N	\N	\N	2024-04-09	2
 33	bluesclues	blues@clues.com	$2b$12$cx7ZmrjoJD3I9xizd9LcU.Id0mYVlnsboKMOec2SpWK1CbHIa4cv6	blues	clues				email	external	English	{Spanish,Mandarin}		15	Nonbinary			2024-04-09	2024-04-09	1
 34	testuser	test@user.com	$2b$12$gweCRW6hOrUYXoqd0kGTwupRujenEL/j1eLERrl8u9SMuV3qocjGm	test	user				email	external	English	{Spanish}		15	Nonbinary			2024-04-09	2024-04-09	1
+1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,English}	\N	\N	\N	\N	\N	\N	2024-04-11	1
 \.
 
 
@@ -1006,14 +1007,14 @@ SELECT pg_catalog.setval('public.topic_topic_id_seq', 23, true);
 -- Name: user_assessment_assessment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 39, true);
+SELECT pg_catalog.setval('public.user_assessment_assessment_id_seq', 40, true);
 
 
 --
 -- Name: user_contents_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.user_contents_id_seq', 24, true);
+SELECT pg_catalog.setval('public.user_contents_id_seq', 25, true);
 
 
 --

@@ -19,12 +19,6 @@ class Config:
     OLLAMA_API_ENDPOINT = os.environ.get("OLLAMA_API_ENDPOINT", "")
     OLLAMA_OPENAI_API_ENDPOINT = OLLAMA_API_ENDPOINT + "/v1"
 
-    DEFAULT_LANGUAGE_TRANSLATION_MODEL = os.environ.get(
-        "DEFAULT_LANGUAGE_TRANSLATION_MODEL", "gpt-3.5-turbo"
-    )
-    DEFAULT_PERSONA = os.environ.get("DEFAULT_PERSONA", "Neutral")
-    DEFAULT_TEMPERATURE = os.environ.get("DEFAULT_TEMPERATURE", "0.0")
-
     # Database configurations
     DB_PORT = os.getenv("DB_PORT", "5432")
     POSTGRES_DB = os.getenv("POSTGRES_DB", "linguai_db")

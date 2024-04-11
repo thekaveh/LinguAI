@@ -9,11 +9,6 @@ class Config:
     # Defaults for the frontend and for demo purposes
     # DEFAULT_USER_NAME = os.environ.get("DEFAULT_USER_NAME", "")
     DEFAULT_SKILL_LEVEL = os.environ.get("DEFAULT_SKILL_LEVEL", "")
-    DEFAULT_TEMPERATURE = os.environ.get("DEFAULT_TEMPERATURE", "")
-    DEFAULT_PERSONA = os.environ.get("DEFAULT_PERSONA", "")
-    DEFAULT_LANGUAGE_TRANSLATION_MODEL = os.environ.get(
-        "DEFAULT_LANGUAGE_TRANSLATION_MODEL", ""
-    )
     DEFAULT_LANGUAGE = os.environ.get("DEFAULT_LANGUAGE", "")
 
     LLM_SERVICE_GET_ALL_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/all/"
@@ -23,6 +18,7 @@ class Config:
     LLM_SERVICE_GET_EMBEDDINGS_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/embeddings/"
 
     CHAT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/chat"
+
     PERSONA_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/personas/"
 
     CONTENT_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/contents/list"

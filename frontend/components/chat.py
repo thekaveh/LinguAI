@@ -107,10 +107,6 @@ def render():
     st.sidebar.write("---")
 
     with st.sidebar.expander("💬", expanded=True):
-        if st.button(label="Clear Chat", use_container_width=True):
-            state_service.chat_clear_messages()
-            st.rerun()
-
         vision_llms = LLMService.get_vision()
         st.file_uploader(
             label="Attach images:",
@@ -124,6 +120,10 @@ def render():
             ),
             key=f"file_uploader_{state_service.chat_file_upload_key}",
         )
+
+        if st.button(label="Clear Chat", use_container_width=True, type="primary"):
+            state_service.chat_clear_messages()
+            st.rerun()
 
     with st.sidebar.expander("⚙️", expanded=True):
         chat_llms = LLMService.get_chat()
