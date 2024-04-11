@@ -9,7 +9,7 @@ class LLM(SQLModel, table=is_backend):
     is_active: bool = Field(default=False)
     chat: int = Field(default=-1)
     vision: int = Field(default=-1)
-    translate: int = Field(default=-1)
+    content: int = Field(default=-1)
     embeddings: int = Field(default=-1)
     provider: str = Field(nullable=False)
     name: str = Field(max_length=100, nullable=False)

@@ -10,6 +10,7 @@ from schema.language import Language
 from schema.user import User, UserTopicBase
 from schema.content_gen import ContentGenReq
 
+from services.llm_service import LLMService
 from services.user_service import UserService
 from services.topic_service import TopicService
 from services.state_service import StateService
@@ -20,8 +21,10 @@ from schema.user_content import UserContentBase, UserContentSearch
 from services.user_content_service import UserContentService
 
 
+CONTENT_TYPE = (
+    3  # move to enums later, tells this content is about the reading page content
+)
 
-CONTENT_TYPE=3 # move to enums later, tells this content is about the reading page content
 
 @log_decorator
 def _render_content_types(content_types):
@@ -90,12 +93,10 @@ def _build_content_gen_request(
     selected_topic_options,
     selected_content_type,
     language,
-    model_name: str,
+    llm_id: int,
     temperature: float,
-    float,
     last_assessment=None,
 ) -> ContentGenReq:
-
     if not last_assessment:
         skill_level = "beginner"
     else:
@@ -108,7 +109,7 @@ def _build_content_gen_request(
         content=selected_content_type,
         language=language,
         skill_level=skill_level,
-        model_name=model_name,
+        llm_id=llm_id,
         temperature=temperature,
     )
 
@@ -153,7 +154,6 @@ def _add_instruction(user):
 
 @log_decorator
 def _add_skill_level_by_language(user):
-
     st.write("\n\n")
     st.write("##### Your Current Skills")
 
@@ -195,7 +195,6 @@ def _get_language_object(user, language_name):
 
 
 def _select_learning_language(user):
-
     if user.learning_languages:
         selected_language = st.radio(
             "##### Select Learning Language", user.learning_languages, index=None
@@ -210,11 +209,11 @@ def _select_learning_language(user):
 def render():
     state_service = StateService.instance()
 
-    model_name = state_service.model
+    llm_id = state_service.content_llm.id
     username = state_service.username
-    temperature = state_service.temperature
+    temperature = state_service.content_temperature
 
-    #st.subheader("Content For You")
+    # st.subheader("Content For You")
 
     user = UserService.get_user_by_username_sync(username)
 
@@ -249,7 +248,11 @@ def render():
 
     st.markdown("---")
 
-    col_tts, col_btn_gen, col_btn_clear,  = st.columns([4, 3, 2])
+    (
+        col_tts,
+        col_btn_gen,
+        col_btn_clear,
+    ) = st.columns([4, 3, 2])
     content_gen_placeholder = st.empty()
 
     state_service.content_reading = ""
@@ -257,7 +260,9 @@ def render():
     with col_tts:
         audio_placeholder = st.empty()
     with col_btn_gen:
-        if st.button("Click to Get Your Content", type="primary",use_container_width=True):
+        if st.button(
+            "Click to Get Your Content", type="primary", use_container_width=True
+        ):
             error = []
             if not selected_topic_options:
                 error.append("You have to Select at least one topic.")
@@ -278,7 +283,7 @@ def render():
                 selected_topic_options,
                 selected_content_type,
                 selected_language,
-                model_name,
+                llm_id,
                 temperature,
                 last_assessment,
             )
@@ -291,13 +296,14 @@ def render():
             async def _content_on_completed(content):
                 state_service.content_reading = content
 
-                audio_data = await TextToSpeechService.agenerate(
-                    lang="en",
-                    text=content,
-                )
+                if state_service.content_tts:
+                    audio_data = await TextToSpeechService.agenerate(
+                        lang="en",
+                        text=content,
+                    )
 
-                audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
+                    audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                    audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
 
             asyncio.run(
                 ContentGenService.agenerate_content(
@@ -307,25 +313,73 @@ def render():
                 )
             )
             if last_assessment:
-                level=last_assessment.skill_level
+                level = last_assessment.skill_level
             else:
-                level="beginner"
+                level = "beginner"
             if selected_language:
-                content_lang=selected_language.language_name
+                content_lang = selected_language.language_name
             else:
-                content_lang="English"
+                content_lang = "English"
             if state_service.content_reading:
-                _save_content_for_later(user, "", state_service.content_reading, level, content_lang)     
+                _save_content_for_later(
+                    user, "", state_service.content_reading, level, content_lang
+                )
 
     with col_btn_clear:
-        if st.button("Clear", type="primary",use_container_width=True ):
+        if st.button("Clear", type="primary", use_container_width=True):
             state_service.content_reading = ""
             st.rerun()
     st.markdown("---")
     _render_previous_delivered_contents(user)
 
+    st.sidebar.write("---")
 
-def _save_content_for_later(user, original_content, generated_content, level, language_name):
+    with st.sidebar.expander("⚙️", expanded=True):
+        content_llms = LLMService.get_content()
+        new_content_llm = st.selectbox(
+            label="Content LLM:",
+            key="content_llm",
+            disabled=not content_llms,
+            format_func=lambda llm: llm.display_name(),
+            options=content_llms if content_llms else ["No LLMs available!"],
+            index=0
+            if not (content_llms or state_service.content_llm)
+            else content_llms.index(
+                next(
+                    (
+                        llm
+                        for llm in content_llms
+                        if llm.id == state_service.content_llm.id
+                    ),
+                    content_llms[0],
+                )
+            ),
+        )
+        state_service.content_llm = (
+            new_content_llm if new_content_llm != "No LLMs available!" else None
+        )
+
+        new_content_temperature = st.slider(
+            step=0.1,
+            min_value=0.0,
+            max_value=1.0,
+            label="Content Temperature:",
+            key="content_temperature",
+            value=state_service.content_temperature,
+        )
+        state_service.content_temperature = new_content_temperature
+
+        new_content_tts = st.checkbox(
+            key="content_tts",
+            label="Content TTS",
+            value=state_service.content_tts,
+        )
+        state_service.content_tts = new_content_tts
+
+
+def _save_content_for_later(
+    user, original_content, generated_content, level, language_name
+):
     # Calculate the current time (created_date) and 7 days from now (expiry_date)
     created_date = datetime.datetime.now(datetime.timezone.utc)
     expiry_date = created_date + datetime.timedelta(days=7)
@@ -339,20 +393,27 @@ def _save_content_for_later(user, original_content, generated_content, level, la
         level=level,
         language=language_name,
         created_date=created_date,
-        expiry_date=expiry_date
+        expiry_date=expiry_date,
     )
 
     try:
-        user_content_saved = asyncio.run(UserContentService.create_user_content(user_content))
+        user_content_saved = asyncio.run(
+            UserContentService.create_user_content(user_content)
+        )
     except Exception as e:
         pass
+
 
 def _render_previous_delivered_contents(user):
     with st.container():
         st.markdown(f"#### :orange[History]")
 
         try:
-            user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=CONTENT_TYPE)))
+            user_contents = asyncio.run(
+                UserContentService.search_user_contents(
+                    UserContentSearch(user_id=user.user_id, content_type=CONTENT_TYPE)
+                )
+            )
             if not user_contents:
                 st.write("No History Found.")
                 return
@@ -362,26 +423,48 @@ def _render_previous_delivered_contents(user):
                     f"Skill Level: {content.level} - Language {content.language} - Date:{content.created_date.strftime('%Y-%m-%d %H:%M')} - ID:{content.id}": content.id
                     for content in user_contents
                 }
-                selected_option = st.selectbox("Select Content", list(content_options.keys()), index=0)
+                selected_option = st.selectbox(
+                    "Select Content", list(content_options.keys()), index=0
+                )
 
                 if selected_option:
                     selected_content_id = content_options[selected_option]
-                    selected_content = next((content for content in user_contents if content.id == selected_content_id), None)
-                    
+                    selected_content = next(
+                        (
+                            content
+                            for content in user_contents
+                            if content.id == selected_content_id
+                        ),
+                        None,
+                    )
+
                     st.write("---")
                     if selected_content:
                         st.markdown("##### :orange[App Created Content]")
-                        st.text_area("Generated Content", value=selected_content.gen_content, height=300, disabled=True)
+                        st.text_area(
+                            "Generated Content",
+                            value=selected_content.gen_content,
+                            height=300,
+                            disabled=True,
+                        )
                         if st.button("Delete Content"):
                             try:
-                                response = asyncio.run(UserContentService.delete_user_content(selected_content.id))
-                                #st.write(response)
+                                response = asyncio.run(
+                                    UserContentService.delete_user_content(
+                                        selected_content.id
+                                    )
+                                )
+                                # st.write(response)
                                 if response:
-                                    user_contents = [content for content in user_contents if content.id != selected_content.id]  # Remove deleted content
+                                    user_contents = [
+                                        content
+                                        for content in user_contents
+                                        if content.id != selected_content.id
+                                    ]  # Remove deleted content
                                     st.experimental_rerun()  # Rerun the app to refresh the content list
                             except Exception as e:
                                 if not str(e).startswith("No object"):
-                                    #raise e  # Re-raise exception if it's not the specific "no object" error
+                                    # raise e  # Re-raise exception if it's not the specific "no object" error
                                     pass
                                 st.success("Content deleted or already doesn't exist.")
         except Exception as e:

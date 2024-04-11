@@ -40,18 +40,18 @@ class LLMService:
 
     @log_decorator
     @staticmethod
-    async def aget_translate() -> List[LLM]:
+    async def aget_content() -> List[LLM]:
         try:
             return await HttpUtils.get(
-                Config.LLM_SERVICE_GET_TRANSLATE_ENDPOINT, response_model=List[LLM]
+                Config.LLM_SERVICE_GET_CONTENT_ENDPOINT, response_model=List[LLM]
             )
         except Exception as e:
             raise e
 
     @log_decorator
     @staticmethod
-    def get_translate() -> List[LLM]:
-        return asyncio.run(LLMService.aget_translate())
+    def get_content() -> List[LLM]:
+        return asyncio.run(LLMService.aget_content())
 
     @log_decorator
     @staticmethod

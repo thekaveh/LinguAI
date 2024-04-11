@@ -255,7 +255,7 @@ CREATE TABLE public.llm (
     is_active boolean DEFAULT true NOT NULL,
 	chat integer DEFAULT -1 NOT NULL,
     vision integer DEFAULT -1 NOT NULL,
-    translate integer DEFAULT -1 NOT NULL,
+    content integer DEFAULT -1 NOT NULL,
 	embeddings integer DEFAULT -1 NOT NULL,
     provider character varying(20) NOT NULL,
     name character varying(100) NOT NULL
@@ -717,7 +717,7 @@ COPY public.language (language_id, language_name) FROM stdin;
 -- Data for Name: llm; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.llm (id, is_active, chat, vision, translate, embeddings, provider, name) FROM stdin;
+COPY public.llm (id, is_active, chat, vision, content, embeddings, provider, name) FROM stdin;
 3	t	-1	-1	6	-1	ollama	stablelm2:1.6b-zephyr-fp16
 4	f	-1	-1	-1	-1	ollama	yi
 6	t	5	-1	4	-1	openai	gpt-3.5-turbo-0125

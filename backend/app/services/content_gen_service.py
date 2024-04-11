@@ -29,17 +29,8 @@ class ContentGenService:
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
 
-        temperature = request.temperature
-        if request.model_name:
-            model_name = request.model_name
-        else:
-            model_name = Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
-
-        # Use temperature from the request if provided, else use the default
-        # temperature = float(Config.DEFAULT_TEMPERATURE)
-
         chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
-            model=model_name, temperature=temperature
+            llm_id=request.llm_id, temperature=request.temperature
         )
         parser = StrOutputParser()
         chain = prompt | chat_runnable | parser

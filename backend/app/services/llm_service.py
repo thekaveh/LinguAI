@@ -59,10 +59,10 @@ class LLMService(CRUDService[LLM]):
         )
 
     @log_decorator
-    def get_translate(self) -> List[LLM]:
+    def get_content(self) -> List[LLM]:
         return sorted(
-            [llm for llm in self.get_all() if llm.translate > 0],
-            key=lambda llm: llm.translate,
+            [llm for llm in self.get_all() if llm.content > 0],
+            key=lambda llm: llm.content,
         )
 
     @log_decorator

@@ -20,6 +20,7 @@ def get_all(service: LLMService = Depends(_get_service)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @log_decorator
 @router.get("/llms/embeddings/")
 def get_embeddings(service: LLMService = Depends(_get_service)):
@@ -28,13 +29,15 @@ def get_embeddings(service: LLMService = Depends(_get_service)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @log_decorator
-@router.get("/llms/translate/")
-def get_translate(service: LLMService = Depends(_get_service)):
+@router.get("/llms/content/")
+def get_content(service: LLMService = Depends(_get_service)):
     try:
-        return service.get_translate()
+        return service.get_content()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @log_decorator
 @router.get("/llms/vision/")
@@ -44,6 +47,7 @@ def get_vision(service: LLMService = Depends(_get_service)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @log_decorator
 @router.get("/llms/chat/")
 def get_chat(service: LLMService = Depends(_get_service)):
@@ -51,6 +55,7 @@ def get_chat(service: LLMService = Depends(_get_service)):
         return service.get_chat()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @log_decorator
 @router.get("/llms/by_name/{name}", response_model=None)
@@ -61,6 +66,7 @@ def get_by_name(name: str, service: LLMService = Depends(_get_service)):
         raise HTTPException(status_code=404, detail="LLM not found!")
 
     return llm
+
 
 @log_decorator
 @router.get("/llms/by_id/{id}", response_model=None)

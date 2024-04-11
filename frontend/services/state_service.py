@@ -24,6 +24,10 @@ class StateService:
         self._chat_llm = LLMService.get_chat()[0]
         st.session_state["chat_file_upload_key"] = 0
 
+        self._content_tts = False
+        self._content_temperature = 0.0
+        self._content_llm = LLMService.get_content()[0]
+
         st.session_state["username"] = None
         st.session_state["session_user"] = None
 
@@ -32,7 +36,6 @@ class StateService:
         st.session_state["content_reading"] = ""
 
         st.session_state["vision_llm"] = LLMService.get_vision()[0]
-        st.session_state["translate_llm"] = LLMService.get_translate()[0]
         st.session_state["embeddings_llm"] = LLMService.get_embeddings()[0]
 
     @log_decorator
@@ -47,7 +50,7 @@ class StateService:
 
         if models:
             st.session_state["model"] = next(
-                (m.name for m in models if m.translate > 0), None
+                (m.name for m in models if m.content > 0), None
             )
         else:
             st.session_state["model"] = None
@@ -218,12 +221,39 @@ class StateService:
         st.session_state["vision_llm"] = value
 
     @property
-    def translate_llm(self) -> LLM:
-        return st.session_state["translate_llm"]
+    def content_llm(self) -> LLM:
+        return self._content_llm
 
-    @translate_llm.setter
-    def translate_llm(self, value: LLM) -> None:
-        st.session_state["translate_llm"] = value
+    @content_llm.setter
+    def content_llm(self, value: LLM) -> None:
+        if value != self._content_llm:
+            self._content_llm = value
+
+            NotificationService.success(
+                f"Content LLM changed to {value.display_name()}"
+            )
+
+    @property
+    def content_temperature(self) -> float:
+        return self._content_temperature
+
+    @content_temperature.setter
+    def content_temperature(self, value: float) -> None:
+        if value != self._content_temperature:
+            self._content_temperature = value
+
+            NotificationService.success(f"Content Temperature changed to {value}")
+
+    @property
+    def content_tts(self) -> bool:
+        return self._content_tts
+
+    @content_tts.setter
+    def content_tts(self, value: bool) -> None:
+        if value != self._content_tts:
+            self._content_tts = value
+
+            NotificationService.success(f"Content TTS changed to {value}")
 
     @property
     def embeddings_llm(self) -> LLM:
