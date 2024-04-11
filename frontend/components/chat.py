@@ -32,7 +32,8 @@ def render():
 
     if prompt := st.chat_input(
         "Ask a question...",
-        disabled=(state_service.persona is None) or (state_service.chat_llm is None),
+        disabled=(state_service.chat_persona is None)
+        or (state_service.chat_llm is None),
     ):
         if (
             state_service.chat_messages
@@ -116,7 +117,7 @@ def render():
             accept_multiple_files=True,
             type=["png", "jpg", "jpeg"],
             on_change=_file_uploader_on_change,
-            disabled=(state_service.persona is None)
+            disabled=(state_service.chat_persona is None)
             or (state_service.chat_llm is None)
             or not any(
                 (llm for llm in vision_llms if llm.id == state_service.chat_llm.id)

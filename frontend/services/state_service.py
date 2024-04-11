@@ -1,4 +1,3 @@
-import asyncio
 import streamlit as st
 
 from models.llm import LLM
@@ -13,10 +12,7 @@ from services.notification_service import NotificationService
 class StateService:
     @log_decorator
     def __init__(self):
-        self._init_model()
         self._init_persona()
-
-        st.session_state["temperature"] = 0.0
 
         self._chat_tts = False
         self._chat_temperature = 0.0
@@ -45,17 +41,6 @@ class StateService:
             del st.session_state[key]
 
     @log_decorator
-    def _init_model(self):
-        models = LLMService.get_all()
-
-        if models:
-            st.session_state["model"] = next(
-                (m.name for m in models if m.content > 0), None
-            )
-        else:
-            st.session_state["model"] = None
-
-    @log_decorator
     def _init_persona(self):
         personas = PersonaService.get_all()
 
@@ -63,10 +48,8 @@ class StateService:
             default_persona = next((p for p in personas if p.is_default), personas[0])
 
             self._chat_persona = default_persona
-            st.session_state["persona"] = default_persona.persona_name
-
         else:
-            st.session_state["persona"] = None
+            self._chat_persona = None
 
     @property
     def session_user(self):
@@ -83,41 +66,6 @@ class StateService:
     @username.setter
     def username(self, value):
         st.session_state["username"] = value
-
-    @property
-    def model(self):
-        return st.session_state.get("model", None)
-
-    @model.setter
-    def model(self, value):
-        if value and (
-            (not st.session_state["model"]) or (value != st.session_state["model"])
-        ):
-            st.session_state["model"] = value
-
-            NotificationService.success(f"LLM Model setting changed to {value}")
-
-    @property
-    def temperature(self):
-        return st.session_state.get("temperature", 0.0)
-
-    @temperature.setter
-    def temperature(self, value):
-        if value != self.temperature:
-            st.session_state["temperature"] = value
-
-            NotificationService.success(f"LLM Temperature setting changed to {value}")
-
-    @property
-    def persona(self):
-        return st.session_state.get("persona", None)
-
-    @persona.setter
-    def persona(self, value):
-        if value and value != self.temperature:
-            st.session_state["persona"] = value
-
-            NotificationService.success(f"Persona setting changed to {value}")
 
     @property
     def chat_file_upload_key(self):
