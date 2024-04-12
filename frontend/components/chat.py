@@ -33,7 +33,7 @@ def render():
     if prompt := st.chat_input(
         "Ask a question...",
         disabled=(state_service.chat_persona is None)
-        or (state_service.chat_llm is None),
+        or (state_service.content_llm is None),
     ):
         if (
             state_service.chat_messages
@@ -62,7 +62,7 @@ def render():
                 state_service.chat_append_message(new_ai_chat_message)
                 state_service.chat_increment_file_upload_key()
 
-                if state_service.chat_tts:
+                if state_service.content_tts:
                     audio_data = await TextToSpeechService.agenerate(
                         lang="en",
                         text=new_ai_chat_message.text,
@@ -72,11 +72,11 @@ def render():
 
             asyncio.run(
                 ChatService.achat(
-                    llm_id=state_service.chat_llm.id,
+                    llm_id=state_service.content_llm.id,
                     on_changed_fn=_achat_on_changed,
                     on_completed_fn=_achat_on_completed,
                     messages=state_service.chat_messages,
-                    temperature=state_service.chat_temperature,
+                    temperature=state_service.content_temperature,
                     persona=state_service.chat_persona.persona_name,
                 )
             )
@@ -114,9 +114,9 @@ def render():
             type=["png", "jpg", "jpeg"],
             on_change=_file_uploader_on_change,
             disabled=(state_service.chat_persona is None)
-            or (state_service.chat_llm is None)
+            or (state_service.content_llm is None)
             or not any(
-                (llm for llm in vision_llms if llm.id == state_service.chat_llm.id)
+                (llm for llm in vision_llms if llm.id == state_service.content_llm.id)
             ),
             key=f"file_uploader_{state_service.chat_file_upload_key}",
         )
@@ -126,37 +126,41 @@ def render():
             st.rerun()
 
     with st.sidebar.expander("⚙️", expanded=True):
-        chat_llms = LLMService.get_chat()
-        new_chat_llm = st.selectbox(
-            key="chat_llm",
-            disabled=not chat_llms,
+        content_llms = LLMService.get_content()
+        new_content_llm = st.selectbox(
+            key="content_llm",
+            disabled=not content_llms,
             label="Large Language Model:",
             help="Content Generation LLM Engine",
             format_func=lambda llm: llm.display_name(),
-            options=chat_llms if chat_llms else ["No LLMs available!"],
+            options=content_llms if content_llms else ["No LLMs available!"],
             index=0
-            if not (chat_llms or state_service.chat_llm)
-            else chat_llms.index(
+            if not (content_llms or state_service.content_llm)
+            else content_llms.index(
                 next(
-                    (llm for llm in chat_llms if llm.id == state_service.chat_llm.id),
-                    chat_llms[0],
+                    (
+                        llm
+                        for llm in content_llms
+                        if llm.id == state_service.content_llm.id
+                    ),
+                    content_llms[0],
                 )
             ),
         )
-        state_service.chat_llm = (
-            new_chat_llm if new_chat_llm != "No LLMs available!" else None
+        state_service.content_llm = (
+            new_content_llm if new_content_llm != "No LLMs available!" else None
         )
 
-        new_chat_temperature = st.slider(
+        new_content_temperature = st.slider(
             step=0.1,
             min_value=0.0,
             max_value=1.0,
             label="Creativity:",
-            key="chat_temperature",
-            value=state_service.chat_temperature,
+            key="content_temperature",
+            value=state_service.content_temperature,
             help="Content Generation LLM Engine Temperature",
         )
-        state_service.chat_temperature = new_chat_temperature
+        state_service.content_temperature = new_content_temperature
 
         chat_personas = PersonaService.get_all()
         new_chat_persona = st.selectbox(
@@ -175,7 +179,7 @@ def render():
                         for persona in chat_personas
                         if persona.persona_id == state_service.chat_persona.persona_id
                     ),
-                    chat_llms[0],
+                    content_llms[0],
                 )
             ),
         )
@@ -183,10 +187,10 @@ def render():
             new_chat_persona if new_chat_persona != "No personas available!" else None
         )
 
-        new_chat_tts = st.checkbox(
-            key="chat_tts",
+        new_content_tts = st.checkbox(
+            key="content_tts",
             label="Voiceover",
-            value=state_service.chat_tts,
+            value=state_service.content_tts,
             help="Content Generation Text-to-Speech",
         )
-        state_service.chat_tts = new_chat_tts
+        state_service.content_tts = new_content_tts

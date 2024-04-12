@@ -49,15 +49,6 @@ def get_vision(service: LLMService = Depends(_get_service)):
 
 
 @log_decorator
-@router.get("/llms/chat/")
-def get_chat(service: LLMService = Depends(_get_service)):
-    try:
-        return service.get_chat()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@log_decorator
 @router.get("/llms/by_name/{name}", response_model=None)
 def get_by_name(name: str, service: LLMService = Depends(_get_service)):
     llm = service.get_by_name(name)

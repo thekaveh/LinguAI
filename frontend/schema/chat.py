@@ -16,10 +16,10 @@ class ChatMessage(BaseModel):
 
         self.images.append(image)
 
-    def to_dict(self):
+    def to_dict(self, include_images=True):
         ret = [{"type": "text", "text": self.text}]
 
-        if self.images:
+        if self.images and include_images:
             ret.extend([{"type": "image_url", "image_url": url} for url in self.images])
 
         return ret

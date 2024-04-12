@@ -25,21 +25,6 @@ class LLMService:
 
     @log_decorator
     @staticmethod
-    async def aget_chat() -> List[LLM]:
-        try:
-            return await HttpUtils.get(
-                Config.LLM_SERVICE_GET_CHAT_ENDPOINT, response_model=List[LLM]
-            )
-        except Exception as e:
-            raise e
-
-    @log_decorator
-    @staticmethod
-    def get_chat() -> List[LLM]:
-        return asyncio.run(LLMService.aget_chat())
-
-    @log_decorator
-    @staticmethod
     async def aget_content() -> List[LLM]:
         try:
             return await HttpUtils.get(
