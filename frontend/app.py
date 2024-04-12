@@ -1,12 +1,12 @@
 import streamlit as st
+
 from core.config import Config
-from utils.logger_config import setup_global_logging
 from services.user_service import UserService
 from services.state_service import StateService
+from utils.logger_config import setup_global_logging
 from components import (
     sidebar,
     home,
-    settings,
     chat,
     admin,
     content_gen,
@@ -90,7 +90,6 @@ def main():
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Admin": {"icon": "person-gear", "page": admin},
-                "Settings": {"icon": "gear", "page": settings},
             }
         else:
             components_info = {
@@ -101,7 +100,6 @@ def main():
                 "Embeddings": {"icon": "puzzle", "page": embeddings},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
-                "Settings": {"icon": "gear", "page": settings},
             }
 
     selected_component_name, selected_component = sidebar.show(components_info)

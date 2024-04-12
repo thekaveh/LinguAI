@@ -22,3 +22,48 @@ class LLMService:
     @staticmethod
     def get_all() -> List[LLM]:
         return asyncio.run(LLMService.aget_all())
+
+    @log_decorator
+    @staticmethod
+    async def aget_content() -> List[LLM]:
+        try:
+            return await HttpUtils.get(
+                Config.LLM_SERVICE_GET_CONTENT_ENDPOINT, response_model=List[LLM]
+            )
+        except Exception as e:
+            raise e
+
+    @log_decorator
+    @staticmethod
+    def get_content() -> List[LLM]:
+        return asyncio.run(LLMService.aget_content())
+
+    @log_decorator
+    @staticmethod
+    async def aget_vision() -> List[LLM]:
+        try:
+            return await HttpUtils.get(
+                Config.LLM_SERVICE_GET_VISION_ENDPOINT, response_model=List[LLM]
+            )
+        except Exception as e:
+            raise e
+
+    @log_decorator
+    @staticmethod
+    def get_vision() -> List[LLM]:
+        return asyncio.run(LLMService.aget_vision())
+
+    @log_decorator
+    @staticmethod
+    async def aget_embeddings() -> List[LLM]:
+        try:
+            return await HttpUtils.get(
+                Config.LLM_SERVICE_GET_EMBEDDINGS_ENDPOINT, response_model=List[LLM]
+            )
+        except Exception as e:
+            raise e
+
+    @log_decorator
+    @staticmethod
+    def get_embeddings() -> List[LLM]:
+        return asyncio.run(LLMService.aget_embeddings())

@@ -19,7 +19,7 @@ class ChatService:
     @log_decorator
     async def achat(self, request: ChatRequest) -> AsyncIterable[str]:
         assert request is not None, "message is required"
-        assert request.model is not None, "model is required"
+        assert request.llm_id is not None, "llm_id is required"
         assert request.messages is not None, "messages is required"
         assert len(request.messages) > 0, "messages must not be empty"
 
@@ -40,7 +40,7 @@ class ChatService:
         prompt = ChatPromptTemplate.from_messages(chat_messages)
 
         chat_runnable = llm_service.get_chat_runnable(
-            model=request.model, temperature=request.temperature
+            llm_id=request.llm_id, temperature=request.temperature
         )
         parser = StrOutputParser()
 

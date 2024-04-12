@@ -10,6 +10,7 @@ from schema.user import User
 from schema.language import Language
 from schema.rewrite_content import ContentRewriteReq
 
+from services.llm_service import LLMService
 from services.user_service import UserService
 from services.state_service import StateService
 from services.language_service import LanguageService
@@ -20,7 +21,8 @@ from schema.user_content import UserContentBase, UserContentSearch
 from services.user_content_service import UserContentService
 
 
-CONTENT_TYPE=1 # trail purpose, need to move to enums
+CONTENT_TYPE = 1  # trail purpose, need to move to enums
+
 
 @log_decorator
 def _add_welcome(user):
@@ -28,7 +30,7 @@ def _add_welcome(user):
     #         user_first = user.preferred_name
     # else:
     #     user_first = user.first_name
-#    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!    
+    #    ### Hi, {user_first} {user.middle_name or ""} {user.last_name}!
     welcome = f"""
     To get started, simply paste the text you'd like to convert into the text area below. 
     LinguAI can convert it into content that matches your skill level and language selected.
@@ -37,10 +39,8 @@ def _add_welcome(user):
     st.markdown(welcome, unsafe_allow_html=True)
 
 
-
 @log_decorator
 def _add_skill_level_by_language(user):
-
     st.write("")
     st.write("")
     st.write("##### Your Skill Level")
@@ -58,34 +58,40 @@ def _add_skill_level_by_language(user):
             skill_level = latest_assessment.skill_level
             st.write(f"###### {language}: {skill_level}")
 
+
 def _get_last_assessment_by_language(user, language):
     latest_assessment = None
     for user_assessment in user.user_assessments:
         if user_assessment.language.language_name == language:
             if (
                 latest_assessment is None
-                or user_assessment.assessment_date
-                > latest_assessment.assessment_date
+                or user_assessment.assessment_date > latest_assessment.assessment_date
             ):
                 latest_assessment = user_assessment
     return latest_assessment
 
 
-
 @log_decorator
 def _build_content_rewrite_request(
-    user: User, input_content: str, skill_level: str, 
-    language: str, user_skill_level:str, user_base_lang:str, model: str, temperature: float) -> ContentRewriteReq:
+    user: User,
+    input_content: str,
+    skill_level: str,
+    language: str,
+    user_skill_level: str,
+    user_base_lang: str,
+    llm_id: int,
+    temperature: float,
+) -> ContentRewriteReq:
     # Build the ContentRewriteReq object
     content_rewrite_req = ContentRewriteReq(
         user_id=user.user_id,
         input_content=input_content,
         skill_level=skill_level,
         language=language,
-        model=model,
+        llm_id=llm_id,
         temperature=temperature,
         user_skill_level=user_skill_level,
-        user_base_language=user_base_lang
+        user_base_language=user_base_lang,
     )
 
     return content_rewrite_req
@@ -124,7 +130,7 @@ def _render_language_dropdown(languages):
 @log_decorator
 def render():
     state_service = StateService.instance()
-    #st.subheader("Rewrite Content to Current Skill Level")
+    # st.subheader("Rewrite Content to Current Skill Level")
 
     st.write("")
 
@@ -136,8 +142,8 @@ def render():
         return
 
     _add_welcome(user)
-    
-    state_service.rewrite_content = ""    
+
+    state_service.rewrite_content = ""
 
     original_rewrite_content = st.text_area(
         "",
@@ -176,7 +182,7 @@ def render():
     button_placeholder = st.empty()
     st.write("---")
     content_placeholder = st.empty()
-    #audio_placeholder = st.empty()
+    # audio_placeholder = st.empty()
 
     # Display initial or existing rewritten content if available
     if state_service.rewrite_content:
@@ -184,31 +190,37 @@ def render():
             f"""{state_service.rewrite_content}""", unsafe_allow_html=True
         )
 
-    temperature = state_service.temperature
-    model=state_service.model
+    temperature = state_service.content_temperature
+    llm_id = state_service.content_llm.id
     if user.base_language is None:
         user_base_lang = "english"
     else:
         user_base_lang = user.base_language
 
-
     with button_placeholder.container():
-        if skill_level is None or selected_language is None or original_rewrite_content == "":
+        if (
+            skill_level is None
+            or selected_language is None
+            or original_rewrite_content == ""
+        ):
             st.markdown(
                 '<div style="padding: 10px; border: 1px solid red; border-radius: 5px;">'
                 "<b></b> Please Enter content int text area above, select a language and skill level.</div>",
                 unsafe_allow_html=True,
             )
         else:
-            col1, col2, col3 = st.columns([3,2,1])
+            col1, col2, col3 = st.columns([3, 2, 1])
             with col1:
                 audio_placeholder = st.empty()
             with col2:
-                if st.button("Rewrite Content", type="primary", use_container_width=True):
-                    
-                    user_skill_level=""
+                if st.button(
+                    "Rewrite Content", type="primary", use_container_width=True
+                ):
+                    user_skill_level = ""
                     if selected_language:
-                        last_assessment_info= _get_last_assessment_by_language(user, selected_language.language_name)
+                        last_assessment_info = _get_last_assessment_by_language(
+                            user, selected_language.language_name
+                        )
                         if last_assessment_info:
                             user_skill_level = last_assessment_info.skill_level
 
@@ -219,8 +231,8 @@ def render():
                         selected_language.language_name,
                         user_skill_level,
                         user_base_lang,
-                        model,
-                        temperature
+                        llm_id,
+                        temperature,
                     )
 
                     async def _content_on_changed(rewrite_content):
@@ -230,15 +242,16 @@ def render():
 
                     async def _content_on_completed(rewrite_content):
                         state_service.rewrite_content = rewrite_content
-                        
-                        audio_data = await TextToSpeechService.agenerate(
-                            lang="en",
-                            text=rewrite_content,
-                        )
 
-                        audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
-                        audio_placeholder.markdown(audio_html, unsafe_allow_html=True)
-                        
+                        if state_service.content_tts:
+                            audio_data = await TextToSpeechService.agenerate(
+                                lang="en",
+                                text=rewrite_content,
+                            )
+                            audio_html = f'<audio src="{audio_data.audio}" controls="controls" autoplay="autoplay" type="audio/mpeg"/>'
+                            audio_placeholder.markdown(
+                                audio_html, unsafe_allow_html=True
+                            )
 
                     asyncio.run(
                         RewriteContentService.arewrite_content(
@@ -248,18 +261,28 @@ def render():
                         )
                     )
                     if state_service.rewrite_content:
-                        _save_content_for_later(user, original_rewrite_content, state_service.rewrite_content, skill_level.level, selected_language.language_name)
+                        _save_content_for_later(
+                            user,
+                            original_rewrite_content,
+                            state_service.rewrite_content,
+                            skill_level.level,
+                            selected_language.language_name,
+                        )
             with col3:
                 if st.button("Clear", type="primary", use_container_width=True):
                     state_service.rewrite_content = ""
-                    st.rerun()         
+                    st.rerun()
 
-                        
-    #st.write("---")       
+    # st.write("---")
     _render_previous_delivered_contents(user)
 
-def _save_content_for_later(user, original_content, generated_content, level, language_name):
-    CONTENT_TYPE=1 # trail purpose, need to move to enums
+    _render_sidebar_settings()
+
+
+def _save_content_for_later(
+    user, original_content, generated_content, level, language_name
+):
+    CONTENT_TYPE = 1  # trail purpose, need to move to enums
     # Calculate the current time (created_date) and 7 days from now (expiry_date)
     created_date = datetime.datetime.now(datetime.timezone.utc)
     expiry_date = created_date + datetime.timedelta(days=7)
@@ -273,20 +296,27 @@ def _save_content_for_later(user, original_content, generated_content, level, la
         level=level,
         language=language_name,
         created_date=created_date,
-        expiry_date=expiry_date
+        expiry_date=expiry_date,
     )
 
     try:
-        user_content_saved = asyncio.run(UserContentService.create_user_content(user_content))
+        user_content_saved = asyncio.run(
+            UserContentService.create_user_content(user_content)
+        )
     except Exception as e:
         pass
+
 
 def _render_previous_delivered_contents(user):
     with st.container():
         st.markdown(f"#### :orange[History]")
 
         try:
-            user_contents = asyncio.run(UserContentService.search_user_contents(UserContentSearch(user_id=user.user_id, content_type=1)))
+            user_contents = asyncio.run(
+                UserContentService.search_user_contents(
+                    UserContentSearch(user_id=user.user_id, content_type=1)
+                )
+            )
             if not user_contents:
                 st.write("No History Found.")
                 return
@@ -296,33 +326,111 @@ def _render_previous_delivered_contents(user):
                     f"Skill Level: {content.level} - Language {content.language} - Date:{content.created_date.strftime('%Y-%m-%d %H:%M')} - ID:{content.id}": content.id
                     for content in user_contents
                 }
-                selected_option = st.selectbox("Select Content", list(content_options.keys()), index=0)
+                selected_option = st.selectbox(
+                    "Select Content", list(content_options.keys()), index=0
+                )
 
                 if selected_option:
                     selected_content_id = content_options[selected_option]
-                    selected_content = next((content for content in user_contents if content.id == selected_content_id), None)
-                    
+                    selected_content = next(
+                        (
+                            content
+                            for content in user_contents
+                            if content.id == selected_content_id
+                        ),
+                        None,
+                    )
+
                     st.write("---")
                     if selected_content:
                         col1, col2 = st.columns(2)
                         with col1:
                             st.markdown("##### :orange[Your Content]")
-                            st.text_area("User Content", value=selected_content.user_content, height=300, disabled=True)
+                            st.text_area(
+                                "User Content",
+                                value=selected_content.user_content,
+                                height=300,
+                                disabled=True,
+                            )
                         with col2:
                             st.markdown("##### :orange[App Created Content]")
-                            st.text_area("Generated Content", value=selected_content.gen_content, height=300, disabled=True)
+                            st.text_area(
+                                "Generated Content",
+                                value=selected_content.gen_content,
+                                height=300,
+                                disabled=True,
+                            )
 
                         if st.button("Delete Content"):
                             try:
-                                response = asyncio.run(UserContentService.delete_user_content(selected_content.id))
-                                #st.write(response)
+                                response = asyncio.run(
+                                    UserContentService.delete_user_content(
+                                        selected_content.id
+                                    )
+                                )
+                                # st.write(response)
                                 if response:
-                                    user_contents = [content for content in user_contents if content.id != selected_content.id]  # Remove deleted content
+                                    user_contents = [
+                                        content
+                                        for content in user_contents
+                                        if content.id != selected_content.id
+                                    ]  # Remove deleted content
                                     st.experimental_rerun()  # Rerun the app to refresh the content list
                             except Exception as e:
                                 if not str(e).startswith("No object"):
-                                    #raise e  # Re-raise exception if it's not the specific "no object" error
+                                    # raise e  # Re-raise exception if it's not the specific "no object" error
                                     pass
                                 st.success("Content deleted or already doesn't exist.")
         except Exception as e:
             pass
+
+
+def _render_sidebar_settings():
+    state_service = StateService.instance()
+
+    st.sidebar.write("---")
+
+    with st.sidebar.expander("⚙️", expanded=True):
+        content_llms = LLMService.get_content()
+        new_content_llm = st.selectbox(
+            key="content_llm",
+            disabled=not content_llms,
+            label="Large Language Model:",
+            help="Content Generation LLM Engine",
+            format_func=lambda llm: llm.display_name(),
+            options=content_llms if content_llms else ["No LLMs available!"],
+            index=0
+            if not (content_llms or state_service.content_llm)
+            else content_llms.index(
+                next(
+                    (
+                        llm
+                        for llm in content_llms
+                        if llm.id == state_service.content_llm.id
+                    ),
+                    content_llms[0],
+                )
+            ),
+        )
+        state_service.content_llm = (
+            new_content_llm if new_content_llm != "No LLMs available!" else None
+        )
+
+        new_content_temperature = st.slider(
+            step=0.1,
+            min_value=0.0,
+            max_value=1.0,
+            label="Creativity:",
+            key="content_temperature",
+            value=state_service.content_temperature,
+            help="Content Generation LLM Engine Temperature",
+        )
+        state_service.content_temperature = new_content_temperature
+
+        new_content_tts = st.checkbox(
+            key="content_tts",
+            label="Voiceover",
+            value=state_service.content_tts,
+            help="Content Generation Text-to-Speech",
+        )
+        state_service.content_tts = new_content_tts

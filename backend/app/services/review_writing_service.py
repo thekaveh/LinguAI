@@ -5,7 +5,6 @@ from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-from app.core.config import Config
 from app.schema.prompt import PromptSearch
 from app.utils.logger import log_decorator
 from app.services.llm_service import LLMService
@@ -31,17 +30,8 @@ class ReviewWritingService:
         system_message = SystemMessage(content=prompt_text)
         prompt = ChatPromptTemplate.from_messages([system_message])
 
-        model_name = Config.DEFAULT_LANGUAGE_TRANSLATION_MODEL
-        temperature = float(Config.DEFAULT_TEMPERATURE)
-
-        if not request.model:
-            model_name = request.model
-
-        if request.temperature:
-            temperature = request.temperature
-
         chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
-            model=model_name, temperature=temperature
+            llm_id=request.llm_id, temperature=request.temperature
         )
         parser = StrOutputParser()
         chain = prompt | chat_runnable | parser
