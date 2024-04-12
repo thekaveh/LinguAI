@@ -18,11 +18,8 @@ class StateService:
     def reset_fields(self):
         self._init_persona()
 
-        self._chat_tts = False
         self._chat_messages = []
-        self._chat_temperature = 0.0
         self._chat_file_upload_key = 0
-        self._chat_llm = LLMService.get_chat()[0]
 
         self._content_tts = False
         self._content_temperature = 0.0
@@ -119,28 +116,6 @@ class StateService:
         self._content_reading = value
 
     @property
-    def chat_llm(self) -> LLM:
-        return self._chat_llm
-
-    @chat_llm.setter
-    def chat_llm(self, value: LLM) -> None:
-        if value != self._chat_llm:
-            self._chat_llm = value
-
-            NotificationService.success(f"Chat LLM changed to {value.display_name()}")
-
-    @property
-    def chat_temperature(self) -> float:
-        return self._chat_temperature
-
-    @chat_temperature.setter
-    def chat_temperature(self, value: float) -> None:
-        if value != self._chat_temperature:
-            self._chat_temperature = value
-
-            NotificationService.success(f"Chat Temperature changed to {value}")
-
-    @property
     def chat_persona(self) -> Persona:
         return self._chat_persona
 
@@ -150,17 +125,6 @@ class StateService:
             self._chat_persona = value
 
             NotificationService.success(f"Chat Persona changed to {value.persona_name}")
-
-    @property
-    def chat_tts(self) -> bool:
-        return self._chat_tts
-
-    @chat_tts.setter
-    def chat_tts(self, value: bool) -> None:
-        if value != self._chat_tts:
-            self._chat_tts = value
-
-            NotificationService.success(f"Chat TTS changed to {value}")
 
     @property
     def vision_llm(self) -> LLM:

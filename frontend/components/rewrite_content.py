@@ -393,9 +393,9 @@ def _render_sidebar_settings():
     with st.sidebar.expander("⚙️", expanded=True):
         content_llms = LLMService.get_content()
         new_content_llm = st.selectbox(
-            label="Content LLM:",
             key="content_llm",
             disabled=not content_llms,
+            label="Large Language Model:",
             help="Content Generation LLM Engine",
             format_func=lambda llm: llm.display_name(),
             options=content_llms if content_llms else ["No LLMs available!"],
@@ -420,8 +420,8 @@ def _render_sidebar_settings():
             step=0.1,
             min_value=0.0,
             max_value=1.0,
+            label="Creativity:",
             key="content_temperature",
-            label="Content Temperature:",
             value=state_service.content_temperature,
             help="Content Generation LLM Engine Temperature",
         )
@@ -429,7 +429,7 @@ def _render_sidebar_settings():
 
         new_content_tts = st.checkbox(
             key="content_tts",
-            label="Content TTS",
+            label="Voiceover",
             value=state_service.content_tts,
             help="Content Generation Text-to-Speech",
         )

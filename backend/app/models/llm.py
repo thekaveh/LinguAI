@@ -7,7 +7,6 @@ is_backend = os.getenv("APP_CONTEXT") == "backend"
 class LLM(SQLModel, table=is_backend):
     id: int = Field(primary_key=True)
     is_active: bool = Field(default=False)
-    chat: int = Field(default=-1)
     vision: int = Field(default=-1)
     content: int = Field(default=-1)
     embeddings: int = Field(default=-1)

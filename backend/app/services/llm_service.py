@@ -73,13 +73,6 @@ class LLMService(CRUDService[LLM]):
         )
 
     @log_decorator
-    def get_chat(self) -> List[LLM]:
-        return sorted(
-            [llm for llm in self.get_all() if llm.chat > 0],
-            key=lambda llm: llm.chat,
-        )
-
-    @log_decorator
     def get_by_id(self, id: int) -> Optional[LLM]:
         query = select(LLM).where(LLM.is_active).where(LLM.id == id)
 
