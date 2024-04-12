@@ -26,8 +26,9 @@ def show(pages):
             # Visually separate the logout button from the menu
             if st.button("Logout", type="primary", use_container_width=True):
                 # Perform logout actions: Reset the authentication state
-                state_service.clear_session_state()
-                st.experimental_rerun()
+                state_service.reset_fields()
+                state_service.just_logged_out = True
+                st.rerun()
         else:
             # Display the login form only if the user is not authenticated
             st.write("---")
@@ -51,6 +52,7 @@ def show(pages):
 
                 if auth_response.status:
                     state_service.username = auth_response.username
+                    state_service.just_logged_in = True
                     st.rerun()
                 else:
                     NotificationService.failure(message=auth_response.message)

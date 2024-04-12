@@ -1,5 +1,5 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Date, String, Integer, ARRAY, ForeignKey, Text
+from sqlalchemy import Column, Date, String, Integer, ARRAY, ForeignKey, Text, DateTime
 
 from .base import Base
 from app.data_access.models.language import Language
@@ -71,7 +71,7 @@ class UserAssessment(Base):
 
     assessment_id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
-    assessment_date = Column(Date)
+    assessment_date = Column(DateTime)
     language_id = Column(Integer, ForeignKey("language.language_id"))
     assessment_type = Column(String(100))
     skill_level = Column(String(100))

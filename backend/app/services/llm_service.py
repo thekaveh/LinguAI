@@ -2,6 +2,7 @@ from ollama import Client
 from typing import List, Optional
 from sqlmodel import Session, select, or_
 
+from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import Runnable
 from langchain_community.chat_models import ChatOllama
@@ -26,6 +27,10 @@ class LLMService(CRUDService[LLM]):
 
             if Config.OPENAI_API_KEY:
                 conditions.append((LLM.provider == "openai"))
+
+            if Config.GROQ_API_KEY:
+                conditions.append((LLM.provider == "groq"))
+
             if Config.OLLAMA_API_ENDPOINT:
                 pulled_ollama_models = [
                     model["model"]
@@ -47,30 +52,65 @@ class LLMService(CRUDService[LLM]):
             raise Exception("Error fetching models") from e
 
     @log_decorator
+    def get_embeddings(self) -> List[LLM]:
+        return sorted(
+            [llm for llm in self.get_all() if llm.embeddings > 0],
+            key=lambda llm: llm.embeddings,
+        )
+
+    @log_decorator
+    def get_content(self) -> List[LLM]:
+        return sorted(
+            [llm for llm in self.get_all() if llm.content > 0],
+            key=lambda llm: llm.content,
+        )
+
+    @log_decorator
+    def get_vision(self) -> List[LLM]:
+        return sorted(
+            [llm for llm in self.get_all() if llm.vision > 0],
+            key=lambda llm: llm.vision,
+        )
+
+    @log_decorator
+    def get_by_id(self, id: int) -> Optional[LLM]:
+        query = select(LLM).where(LLM.is_active).where(LLM.id == id)
+
+        return self.db_session.exec(query).first()
+
+    @log_decorator
     def get_by_name(self, name: str) -> Optional[LLM]:
         query = select(LLM).where(LLM.is_active).where(LLM.name == name)
 
         return self.db_session.exec(query).first()
 
     @log_decorator
-    def get_chat_runnable(self, model: str, temperature: float = 0) -> Runnable:
+    def get_chat_runnable(self, llm_id: int, temperature: float = 0) -> Runnable:
         try:
-            llm = self.get_by_name(model)
+            llm = self.get_by_id(id=llm_id)
 
             if not llm:
-                raise Exception(f"Model {model} not found!")
+                raise Exception(f"LLM with id {llm_id} not found!")
 
             if llm.provider == "openai":
                 return ChatOpenAI(
-                    model=model,
+                    model=llm.name,
                     streaming=True,
                     temperature=temperature,
                     base_url=Config.OPENAI_API_ENDPOINT,
                     openai_api_key=Config.OPENAI_API_KEY,
                 )
+            elif llm.provider == "groq":
+                return ChatGroq(
+                    streaming=True,
+                    model_name=llm.name,
+                    temperature=temperature,
+                    groq_api_key=Config.GROQ_API_KEY,
+                    # groq_api_base=Config.GROQ_API_ENDPOINT,
+                )
             elif llm.provider == "ollama":
                 return ChatOllama(
-                    model=model,
+                    model=llm.name,
                     streaming=True,
                     temperature=temperature,
                     base_url=Config.OLLAMA_API_ENDPOINT,
