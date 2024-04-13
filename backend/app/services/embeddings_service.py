@@ -28,7 +28,7 @@ class EmbeddingsService:
     def get(self, request: EmbeddingsGetRequest) -> EmbeddingsGetResponse:
         try:
             llm_service = LLMService(db_session=self.db_session)
-            llm = llm_service.get_by_name(request.model)
+            llm = llm_service.get_by_id(id=request.llm_id)
 
             if not llm:
                 raise Exception(f"Model {request.model} not found!")

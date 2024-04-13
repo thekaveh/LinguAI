@@ -6,14 +6,11 @@ from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 from langchain.schema.runnable import Runnable
 from langchain_community.chat_models import ChatOllama
-from langchain_openai.embeddings import OpenAIEmbeddings
-from langchain_community.embeddings import OllamaEmbeddings
 
 from app.models.llm import LLM
 from app.core.config import Config
 from app.utils.logger import log_decorator
 from app.services.crud_service import CRUDService
-from app.models.embeddings import EmbeddingsGetRequest, EmbeddingsGetResponse
 
 
 class LLMService(CRUDService[LLM]):
@@ -120,38 +117,6 @@ class LLMService(CRUDService[LLM]):
                 )
             else:
                 raise Exception(f"Provider {llm.provider} not supported!")
-        except Exception as e:
-            raise e
-
-    @log_decorator
-    def get_embeddings(self, request: EmbeddingsGetRequest) -> EmbeddingsGetResponse:
-        try:
-            llm = self.get_by_name(request.model)
-
-            if not llm:
-                raise Exception(f"Model {request.model} not found!")
-
-            print(request.model)
-            print(request.texts)
-
-            print(llm)
-
-            if llm.provider == "openai":
-                embeddings = OpenAIEmbeddings(
-                    model=llm.name,
-                    base_url=Config.OPENAI_API_ENDPOINT,
-                    openai_api_key=Config.OPENAI_API_KEY,
-                )
-            elif llm.provider == "ollama":
-                print("ollama")
-                embeddings = OllamaEmbeddings(
-                    model=llm.name,
-                    base_url=Config.OLLAMA_API_ENDPOINT
-                )
-            else:
-                raise Exception(f"Provider {llm.provider} not supported!")
-
-            return embeddings.embed_documents(request.texts)
         except Exception as e:
             raise e
 

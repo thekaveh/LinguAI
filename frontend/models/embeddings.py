@@ -3,7 +3,7 @@ from sqlmodel import SQLModel, Field
 
 
 class EmbeddingsGetRequest(SQLModel, table=False):
-    model: str = Field(max_length=100, nullable=False)
+    llm_id: int = Field(nullable=False)
     texts: List[str] = Field(nullable=False)
 
 

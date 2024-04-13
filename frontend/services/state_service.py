@@ -175,7 +175,12 @@ class StateService:
 
     @embeddings_llm.setter
     def embeddings_llm(self, value: LLM) -> None:
-        self._embeddings_llm = value
+        if value != self._embeddings_llm:
+            self._embeddings_llm = value
+
+            NotificationService.success(
+                f"Embeddings LLM changed to {value.display_name()}"
+            )
 
     @property
     def just_logged_in(self) -> bool:
