@@ -15,6 +15,7 @@ from components import (
     foot_notes,
     header,
     register,
+    assessment,
 )
 import asyncio
 
@@ -86,6 +87,7 @@ def main():
                 "Content Reading": {"icon": "body-text", "page": content_gen},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
+                "Assessment": {"icon": "clipboard", "page": assessment},
                 "Admin": {"icon": "person-gear", "page": admin},
             }
         else:
@@ -96,6 +98,7 @@ def main():
                 "Content Reading": {"icon": "body-text", "page": content_gen},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
+                "Assessment": {"icon": "clipboard", "page": assessment},
             }
 
     selected_component_name, selected_component = sidebar.show(components_info)
