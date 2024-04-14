@@ -8,7 +8,23 @@ from services.user_service import UserService
 from services.language_service import LanguageService
 from schema.user_assessment import UserAssessmentCreate
 
-@log_decorator
+
+def get_user_by_username_sync(username):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    user_details = loop.run_until_complete(UserService.get_user_id_by_username(username))
+    loop.close()
+    return user_details
+
+
+def get_language_sync(language_name):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    language_details = loop.run_until_complete(LanguageService.get_language_by_name(language_name))
+    loop.close()
+    return language_details
+
+
 def load_quiz_questions(language):
     try:
         with open(f"./starter_quizzes/{language.lower()}_quiz.json", "r", encoding="utf-8") as file:
@@ -18,12 +34,6 @@ def load_quiz_questions(language):
         st.error(f"The quiz for {language} could not be found.")
         return []
 
-def get_user_by_username_sync(username):
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    user_details = loop.run_until_complete(UserService.get_user_id_by_username(username))
-    loop.close()
-    return user_details
 
 def determine_skill_level(total_points):
     if total_points <= 10:
@@ -32,7 +42,8 @@ def determine_skill_level(total_points):
         return "Intermediate"
     else:
         return "Advanced"
-    
+
+
 def create_user_assessment_sync(user_id, assessment_data):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -40,77 +51,67 @@ def create_user_assessment_sync(user_id, assessment_data):
     loop.close()
     return result
 
-def clear_quiz_state(language):
-    if f'{language}_quiz_submitted' in st.session_state:
-        del st.session_state[f'{language}_quiz_submitted']
-    if f'{language}_skill_level' in st.session_state:
-        del st.session_state[f'{language}_skill_level']
-    # Clear any question states for the language
-    for key in list(st.session_state.keys()):
-        if key.startswith("question_"):
-            del st.session_state[key]
-    st.experimental_rerun()
-
-def render_quiz(language, user_id):
-    questions = load_quiz_questions(language)
-    if questions:
-        if st.session_state.get(f'{language}_quiz_submitted', False):
-            skill_level = st.session_state.get(f'{language}_skill_level', "Not determined")
-            st.success(f"Your current skill level for {language} is: {skill_level}")
-            clear_quiz_state(language)
-        
-        form_key = f"{language}_quiz_form"
-        with st.form(key=form_key):
-            total_points = 0
-            for i, question in enumerate(questions):
-                st.write(question["question"])
-                options = question["options"]
-                answer = st.radio("Choose an option:", options, key=f"question_{i}", index=None)
-                if answer == question["answer"]:
-                    total_points += question["points"]
-            
-            submitted = st.form_submit_button("Submit Quiz")
-                                
-        if submitted:
-            # Calculate and temporarily store skill level for current language
-            skill_level = determine_skill_level(total_points)
-            st.session_state[f'{language}_skill_level'] = skill_level
-            st.session_state[f'{language}_quiz_submitted'] = True
-            
-            # update the backend with the new assessment 
-            language_details = get_language_sync(language)
-            language_id = language_details.language_id
-            
-            assessment_data = UserAssessmentCreate(
-                user_id=user_id,
-                language_id=language_id,
-                assessment_date=datetime.today(),
-                assessment_type="Repeated",
-                skill_level=skill_level.lower(),
-                strength="Retake of diagnostic quiz",
-                weakness="Retake of diagnostic quiz",
-                language=language_details,
-            )
-            
-            # create_user_assessment_sync(user_id, assessment_data)
-            create_user_assessment_sync(user_id, assessment_data)
-                            
-            # Use rerun to refresh the page to show the skill level
-            st.experimental_rerun()
-
 def render():
+     # Initialize session state for managing quiz progress
+    if 'quiz_started' not in st.session_state:
+        st.session_state['quiz_started'] = False
+    if 'selected_language' not in st.session_state:
+        st.session_state['selected_language'] = ""
+    if 'quiz_submitted' not in st.session_state:
+        st.session_state['quiz_submitted'] = False
+    if 'total_points' not in st.session_state:
+        st.session_state['total_points'] = 0
+    if 'display_quiz' not in st.session_state:
+        st.session_state['display_quiz'] = True
+
+    
     state_service = StateService.instance()
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
     current_user_languages = [language for language in user.learning_languages]
     user_id = get_user_by_username_sync(user.username)
-    
+
     st.write("##### Take Language Assessments to Increase Your Skill Level!")
-    
-    selected_language = st.selectbox("Select Language to Assess", options=current_user_languages)
-    
-    if st.button(f"Start {selected_language} Assessment"):
-        if 'quiz_attempt' not in st.session_state:
-            st.session_state['quiz_attempt'] = 0
-        render_quiz(selected_language, user_id)
+    language = st.selectbox("Select Language to Assess", options=current_user_languages)
+
+    if st.button("Start Assessment"):
+        st.session_state['quiz_started'] = True
+        st.session_state['selected_language'] = language
+        
+    if st.session_state['quiz_started']:
+        questions = load_quiz_questions(st.session_state['selected_language'])
+        with st.form(key=f"{st.session_state['selected_language']}_quiz_form", clear_on_submit=True):
+            total_points = 0
+            for i, question in enumerate(questions):
+                st.write(question["question"])
+                options = question["options"]
+                answer = st.radio("Choose an option:", options, key=f"{language}_question_{i}", index=None)
+                if answer == question["answer"]:
+                    total_points += question["points"]
             
-    
+            submit = st.form_submit_button("Submit Quiz")
+            if submit:
+                st.session_state['quiz_submitted'] = True
+                st.session_state['quiz_started'] = False
+                st.session_state['total_points'] = total_points
+                
+    if st.session_state.get('quiz_submitted'):
+        skill_level = determine_skill_level(st.session_state['total_points'])
+        st.success(f"Your new skill level for {language} is: {skill_level}")
+        language_details = get_language_sync(language)
+        language_id = language_details.language_id
+                
+        assessment_data = UserAssessmentCreate(
+            user_id=user_id,
+            language_id=language_id,
+            assessment_date=datetime.today(),
+            assessment_type="Retake",
+            skill_level=skill_level.lower(),
+            strength="Assessment retake",
+            weakness="Assessment retake",
+            language=language_details,
+        )
+        
+        create_user_assessment_sync(user_id, assessment_data)
+
+        st.session_state['quiz_submitted'] = False
+        st.session_state['total_points'] = 0
