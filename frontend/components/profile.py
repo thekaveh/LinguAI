@@ -116,47 +116,50 @@ def render_awards_info():
 
 @log_decorator
 def render():
-    #st.title("Profile")
     state_service = StateService.instance()
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
-    ### user awards (gamification)
-    st.markdown("#### Your Awards 🏆")
-    render_awards(user)
-    st.write(f"* Daily Streak: {user.consecutive_login_days}")
     
-    st.markdown("#### Your Mastery")
-    render_language_mastery(user)
+    st.markdown("##### Awards and Mastery 🏆")
+
+    col1, col2 = st.columns(2)
+    ### user awards (gamification)
+    with col1:
+        render_awards(user)
+        st.write(f"* Daily Streak: {user.consecutive_login_days}")
+    
+    with col2:
+        # st.markdown("#### Your Mastery")
+        render_language_mastery(user)
         
     ### interest selection
-    st.markdown("#### Interest Selection")
+    st.markdown("##### Interest/Language Selection")
 
-
-    topics = asyncio.run(TopicService.list())
-    topics = [topic.topic_name for topic in topics]
-    current_user_topics = [topic.topic_name for topic in user.user_topics]
-    options = st.multiselect('Select your interests below', topics, current_user_topics)
+    col1, col2 = st.columns(2)
     
-    if (len(options) > 0 and len(current_user_topics) != len(options)):
-        asyncio.run(UserService.update_topics(options, state_service.username))
-        st.experimental_rerun()
+    with col1:
+        topics = asyncio.run(TopicService.list())
+        topics = [topic.topic_name for topic in topics]
+        current_user_topics = [topic.topic_name for topic in user.user_topics]
+        options = st.multiselect('Select your interests below', topics, current_user_topics)
+        
+        if (len(options) > 0 and len(current_user_topics) != len(options)):
+            asyncio.run(UserService.update_topics(options, state_service.username))
+            st.experimental_rerun()
         
     ### language selection 
-    st.write("")
+    with col2: 
+        languages = asyncio.run(LanguageService.list())
+        languages = [language.language_name for language in languages]
 
-    st.markdown("#### Language Selection")
-
-    languages = asyncio.run(LanguageService.list())
-    languages = [language.language_name for language in languages]
-
-    current_user_languages = [language for language in user.learning_languages]
-    options = st.multiselect('Select your learning languages below', languages, current_user_languages)
-    
-    if (len(options) > 0 and len(current_user_languages) != len(options)):
-        asyncio.run(UserService.update_languages(options, state_service.username))
-        st.experimental_rerun()
+        current_user_languages = [language for language in user.learning_languages]
+        options = st.multiselect('Select your learning languages below', languages, current_user_languages)
+        
+        if (len(options) > 0 and len(current_user_languages) != len(options)):
+            asyncio.run(UserService.update_languages(options, state_service.username))
+            st.experimental_rerun()
 
     ### User Information 
-    st.markdown("#### User Profile/Security")
+    st.markdown("##### User Profile/Security")
 
     # view/update user information     
     with st.expander("Click to view/update your profile", expanded=False):
@@ -227,5 +230,5 @@ def render():
                             st.error(f"Failed to change password: {e}")
                             
     ### Extra Information 
-    st.markdown("#### Extra Info")
+    st.markdown("##### Extra Info")
     render_awards_info()

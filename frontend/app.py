@@ -17,6 +17,7 @@ from components import (
     header,
     register,
     embeddings,
+    assessment,
 )
 import asyncio
 
@@ -89,6 +90,7 @@ def main():
                 "Embeddings": {"icon": "puzzle", "page": embeddings},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
+                "Assessment": {"icon": "clipboard", "page": assessment},
                 "Admin": {"icon": "person-gear", "page": admin},
             }
         else:
@@ -100,6 +102,7 @@ def main():
                 "Embeddings": {"icon": "puzzle", "page": embeddings},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
+                "Assessment": {"icon": "clipboard", "page": assessment},
             }
 
     selected_component_name, selected_component = sidebar.show(components_info)
