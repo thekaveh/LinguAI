@@ -17,7 +17,7 @@ from components import (
     header,
     register,
     embeddings,
-    assessments,
+    assessment,
 )
 import asyncio
 
