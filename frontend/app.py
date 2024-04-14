@@ -15,7 +15,7 @@ from components import (
     foot_notes,
     header,
     register,
-    assessment,
+    assessments,
 )
 import asyncio
 
