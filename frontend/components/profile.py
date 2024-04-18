@@ -117,6 +117,21 @@ def render_awards_info():
 @log_decorator
 def render():
     state_service = StateService.instance()
+
+    if state_service.tour_mode != None:
+        state_service.last_visited = 5
+        with state_service.tour_mode.container():
+            st.markdown('This is our profile page!')
+            st.markdown('You can view your profile details here, view your progress, as well as update  your information!\n')
+
+            st.markdown('Let\'s continue with the tour!')
+
+            st.button(f"Next Stop: Settings", key='switch_button')
+
+            exit_tour = st.button("Exit Tour")
+            if exit_tour:
+                state_service.tour_mode = None
+
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
     
     st.markdown("##### Awards and Mastery 🏆")

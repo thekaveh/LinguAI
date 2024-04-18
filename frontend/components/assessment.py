@@ -75,6 +75,22 @@ def render():
         st.session_state["display_quiz"] = True
 
     state_service = StateService.instance()
+
+    # Tour mode
+    if state_service.tour_mode != None:
+        state_service.last_visited = 6
+        with state_service.tour_mode.container():
+            st.markdown('This is our language assessment page!')
+            st.markdown('On this page, you can assess your language skills and increase your skill level.')
+
+            st.markdown('We\'ve completed the tour!')
+
+            st.button(f"Restart Tour", key='switch_button')
+
+            exit_tour = st.button("Exit Tour")
+            if exit_tour:
+                state_service.tour_mode = None
+
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
     current_user_languages = [language for language in user.learning_languages]
     user_id = get_user_by_username_sync(user.username)

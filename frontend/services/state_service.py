@@ -33,6 +33,10 @@ class StateService:
         self._rewrite_content = ""
         self._content_reading = ""
 
+        self._tour_mode = None
+        self._last_visited = -1
+        self._switch_button = None
+
         self._vision_llm = LLMService.get_vision()[0]
         self._embeddings_llm = LLMService.get_embeddings()[0]
 
@@ -192,6 +196,30 @@ class StateService:
     @just_logged_out.setter
     def just_logged_out(self, value: bool) -> None:
         self._just_logged_out = value
+    
+    @property
+    def tour_mode(self):
+        return self._tour_mode
+
+    @tour_mode.setter
+    def tour_mode(self, value):
+        self._tour_mode = value
+
+    @property
+    def last_visited(self):
+        return self._last_visited
+
+    @last_visited.setter
+    def last_visited(self, value):
+        self._last_visited = value
+
+    @property
+    def switch_button(self):
+        return self._switch_button
+
+    @switch_button.setter
+    def switch_button(self, value):
+        self._switch_button = value
 
     @log_decorator
     @staticmethod
