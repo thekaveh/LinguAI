@@ -181,6 +181,20 @@ def _find_last_user_assessment(
 def render():
     state_service = StateService.instance()
 
+    if state_service.tour_mode != None:
+        state_service.last_visited = 2
+        with state_service.tour_mode.container():
+            st.markdown('This is our review writing content page!')
+            st.markdown("On this page, you can get personal feedback on content that you've written yourself based on your skill level and in the language of your text.\n")
+
+            st.markdown('Let\'s continue with the tour!')
+
+            st.button(f"Next Stop: Content Generation", key='switch_button')
+
+            exit_tour = st.button("Exit Tour")
+            if exit_tour:
+                state_service.tour_mode = None
+
     state_service.review_writing = ""
 
     llm_id = state_service.content_llm.id

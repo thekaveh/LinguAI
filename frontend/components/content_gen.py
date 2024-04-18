@@ -209,6 +209,20 @@ def _select_learning_language(user):
 def render():
     state_service = StateService.instance()
 
+    if state_service.tour_mode != None:
+        state_service.last_visited = 3
+        with state_service.tour_mode.container():
+            st.markdown('This is our content generation page!')
+            st.markdown('On this page, you can select from different topics, content types, and languages to generate custom content to further your language learning journey!')
+
+            st.markdown('Let\'s continue with the tour!')
+
+            st.button(f"Next Stop: Chat", key='switch_button')
+
+            exit_tour = st.button("Exit Tour")
+            if exit_tour:
+                state_service.tour_mode = None
+
     llm_id = state_service.content_llm.id
     username = state_service.username
     temperature = state_service.content_temperature
