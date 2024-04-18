@@ -57,10 +57,9 @@ Please note that you can optionally start services in detached mode using `docke
 
 ## Running Local Tests
 
-Frontend services: cd into frontend/ and run `python -m pytest tests/` to run all frontend service tests
-Backend services: cd into backend/ and run `python -m pytest app/tests/` to run all backend service tests
+Frontend services: cd into frontend/ and run `docker exec -it frontend python -m pytest tests/` to run all frontend service tests
 
-*Make sure to install pytest, pytest-asyncio, and do `poetry install` to get rest of dependencies locally in virtual env
+Backend services: cd into backend/ and run `docker exec -it backend python -m pytest app/tests/` to run all backend service tests
 
 ### Code Changes
 
