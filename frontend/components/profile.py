@@ -134,17 +134,15 @@ def render():
 
     user = asyncio.run(UserService.get_user_by_username(state_service.username))
     
-    st.markdown("##### Awards 🏆")
+    st.markdown("##### Awards and Usage🏆")
 
     col1, col2 = st.columns(2)
     ### user awards (gamification)
     with col1:
         render_awards(user)
-        st.write(f"* Daily Streak: {user.consecutive_login_days}")
     
-    # with col2:
-    #     # st.markdown("#### Your Mastery")
-    #     render_language_mastery(user)
+    with col2:
+        st.write(f"* Daily Streak: {user.consecutive_login_days}")
         
     ### interest selection
     st.markdown("##### Interest/Language Selection")
