@@ -58,8 +58,10 @@ Please note that you can optionally start services in detached mode using `docke
 ## Running Local Tests
 
 Frontend services: cd into frontend/ and run `docker exec -it frontend python -m pytest tests/` to run all frontend service tests
+For coverage: run `docker exec -it frontend python -m pytest --cov=services tests/`
 
 Backend services: cd into backend/ and run `docker exec -it backend python -m pytest app/tests/` to run all backend service tests
+For coverage: run `docker exec -it backend python -m pytest --cov=app/services app/tests/`
 
 ### Code Changes
 
