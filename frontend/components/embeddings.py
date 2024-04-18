@@ -1,3 +1,4 @@
+from logging import disable
 import streamlit as st
 import plotly.graph_objs as go
 
@@ -5,6 +6,8 @@ from utils.logger import log_decorator
 from services.llm_service import LLMService
 from services.state_service import StateService
 from services.embeddings_service import EmbeddingsService
+from services.embeddings_quiz_service import EmbeddingsQuizService
+from models.embeddings_quiz import EmbeddingsQuizRequest, EmbeddingsQuizResponse
 from models.embeddings import (
     EmbeddingsGetRequest,
     EmbeddingsGetResponse,
@@ -17,66 +20,132 @@ from models.embeddings import (
 
 @log_decorator
 def render():
-    _render_sidebar_settings()
-
-    source_lang = st.selectbox(
-        "Choose source language:", ["English", "Spanish", "French"]
-    )
-    difficulty = st.select_slider(
-        "Select difficulty:", options=["Easy", "Medium", "Hard"]
-    )
-
     state_service = StateService.instance()
 
-    original = st.text_input("Enter text to embed:")
+    _render_sidebar_settings()
 
-    attempts = []
-    for i in range(1, 4):  # Three attempts for simplicity
-        attempt = st.text_input(f"Attempt {i}", key=f"attempt_{i}")
-        attempts.append(attempt)
+    with st.form(key="embeddings_quiz_gen_form"):
+        col_src_lang, col_dst_lang, col_diff = st.columns([1, 1, 1])
 
-    if st.button("Submit"):
-        if not all(attempts):
-            st.warning("Please fill in all attempts.")
-        else:
-            # ideal_translation = fetch_ideal_translation(generated_text, target_lang)
-            # similarities = [calculate_cosine_similarity(attempt, ideal_translation) for attempt in attempts]
+        with col_src_lang:
+            src_lang = st.selectbox(
+                "Choose source language:", ["English", "Spanish", "French"]
+            )
 
-            # for i, sim in enumerate(similarities, 1):
-            # 	st.write(f"Cosine similarity for Attempt {i}: {sim:.2f}")
+        with col_dst_lang:
+            dst_lang = st.selectbox(
+                "Choose target language:", ["English", "Spanish", "French"]
+            )
 
-            # st.write("Ideal Translation:")
-            # st.info(ideal_translation)
+        with col_diff:
+            difficulty = st.select_slider(
+                "Select difficulty:", options=["Easy", "Medium", "Hard"]
+            )
 
-            # # Generate and display t-SNE plot
-            # embeddings = [generate_embedding(text) for text in [generated_text, ideal_translation] + attempts]
-            # tsne_plot = generate_tsne_plot(embeddings)
-            # st.pyplot(tsne_plot)
+        if "embeddings_quiz_response" not in st.session_state:
+            st.session_state.embeddings_quiz_response = None
 
-            emb = EmbeddingsService.get(
-                EmbeddingsGetRequest(
-                    llm_id=state_service.embeddings_llm.id,
-                    texts=[original] + attempts,
+        _, col_gen_btn, _ = st.columns([2, 1, 2])
+
+        with col_gen_btn:
+            if st.form_submit_button(
+                "Generate Quiz", type="primary", use_container_width=True
+            ):
+                st.session_state.embeddings_quiz_response = (
+                    EmbeddingsQuizService.generate(
+                        EmbeddingsQuizRequest(
+                            llm_id=state_service.embeddings_llm.id,
+                            llm_temperature=state_service.content_temperature,
+                            source_lang=src_lang,
+                            target_lang=dst_lang,
+                            difficulty=difficulty,
+                        )
+                    )
                 )
-            ).embeddings
 
-            sim = EmbeddingsService.similarities(
-                EmbeddingsSimilaritiesRequest(embeddings=emb)
-            ).similarities
+    st.write(st.session_state.embeddings_quiz_response)
 
-            st.write(sim)
+    if (
+        "embeddings_quiz_response" in st.session_state
+        and st.session_state.embeddings_quiz_response
+    ):
+        if "attempts" not in st.session_state:
+            st.session_state.attempts = [""]
 
-            reduced_2d = EmbeddingsService.reduce(
-                EmbeddingsReduceRequest(embeddings=emb, target_dims=2)
-            ).reduced_embeddings
+        with st.form(key="embeddings_quiz_attempts_form"):
+            st.text_input(
+                "Question",
+                value=st.session_state.embeddings_quiz_response.source_question,
+                disabled=True,
+            )
 
-            plot_2d_embeddings_with_plotly(reduced_2d)
+            if st.session_state.show_answer:
+                st.text_input(
+                    "Ideal Answer",
+                    value=st.session_state.embeddings_quiz_response.target_question,
+                    disabled=True,
+                )
+            else:
+                st.text_input(
+                    "Ideal Answer",
+                    value="Answer hidden until you submit your attempts",
+                    disabled=True,
+                )
 
-            reduced_3d = EmbeddingsService.reduce(
-                EmbeddingsReduceRequest(embeddings=emb, target_dims=3)
-            ).reduced_embeddings
+            for i, attempt in enumerate(st.session_state.attempts):
+                st.session_state.attempts[i] = st.text_area(
+                    f"Attempt {i+1}", value=attempt, key=f"attempt_{i}"
+                )
 
-            plot_3d_embeddings_with_plotly(reduced_3d)
+            all_attempts_filled = all(
+                attempt.strip() for attempt in st.session_state.attempts
+            )
+
+            _, col_add_attempt, col_submit_attempt, _ = st.columns([1, 1, 1, 1])
+
+            # with col_add_attempt:
+            #     if len(st.session_state.attempts) < 5 and st.form_submit_button(
+            #         "Add Attempt"
+            #     ):
+            #         st.session_state.attempts.append("")
+
+            with col_submit_attempt:
+                if st.form_submit_button(
+                    "Submit All Attempts", disabled=not all_attempts_filled
+                ):
+                    st.session_state.show_answer = (
+                        True  # Reveal the answer upon submission
+                    )
+                    st.success("Attempts submitted successfully!")
+
+            # if st.form_submit_button("Submit", disabled=not all(attempts)):
+            #     emb = EmbeddingsService.get(
+            #         EmbeddingsGetRequest(
+            #             llm_id=state_service.embeddings_llm.id,
+            #             texts=[
+            #                 st.session_state.embeddings_quiz_response.target_question
+            #             ]
+            #             + st.session_state.attempts,
+            #         )
+            #     ).embeddings
+
+            #     sim = EmbeddingsService.similarities(
+            #         EmbeddingsSimilaritiesRequest(embeddings=emb)
+            #     ).similarities
+
+            #     st.write(sim)
+
+            #     reduced_2d = EmbeddingsService.reduce(
+            #         EmbeddingsReduceRequest(embeddings=emb, target_dims=2)
+            #     ).reduced_embeddings
+
+            #     plot_2d_embeddings_with_plotly(reduced_2d)
+
+            #     reduced_3d = EmbeddingsService.reduce(
+            #         EmbeddingsReduceRequest(embeddings=emb, target_dims=3)
+            #     ).reduced_embeddings
+
+            #     plot_3d_embeddings_with_plotly(reduced_3d)
 
 
 def _render_sidebar_settings():

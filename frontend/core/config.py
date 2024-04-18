@@ -23,6 +23,8 @@ class Config:
     )
     EMBEDDINGS_SERVICE_REDUCE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/embeddings/reduce/"
 
+    EMBEDDINGS_QUIZ_GENERATE_SERVICE = f"{BACKEND_ENDPOINT}/v1/embeddings_quiz/generate"
+
     CHAT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/chat"
 
     PERSONA_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/personas/"
