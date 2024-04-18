@@ -14,21 +14,21 @@ def show(pages):
     with st.sidebar:
         state_service = StateService.instance()
 
-        if st.session_state.get('switch_button', False):
+        if st.session_state.get("switch_button", False):
             manual_select = (state_service.last_visited + 1) % 7
         else:
             manual_select = None
 
         selected = option_menu(
             default_index=0,
-            menu_icon="cast",
             menu_title="LinguAI",
             orientation="vertical",
             options=list(pages.keys()),
+            menu_icon="globe-americas",
             icons=[pages[option]["icon"] for option in pages.keys()],
-            manual_select=manual_select
+            manual_select=manual_select,
         )
-        
+
         # Check if the user is authenticated
         if state_service.username is not None:
             # Visually separate the logout button from the menu
