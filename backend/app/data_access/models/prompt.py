@@ -4,6 +4,17 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class Prompt(Base):
+    """
+    Represents a prompt entity in the database.
+
+    Attributes:
+        prompt_id (int): The unique identifier for the prompt.
+        prompt_text (str): The text of the prompt.
+        prompt_type (str): The type of the prompt.
+        prompt_category (str): The category of the prompt.
+        external_references (str): Any external references related to the prompt.
+    """
+
     __tablename__ = 'prompts'
 
     prompt_id = Column(Integer, primary_key=True)
