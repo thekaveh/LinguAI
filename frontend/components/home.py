@@ -25,7 +25,7 @@ def render():
 
     # st.image("./static/logo.png", width=100)
     st.subheader("Personalized language learning for intermediate learners")
-    st.image("./static/different-languages.jpeg", width=704)
+    st.image("./static/different-languages.jpeg", use_column_width="auto")
     st.write("")
 
     if state_service.username is None:
@@ -118,7 +118,7 @@ def render():
 
     with col1:
         if state_service.username is None:
-            st.image("./static/language.jpg")
+            st.image("./static/language.jpg", use_column_width="auto" )
     with col2:
         if state_service.username is None:
             st.write(

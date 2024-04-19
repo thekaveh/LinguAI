@@ -162,3 +162,4 @@ db/snapshot/linguai_db_ss.sql
 /logs
 
 .metals
+.env.old

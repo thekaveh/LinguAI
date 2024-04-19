@@ -11,6 +11,17 @@ router = APIRouter()
 def read_skill_levels(db: Session = Depends(get_db)):
     """
     Retrieve all skill levels.
+
+    Returns a list of all skill levels available in the database.
+
+    Parameters:
+    - db (Session): The database session to use for querying.
+
+    Raises:
+    - HTTPException: If no skill levels are found in the database.
+
+    Returns:
+    - list[SkillLevelSchema]: A list of skill levels retrieved from the database.
     """
     skill_level_service = SkillLevelService(db)
     skill_levels = skill_level_service.get_all_skill_levels()
@@ -22,6 +33,16 @@ def read_skill_levels(db: Session = Depends(get_db)):
 def get_skill_level_by_level(level: str, db: Session = Depends(get_db)):
     """
     Retrieve a skill level by its level.
+
+    Parameters:
+    - level (str): The level of the skill.
+
+    Returns:
+    - SkillLevelSchema: The skill level object.
+
+    Raises:
+    - HTTPException: If the skill level is not found.
+
     """
     skill_level_service = SkillLevelService(db)
     skill_level = skill_level_service.get_skill_level_by_level(level)
