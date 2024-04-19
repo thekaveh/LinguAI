@@ -20,6 +20,15 @@ class LLMService(CRUDService[LLM]):
 
     @log_decorator
     def get_all(self) -> List[LLM]:
+        """
+        Retrieve all LLM models based on certain conditions.
+
+        Returns:
+            List[LLM]: A list of LLM models that match the specified conditions.
+        
+        Raises:
+            Exception: If there is an error fetching the models.
+        """
         try:
             query = select(LLM).where(LLM.is_active)
 
@@ -86,6 +95,19 @@ class LLMService(CRUDService[LLM]):
 
     @log_decorator
     def get_chat_runnable(self, llm_id: int, temperature: float = 0) -> Runnable:
+        """
+        Returns a runnable object for chat based on the specified LLM ID and temperature.
+
+        Args:
+            llm_id (int): The ID of the LLM.
+            temperature (float, optional): The temperature value for generating chat responses. Defaults to 0.
+
+        Returns:
+            Runnable: A runnable object for chat based on the specified LLM ID and temperature.
+
+        Raises:
+            Exception: If the LLM with the specified ID is not found or if the provider is not supported.
+        """
         try:
             llm = self.get_by_id(id=llm_id)
 
@@ -122,6 +144,12 @@ class LLMService(CRUDService[LLM]):
 
     @log_decorator
     def init_ollama(self) -> None:
+        """
+        Initializes the Ollama service by checking for required models and pulling them if necessary.
+
+        Raises:
+            Exception: If an error occurs during the initialization process.
+        """
         try:
             if Config.OLLAMA_API_ENDPOINT:
                 query = select(LLM).where(LLM.is_active).where(LLM.provider == "ollama")

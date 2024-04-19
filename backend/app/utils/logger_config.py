@@ -7,6 +7,17 @@ from datetime import datetime
 import glob
 
 def setup_global_logging(logger_name='LinguAI-BACKEND', log_filename='/app/logs/backend-app.log', log_level="INFO"):
+    """
+    Set up global logging configuration.
+
+    Args:
+        logger_name (str, optional): The name of the logger. Defaults to 'LinguAI-BACKEND'.
+        log_filename (str, optional): The path and filename of the log file. Defaults to '/app/logs/backend-app.log'.
+        log_level (str, optional): The log level. Defaults to 'INFO'.
+
+    Returns:
+        None
+    """
     log_directory = os.path.dirname(log_filename)
     base_filename = os.path.basename(log_filename)
     base_filename_without_ext, ext = os.path.splitext(base_filename)

@@ -134,6 +134,16 @@ class UserService:
 
     @log_decorator
     def update_user_topics(self, username: str, new_topics: User) -> None:
+        """
+        Update the topics of a user in the database.
+
+        Args:
+            username (str): The username of the user.
+            new_topics (User): An instance of the User class containing the new topics.
+
+        Returns:
+            None
+        """
         user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         
         # Checking if user exists
@@ -152,6 +162,16 @@ class UserService:
 
     @log_decorator
     def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:
+        """
+        Removes a topic from a user's list of topics.
+
+        Args:
+            user_id (int): The ID of the user.
+            topic_name (str): The name of the topic to be removed.
+
+        Returns:
+            None
+        """
         db_user = self.user_repo.find_by_id(user_id)
         if db_user:
             topic = (
@@ -174,6 +194,15 @@ class UserService:
 
     @log_decorator
     def authenticate(self, request: AuthenticationRequest) -> AuthenticationResponse:
+        """
+        Authenticates a user based on the provided username and password.
+
+        Args:
+            request (AuthenticationRequest): The authentication request containing the username and password.
+
+        Returns:
+            AuthenticationResponse: The authentication response indicating the success or failure of the authentication.
+        """
         db_user = self.user_repo.find_by_username(request.username.lower())
 
         if not db_user:
@@ -203,6 +232,16 @@ class UserService:
         return AuthenticationResponse.success(username=request.username)
     
     def create_user_assessment(self, user_id: int, assessment_data: UserAssessmentCreate) -> UserAssessment:
+        """
+        Create a new user assessment.
+
+        Args:
+            user_id (int): The ID of the user.
+            assessment_data (UserAssessmentCreate): The data for the user assessment.
+
+        Returns:
+            UserAssessment: The created user assessment.
+        """
         db_assessment = UserAssessment(
             user_id=user_id,
             assessment_date=assessment_data.assessment_date,
@@ -227,6 +266,16 @@ class UserService:
     def update_user_assessment(
         self, assessment_id: int, assessment_data: UserAssessmentCreate
     ) -> Optional[UserAssessment]:
+        """
+        Update a user assessment in the database.
+
+        Args:
+            assessment_id (int): The ID of the assessment to update.
+            assessment_data (UserAssessmentCreate): The updated assessment data.
+
+        Returns:
+            Optional[UserAssessment]: The updated user assessment if it exists, otherwise None.
+        """
         db_assessment = self.get_user_assessment(assessment_id)
         if db_assessment:
             for key, value in assessment_data.dict().items():
@@ -245,6 +294,16 @@ class UserService:
 
     @log_decorator
     def update_user_languages(self, username: str, user: User):
+        """
+        Updates the learning languages of a user in the database.
+
+        Args:
+            username (str): The username of the user.
+            user (User): The updated user object containing the new learning languages.
+
+        Returns:
+            None
+        """
         db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
         if db_user:
             # get current languages 
@@ -277,6 +336,19 @@ class UserService:
             
     @log_decorator
     def update_user_profile(self, username: str, user_update: UserCreate) -> User:
+        """
+        Update the profile of a user in the database.
+
+        Args:
+            username (str): The username of the user to update.
+            user_update (UserCreate): An instance of the UserCreate class containing the updated user information.
+
+        Returns:
+            User: The updated user object.
+
+        Raises:
+            ValueError: If the user with the given username is not found in the database.
+        """
         db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
         if not db_user:
             raise ValueError("user not found")
@@ -296,6 +368,20 @@ class UserService:
 
     @log_decorator
     def change_password(self, username: str, current_password: str, new_password: str):
+        """
+        Changes the password for a user.
+
+        Args:
+            username (str): The username of the user.
+            current_password (str): The current password of the user.
+            new_password (str): The new password to set for the user.
+
+        Raises:
+            ValueError: If the current password is incorrect.
+
+        Returns:
+            None
+        """
         db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
         if not db_user or not self.verify_password(current_password, db_user.password_hash):
             raise ValueError("Current password is incorrect")

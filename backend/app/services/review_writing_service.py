@@ -23,6 +23,19 @@ class ReviewWritingService:
 
     @log_decorator
     async def areview_writing(self, request: ReviewWritingReq) -> AsyncIterable[str]:
+        """
+        Generates a review based on the given request.
+
+        Args:
+            request (ReviewWritingReq): The request object containing the necessary information.
+
+        Returns:
+            AsyncIterable[str]: An asynchronous iterable that yields the generated review.
+
+        Raises:
+            AssertionError: If the request is None.
+        """
+
         assert request is not None, "Request is required"
 
         prompt_text = self._generate_prompt(request)
@@ -40,6 +53,18 @@ class ReviewWritingService:
 
     @log_decorator
     def _generate_prompt(self, request: ReviewWritingReq) -> str:
+        """
+        Generates a prompt for reviewing input content based on the writer's skill level and language.
+
+        Args:
+            request (ReviewWritingReq): The request object containing information about the writer's skill level, language, and input content.
+
+        Returns:
+            str: The generated prompt for reviewing the input content.
+
+        Raises:
+            None
+        """
         # Define the search criteria
         search_criteria = PromptSearch(
             prompt_type="system", prompt_category="rewrite-content-by-skill-level"

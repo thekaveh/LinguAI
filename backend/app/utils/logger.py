@@ -6,6 +6,16 @@ from app.core.config import Config
 
 
 def log_decorator(func):
+    """
+    A decorator function that logs the entry, exit, and any exceptions that occur within the decorated function.
+
+    Args:
+        func (callable): The function to be decorated.
+
+    Returns:
+        callable: The decorated function.
+
+    """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         # Use the same logger name as configured globally

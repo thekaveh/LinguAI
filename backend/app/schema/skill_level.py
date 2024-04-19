@@ -10,6 +10,10 @@ class SkillLevelCreate(SkillLevelBase):
 
 
 class SkillLevelSchema(SkillLevelBase):
+    """
+    Represents a schema for the skill level of a particular skill.
+    """
+
     id: int
 
     class Config:

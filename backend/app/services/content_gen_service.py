@@ -19,25 +19,51 @@ class ContentGenService:
         self.prompt_service = PromptService(db)
         self.sql_model_session = sql_model_session
 
-    @log_decorator
-    async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
-        assert request is not None, "Request is required"
+    class ContentGenService:
+        @log_decorator
+        async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
+            """
+            Generates content based on the given request.
 
-        prompt_text = self._generate_prompt(request)
+            Args:
+                request (ContentGenReq): The request object containing the necessary information.
 
-        system_message = SystemMessage(content=prompt_text)
-        prompt = ChatPromptTemplate.from_messages([system_message])
+            Returns:
+                AsyncIterable[str]: An asynchronous iterable that yields the generated content.
 
-        chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
-            llm_id=request.llm_id, temperature=request.temperature
-        )
-        parser = StrOutputParser()
-        chain = prompt | chat_runnable | parser
+            Raises:
+                AssertionError: If the request is None.
+            """
 
-        return chain.astream(input={})
+            assert request is not None, "Request is required"
+
+            prompt_text = self._generate_prompt(request)
+
+            system_message = SystemMessage(content=prompt_text)
+            prompt = ChatPromptTemplate.from_messages([system_message])
+
+            chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
+                llm_id=request.llm_id, temperature=request.temperature
+            )
+            parser = StrOutputParser()
+            chain = prompt | chat_runnable | parser
+
+            return chain.astream(input={})
 
     @log_decorator
     def _generate_prompt(self, request: ContentGenReq) -> str:
+        """
+        Generate a prompt based on the given request.
+
+        Args:
+            request (ContentGenReq): The request object containing the necessary information for generating the prompt.
+
+        Returns:
+            str: The generated prompt.
+
+        Raises:
+            None
+        """
         # Define the search criteria
         search_criteria = PromptSearch(
             prompt_type="system", prompt_category="content-gen-by-topics-content"
