@@ -19,6 +19,17 @@ async def review_writing(
     db: Session = Depends(get_db),
     sql_model_session: SqlModelSession = Depends(get_db_session),
 ) -> StreamingResponse:
+    """
+    Endpoint for writing a review.
+
+    Args:
+        request (ReviewWritingReq): The request object containing the review details.
+        db (Session, optional): The database session. Defaults to Depends(get_db).
+        sql_model_session (SqlModelSession, optional): The SQL model session. Defaults to Depends(get_db_session).
+
+    Returns:
+        StreamingResponse: The streaming response containing the review content.
+    """
     service = ReviewWritingService(db, sql_model_session=sql_model_session)
     try:
         stream = await service.areview_writing(request)

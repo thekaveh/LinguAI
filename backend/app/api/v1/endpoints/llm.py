@@ -15,6 +15,15 @@ def _get_service(db_session: Session = Depends(get_db_session)) -> LLMService:
 @log_decorator
 @router.get("/llms/all/")
 def get_all(service: LLMService = Depends(_get_service)):
+    """
+    Retrieve all LLMs.
+
+    Returns:
+        List[LLM]: A list of all LLMs.
+    
+    Raises:
+        HTTPException: If there is an error retrieving the LLMs.
+    """
     try:
         return service.get_all()
     except Exception as e:
@@ -24,6 +33,17 @@ def get_all(service: LLMService = Depends(_get_service)):
 @log_decorator
 @router.get("/llms/embeddings/")
 def get_embeddings(service: LLMService = Depends(_get_service)):
+    """
+    Retrieve the embeddings for the LLMs.
+
+    This endpoint returns the embeddings for the LLMs. It calls the `get_embeddings` method of the `LLMService` class.
+
+    Returns:
+        The embeddings for the LLMs.
+
+    Raises:
+        HTTPException: If there is an error retrieving the embeddings.
+    """
     try:
         return service.get_embeddings()
     except Exception as e:
@@ -33,6 +53,18 @@ def get_embeddings(service: LLMService = Depends(_get_service)):
 @log_decorator
 @router.get("/llms/content/")
 def get_content(service: LLMService = Depends(_get_service)):
+    """
+    Retrieve the content for the LLMs.
+
+    Args:
+        service (LLMService): The LLM service instance.
+
+    Returns:
+        The content for the LLMs.
+
+    Raises:
+        HTTPException: If there is an error retrieving the content.
+    """
     try:
         return service.get_content()
     except Exception as e:
@@ -42,6 +74,18 @@ def get_content(service: LLMService = Depends(_get_service)):
 @log_decorator
 @router.get("/llms/vision/")
 def get_vision(service: LLMService = Depends(_get_service)):
+    """
+    Retrieve vision data from the LLM service.
+
+    Parameters:
+    - service: An instance of the LLMService class.
+
+    Returns:
+    - The vision data retrieved from the LLM service.
+
+    Raises:
+    - HTTPException: If an error occurs while retrieving the vision data.
+    """
     try:
         return service.get_vision()
     except Exception as e:
@@ -51,6 +95,19 @@ def get_vision(service: LLMService = Depends(_get_service)):
 @log_decorator
 @router.get("/llms/by_name/{name}", response_model=None)
 def get_by_name(name: str, service: LLMService = Depends(_get_service)):
+    """
+    Retrieve an LLM by its name.
+
+    Args:
+        name (str): The name of the LLM to retrieve.
+        service (LLMService, optional): The LLM service dependency. Defaults to _get_service.
+
+    Returns:
+        LLM: The retrieved LLM.
+
+    Raises:
+        HTTPException: If the LLM is not found.
+    """
     llm = service.get_by_name(name)
 
     if llm is None:
@@ -62,6 +119,19 @@ def get_by_name(name: str, service: LLMService = Depends(_get_service)):
 @log_decorator
 @router.get("/llms/by_id/{id}", response_model=None)
 def get_by_id(id: int, service: LLMService = Depends(_get_service)):
+    """
+    Retrieve an LLM by its ID.
+
+    Args:
+        id (int): The ID of the LLM to retrieve.
+        service (LLMService, optional): The LLM service dependency. Defaults to _get_service.
+
+    Returns:
+        LLM: The retrieved LLM object.
+
+    Raises:
+        HTTPException: If the LLM with the specified ID is not found.
+    """
     llm = service.get_by_id(id)
 
     if llm is None:

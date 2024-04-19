@@ -19,6 +19,17 @@ async def rewrite_content(
     db: Session = Depends(get_db),
     sql_model_session: SqlModelSession = Depends(get_db_session),
 ) -> StreamingResponse:
+    """
+    Rewrite the content based on the given request.
+
+    Args:
+        request (ContentRewriteReq): The request object containing the content to be rewritten.
+        db (Session): The database session.
+        sql_model_session (SqlModelSession): The SQL model session.
+
+    Returns:
+        StreamingResponse: The streaming response containing the rewritten content.
+    """
     rewrite_service = RewriteContentService(db, sql_model_session=sql_model_session)
     try:
         stream = await rewrite_service.arewrite_content(request)

@@ -15,6 +15,19 @@ router = APIRouter()
 async def chat(
     request: ChatRequest, db_session: Session = Depends(get_db_session)
 ) -> StreamingResponse:
+    """
+    Chat endpoint that handles the chat functionality.
+
+    Args:
+        request (ChatRequest): The request object containing chat data.
+        db_session (Session, optional): The database session. Defaults to Depends(get_db_session).
+
+    Returns:
+        StreamingResponse: The streaming response containing the chat stream.
+
+    Raises:
+        HTTPException: If an error occurs during the chat process.
+    """
     try:
         service = ChatService(db_session)
         stream = await service.achat(request=request)
