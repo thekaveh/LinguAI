@@ -21,6 +21,18 @@ class RewriteContentService:
 
     @log_decorator
     async def arewrite_content(self, request: ContentRewriteReq) -> AsyncIterable[str]:
+        """
+        Rewrites the content based on the given request.
+
+        Args:
+            request (ContentRewriteReq): The request object containing the necessary information for content rewriting.
+
+        Returns:
+            AsyncIterable[str]: An asynchronous iterable that yields the rewritten content.
+
+        Raises:
+            AssertionError: If the request is None.
+        """
         assert request is not None, "Request is required"
 
         prompt_text = self._generate_prompt(request)
@@ -38,6 +50,15 @@ class RewriteContentService:
 
     @log_decorator
     def _generate_prompt(self, request: ContentRewriteReq) -> str:
+        """
+        Generate a prompt for content rewriting based on the user's request.
+
+        Args:
+            request (ContentRewriteReq): The user's request for content rewriting.
+
+        Returns:
+            str: The generated prompt for content rewriting.
+        """
         feedback_lang = request.user_base_language
         skill_level = request.user_skill_level
         if skill_level:

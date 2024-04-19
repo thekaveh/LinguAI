@@ -12,6 +12,16 @@ class UserContentService:
         self.db = db
         self.logger = logging.getLogger(Config.BACKEND_LOGGER_NAME)
     def create_user_content(self, user_content_data: UserContentBase) -> UserContent:
+        """
+        Creates a new user content.
+
+        Args:
+            user_content_data (UserContentBase): The data for the user content.
+
+        Returns:
+            UserContent: The created user content.
+
+        """
         self.logger.info(f"Creating user content: {user_content_data}")
         user_content_dict = user_content_data.dict(exclude_none=True)
         user_content = UserContentModel(**user_content_dict)
@@ -22,6 +32,15 @@ class UserContentService:
         return UserContent.from_orm(user_content)
 
     def read_user_content_v0(self, search_params: UserContentSearch) -> List[UserContent]:
+        """
+        Reads user content based on the provided search parameters.
+
+        Args:
+            search_params (UserContentSearch): The search parameters to filter the user content.
+
+        Returns:
+            List[UserContent]: A list of UserContent objects that match the search criteria.
+        """
         query = self.db.query(UserContentModel).filter(UserContentModel.user_id == search_params.user_id)
         if search_params.content_type is not None:
             query = query.filter(UserContentModel.type == search_params.content_type)
@@ -29,6 +48,15 @@ class UserContentService:
         return parse_obj_as(List[UserContent], user_contents)
     
     def delete_user_content(self, content_id: int) -> None:
+        """
+        Deletes user content with the specified ID.
+
+        Args:
+            content_id (int): The ID of the content to be deleted.
+
+        Returns:
+            None
+        """
         self.logger.info(f"Deleting content with ID: {content_id}")
         user_content = self.db.query(UserContentModel).filter(UserContentModel.id == content_id).first()
         if user_content:
@@ -36,6 +64,15 @@ class UserContentService:
             self.db.commit()
 
     def read_user_content(self, search_params: UserContentSearch) -> List[UserContent]:
+        """
+        Reads user content based on the provided search parameters.
+
+        Args:
+            search_params (UserContentSearch): The search parameters to filter the user content.
+
+        Returns:
+            List[UserContent]: A list of user content objects that match the search parameters.
+        """
         query = self.db.query(UserContentModel).filter(UserContentModel.user_id == search_params.user_id)
         
         if search_params.content_type is not None:
@@ -45,4 +82,4 @@ class UserContentService:
         query = query.order_by(desc(UserContentModel.created_date))
         
         user_contents = query.all()
-        return parse_obj_as(List[UserContent], user_contents)            
+        return parse_obj_as(List[UserContent], user_contents)
