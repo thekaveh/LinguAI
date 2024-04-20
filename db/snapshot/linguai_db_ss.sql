@@ -721,7 +721,7 @@ COPY public.llm (id, is_active, vision, content, embeddings, provider, name) FRO
 4	f	-1	-1	-1	ollama	yi
 6	t	-1	5	-1	openai	gpt-3.5-turbo-0125
 8	f	1	-1	-1	ollama	llava:13b
-7	t	2	-1	-1	openai	gpt-4-vision-preview
+7	t	2	11	-1	openai	gpt-4-vision-preview
 5	t	-1	2	-1	openai	gpt-4
 9	t	-1	1	-1	openai	gpt-4-turbo-preview
 1	t	-1	5	5	ollama	llama2:13b-chat
