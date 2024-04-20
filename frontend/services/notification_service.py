@@ -53,3 +53,14 @@ class NotificationService:
     @staticmethod
     def greet(message: str):
         asyncio.run(NotificationService.agreet(message))
+
+    @staticmethod
+    async def acelebrate(message: str):
+        st.toast(
+            message,
+            icon="🎉",
+        )
+
+    @staticmethod
+    def celebrate(message: str):
+        asyncio.run(NotificationService.acelebrate(message))
