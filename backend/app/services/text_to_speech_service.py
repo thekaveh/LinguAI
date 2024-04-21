@@ -7,12 +7,28 @@ from app.schema.text_to_speech import TextToSpeechRequest, TextToSpeechResponse
 
 
 class TextToSpeechService:
+    """
+    A class that provides text-to-speech functionality.
+
+    Methods:
+        generate(request: TextToSpeechRequest) -> TextToSpeechResponse: Generates audio from the given text.
+    """
+
     @log_decorator
     def __init__(self):
         pass
 
     @log_decorator
     def generate(self, request: TextToSpeechRequest) -> TextToSpeechResponse:
+        """
+        Generates audio from the given text.
+
+        Args:
+            request (TextToSpeechRequest): The request object containing the text and language.
+
+        Returns:
+            TextToSpeechResponse: The response object containing the generated audio and language.
+        """
         tts = gTTS(text=request.text, lang=request.lang)
 
         with BytesIO() as audio_buffer:

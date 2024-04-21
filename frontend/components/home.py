@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.logger import log_decorator
+from streamlit_modal import Modal
 
 from services.user_service import UserService
 from services.state_service import StateService
@@ -24,7 +25,7 @@ def render():
 
     # st.image("./static/logo.png", width=100)
     st.subheader("Personalized language learning for intermediate learners")
-    st.image("./static/different-languages.jpeg", width=704)
+    st.image("./static/different-languages.jpeg", use_column_width="auto")
     st.write("")
 
     if state_service.username is None:
@@ -54,6 +55,45 @@ def render():
             _add_linguai_note()
 
     else:
+        # Tour Feature
+        if state_service.tour_mode is None:
+            start_ui_tour = st.button(label="Start UI Tour")
+
+            if start_ui_tour:
+                modal = Modal(
+                    "LinguAI Tour",
+                    key="tour-modal",
+                    # Optional
+                    padding=20,  # default value
+                    max_width=500,  # default value
+                )
+
+                state_service.tour_mode = modal
+                state_service.last_visited = None
+        else:
+            resume_tour = st.button(label="Resume Tour")
+
+            if resume_tour:
+                state_service.last_visited = -1
+
+        if state_service.tour_mode is not None:
+            state_service.last_visited = 0
+            with state_service.tour_mode.container():
+                st.markdown("Hello! Welcome to the LinguAI tour!")
+                st.markdown(
+                    "This is our home page where you can read about LinguAI and start your language learning journey."
+                )
+
+                st.markdown("Let's get started on the tour!")
+
+                st.button(f"Next Stop: Rewrite Content", key="switch_button")
+
+                exit_tour = st.button("Exit Tour")
+                if exit_tour:
+                    state_service.tour_mode = None
+                    state_service.last_visited = -1
+                    st.rerun()
+
         # User is authenticated; show the rest of the content
         user = UserService.get_user_by_username_sync(state_service.username)
 
@@ -67,8 +107,8 @@ def render():
         )
 
         if state_service.just_logged_in:
-            NotificationService.greet(
-                message=f"Welcome back to LinguAI, {logged_in_user_display_name}!"
+            NotificationService.celebrate(
+                message=f"Welcome back to LinguAI, **{logged_in_user_display_name}**!"
             )
             state_service.just_logged_in = False
 
@@ -79,7 +119,7 @@ def render():
 
     with col1:
         if state_service.username is None:
-            st.image("./static/language.jpg")
+            st.image("./static/language.jpg", use_column_width="auto")
     with col2:
         if state_service.username is None:
             st.write(

@@ -132,6 +132,23 @@ def render():
     state_service = StateService.instance()
     # st.subheader("Rewrite Content to Current Skill Level")
 
+    if state_service.tour_mode is not None:
+        state_service.last_visited = 1
+        with state_service.tour_mode.container():
+            st.markdown('This is our rewrite content page!')
+            st.markdown('You can paste in text that you might want to read at a different skill level or in a different language!')
+            st.markdown('We support 5 different skill levels and 5 different languages for this tool!\n')
+
+            st.markdown('Let\'s continue with the tour!')
+
+            st.button(f"Next Stop: Review Writing", key='switch_button')
+
+            exit_tour = st.button("Exit Tour")
+            if exit_tour:
+                state_service.tour_mode = None
+                state_service.last_visited = -1
+                st.rerun()
+
     st.write("")
 
     username = state_service.username

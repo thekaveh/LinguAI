@@ -13,6 +13,15 @@ class PromptRepository:
 
     @log_decorator
     def find_by_prompt_id(self, prompt_id: int) -> Optional[Prompt]:
+        """
+        Find a prompt by its ID.
+
+        Args:
+            prompt_id (int): The ID of the prompt to find.
+
+        Returns:
+            Optional[Prompt]: The found prompt, or None if not found.
+        """
         return (
             self.db_session.query(Prompt).filter(Prompt.prompt_id == prompt_id).first()
         )
@@ -21,6 +30,15 @@ class PromptRepository:
     def find_by_search_criteria(
         self, search_criteria: PromptSearch
     ) -> Optional[Prompt]:
+        """
+        Find a prompt by search criteria.
+
+        Args:
+            search_criteria (PromptSearch): The search criteria for the prompt.
+
+        Returns:
+            Optional[Prompt]: The found prompt, or None if not found.
+        """
         return (
             self.db_session.query(Prompt)
             .filter(
@@ -36,6 +54,15 @@ class PromptRepository:
 
     @log_decorator
     def create(self, prompt_create: PromptCreate) -> Prompt:
+        """
+        Creates a new prompt in the database.
+
+        Args:
+            prompt_create (PromptCreate): The prompt data to be created.
+
+        Returns:
+            Prompt: The newly created prompt object.
+        """
         new_prompt = Prompt(
             prompt_text=prompt_create.prompt_text,
             prompt_type=prompt_create.prompt_type,
@@ -49,7 +76,16 @@ class PromptRepository:
 
     @log_decorator
     def update(self, prompt: Prompt, prompt_update: PromptUpdate) -> Prompt:
-        # Update the fields of `prompt` with values from `prompt_update`
+        """
+        Update the fields of a prompt object with values from a prompt_update object.
+
+        Args:
+            prompt (Prompt): The prompt object to be updated.
+            prompt_update (PromptUpdate): The prompt_update object containing the updated values.
+
+        Returns:
+            Prompt: The updated prompt object.
+        """
         update_data = prompt_update.dict(exclude_unset=True)
         for key, value in update_data.items():
             setattr(prompt, key, value)
@@ -59,6 +95,15 @@ class PromptRepository:
 
     @log_decorator
     def delete(self, prompt_id: int) -> None:
+        """
+        Deletes a prompt from the database.
+
+        Args:
+            prompt_id (int): The ID of the prompt to be deleted.
+
+        Returns:
+            None
+        """
         prompt = self.find_by_prompt_id(prompt_id)
         if prompt:
             self.db_session.delete(prompt)

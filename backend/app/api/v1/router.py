@@ -37,3 +37,15 @@ router.include_router(text_to_speech.router, prefix="/v1", tags=["v1"])
 router.include_router(user_content.router, prefix="/v1", tags=["v1"])
 router.include_router(embeddings.router, prefix="/v1", tags=["v1"])
 router.include_router(embeddings_quiz.router, prefix="/v1", tags=["v1"])
+
+"""
+This module defines the router for the API endpoints in the v1 version.
+
+The router includes various sub-routers for different endpoints, such as chat, llm, persona, user, content, topic, etc.
+
+Example usage:
+    from app.api.v1.router import router
+
+    app.include_router(router, prefix="/api")
+
+"""

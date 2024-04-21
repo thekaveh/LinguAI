@@ -33,6 +33,10 @@ class StateService:
         self._rewrite_content = ""
         self._content_reading = ""
 
+        self._tour_mode = None
+        self._last_visited = -1
+        self._switch_button = None
+
         self._vision_llm = LLMService.get_vision()[0]
         self._embeddings_llm = LLMService.get_embeddings()[0]
 
@@ -124,7 +128,9 @@ class StateService:
         if value != self._chat_persona:
             self._chat_persona = value
 
-            NotificationService.success(f"Chat Persona changed to {value.persona_name}")
+            NotificationService.success(
+                f"Chat Persona changed to **{value.persona_name}**"
+            )
 
     @property
     def vision_llm(self) -> LLM:
@@ -144,7 +150,7 @@ class StateService:
             self._content_llm = value
 
             NotificationService.success(
-                f"Content LLM changed to {value.display_name()}"
+                f"Content LLM changed to **{value.display_name()}**"
             )
 
     @property
@@ -156,7 +162,7 @@ class StateService:
         if value != self._content_temperature:
             self._content_temperature = value
 
-            NotificationService.success(f"Content Temperature changed to {value}")
+            NotificationService.success(f"Content Temperature changed to **{value}**")
 
     @property
     def content_tts(self) -> bool:
@@ -167,7 +173,7 @@ class StateService:
         if value != self._content_tts:
             self._content_tts = value
 
-            NotificationService.success(f"Content TTS changed to {value}")
+            NotificationService.success(f"Content TTS changed to **{value}**")
 
     @property
     def embeddings_llm(self) -> LLM:
@@ -197,6 +203,30 @@ class StateService:
     @just_logged_out.setter
     def just_logged_out(self, value: bool) -> None:
         self._just_logged_out = value
+
+    @property
+    def tour_mode(self):
+        return self._tour_mode
+
+    @tour_mode.setter
+    def tour_mode(self, value):
+        self._tour_mode = value
+
+    @property
+    def last_visited(self):
+        return self._last_visited
+
+    @last_visited.setter
+    def last_visited(self, value):
+        self._last_visited = value
+
+    @property
+    def switch_button(self):
+        return self._switch_button
+
+    @switch_button.setter
+    def switch_button(self, value):
+        self._switch_button = value
 
     @log_decorator
     @staticmethod

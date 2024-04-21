@@ -7,6 +7,10 @@ from app.services.crud_service import CRUDService
 
 
 class PersonaService(CRUDService[Persona]):
+    """
+    Service class for managing Persona objects in the database.
+    """
+
     @log_decorator
     def __init__(self, db_session: Session):
         self.db_session = db_session
@@ -25,12 +29,30 @@ class PersonaService(CRUDService[Persona]):
 
     @log_decorator
     def get_by_name(self, name: str) -> Optional[Persona]:
+        """
+        Retrieves a Persona object from the database based on the given name.
+
+        Args:
+            name (str): The name of the persona to retrieve.
+
+        Returns:
+            Optional[Persona]: The Persona object if found, None otherwise.
+        """
         query = select(Persona).where(Persona.persona_name == name)
 
         return self.db_session.exec(query).first()
 
     @log_decorator
     def create(self, entity: Persona) -> Persona:
+        """
+        Creates a new persona in the database.
+
+        Args:
+            entity (Persona): The persona object to be created.
+
+        Returns:
+            Persona: The created persona object.
+        """
         self.db_session.add(entity)
         self.db_session.commit()
         self.db_session.refresh(entity)
@@ -39,6 +61,16 @@ class PersonaService(CRUDService[Persona]):
 
     @log_decorator
     def update(self, id: int, value: Persona) -> Optional[Persona]:
+        """
+        Update a persona with the given ID.
+
+        Args:
+            id (int): The ID of the persona to update.
+            value (Persona): The updated persona data.
+
+        Returns:
+            Optional[Persona]: The updated persona if found, None otherwise.
+        """
         persona = self.db_session.get(Persona, id)
 
         if not persona:
@@ -57,6 +89,15 @@ class PersonaService(CRUDService[Persona]):
 
     @log_decorator
     def delete(self, id: int) -> None:
+        """
+        Deletes a persona from the database.
+
+        Args:
+            id (int): The ID of the persona to delete.
+
+        Returns:
+            None
+        """
         persona = self.db_session.get(Persona, id)
 
         if persona:

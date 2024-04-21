@@ -82,7 +82,6 @@ services:
     environment:
       - APP_CONTEXT=frontend
       - BACKEND_ENDPOINT=http://backend:8000
-    command: ["streamlit", "run", "app.py"]
 
 volumes:
   db-data:

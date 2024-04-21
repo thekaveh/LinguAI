@@ -4,6 +4,13 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class Content(Base):
+    """
+    Represents a piece of content.
+
+    Attributes:
+        content_id (int): The unique identifier for the content.
+        content_name (str): The name of the content.
+    """
     __tablename__ = 'content'
 
     content_id = Column(Integer, primary_key=True)

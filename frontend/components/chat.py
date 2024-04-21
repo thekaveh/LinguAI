@@ -15,6 +15,20 @@ from services.text_to_speech_service import TextToSpeechService
 def render():
     state_service = StateService.instance()
 
+    if state_service.tour_mode != None:
+        state_service.last_visited = 4
+        with state_service.tour_mode.container():
+            st.markdown('This is our chat page!')
+            st.markdown('You can interact with the chatbot to practice your language skills as well as upload visual images to ask questions about!\n')
+
+            st.markdown('Let\'s continue with the tour!')
+
+            st.button(f"Next Stop: Profile", key='switch_button')
+
+            exit_tour = st.button("Exit Tour")
+            if exit_tour:
+                state_service.tour_mode = None
+
     def _render_chat_messages():
         messages = state_service.chat_messages
         n = len(messages)

@@ -19,6 +19,17 @@ async def generate_content_by_topic(
     db: Session = Depends(get_db),
     sql_model_session: SqlModelSession = Depends(get_db_session),
 ) -> StreamingResponse:
+    """
+    Generate content by topic.
+
+    Args:
+        request (ContentGenReq): The request object containing the topic information.
+        db (Session): The database session.
+        sql_model_session (SqlModelSession): The SQL model session.
+
+    Returns:
+        StreamingResponse: A streaming response containing the generated content.
+    """
     service = ContentGenService(db, sql_model_session=sql_model_session)
     try:
         stream = await service.agenerate_content(request)
