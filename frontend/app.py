@@ -16,7 +16,7 @@ from components import (
     foot_notes,
     header,
     register,
-    embeddings,
+    embeddings_quiz,
     assessment,
 )
 import asyncio
@@ -87,7 +87,7 @@ def main():
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
                 "Content Reading": {"icon": "body-text", "page": content_gen},
-                "Embeddings": {"icon": "puzzle", "page": embeddings},
+                "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},
@@ -99,7 +99,7 @@ def main():
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
                 "Content Reading": {"icon": "body-text", "page": content_gen},
-                "Embeddings": {"icon": "puzzle", "page": embeddings},
+                "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},

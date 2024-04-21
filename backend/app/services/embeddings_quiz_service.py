@@ -22,14 +22,14 @@ class EmbeddingsQuizService:
         assert request is not None, "message is required"
         assert request.llm_id is not None, "llm_id is required"
         assert request.llm_temperature is not None, "llm_temperature is required"
-        assert request.source_lang is not None, "source_lang is required"
-        assert request.target_lang is not None, "target_lang is required"
+        assert request.src_lang is not None, "src_lang is required"
+        assert request.dst_lang is not None, "dst_lang is required"
         assert request.difficulty is not None, "difficulty is required"
 
         return EmbeddingsQuizResponse(
-            source_lang=request.source_lang,
-            target_lang=request.target_lang,
+            src_lang=request.src_lang,
+            dst_lang=request.dst_lang,
             difficulty=request.difficulty,
-            source_question="Hello!",
-            target_question="And Goodbye!",
+            src_lang_question="Hello!",
+            dst_lang_question="And Goodbye!",
         )
