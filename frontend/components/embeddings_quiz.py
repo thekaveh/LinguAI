@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.graph_objs as go
@@ -31,9 +32,9 @@ class EmbeddingsQuizViewModel:
 
         self._attempts: List[str] = [""]
 
-        self._text_similarities = None
-        self._reduced_2d = None
-        self._reduced_3d = None
+        self._data = None
+        self._data_2d = None
+        self._data_3d = None
 
     @property
     def src_langs(self):
@@ -96,11 +97,11 @@ class EmbeddingsQuizViewModel:
         return self._embeddings_quiz is not None
 
     def clear_embeddings_quiz(self):
-        self._embeddings_quiz = None
-        self._text_similarities = None
-        self._reduced_2d = None
-        self._reduced_3d = None
+        self._data = None
+        self._data_2d = None
+        self._data_3d = None
         self._attempts = [""]
+        self._embeddings_quiz = None
 
     @property
     def attempts(self):
@@ -140,32 +141,45 @@ class EmbeddingsQuizViewModel:
                 EmbeddingsSimilaritiesRequest(embeddings=embeddings)
             ).similarities
 
-            self._text_similarities = list(zip(texts, similarities))
-            self._text_similarities.sort(key=lambda x: x[1], reverse=True)
+            colors = [_similarity_to_color(sim) for sim in similarities]
 
-            self._reduced_2d = EmbeddingsService.reduce(
-                EmbeddingsReduceRequest(embeddings=embeddings, target_dims=2)
+            self._data = list(zip(texts, embeddings, similarities, colors))
+            self._data.sort(key=lambda x: x[2], reverse=True)
+
+            sorted_embeddings = [x[1] for x in self._data]
+
+            reduced_2d = EmbeddingsService.reduce(
+                EmbeddingsReduceRequest(embeddings=sorted_embeddings, target_dims=2)
             ).reduced_embeddings
 
-            self._reduced_3d = EmbeddingsService.reduce(
-                EmbeddingsReduceRequest(embeddings=embeddings, target_dims=3)
+            reduced_3d = EmbeddingsService.reduce(
+                EmbeddingsReduceRequest(embeddings=sorted_embeddings, target_dims=3)
             ).reduced_embeddings
+
+            self._data_2d = [
+                (text, coord, sim, color)
+                for ((text, _, sim, color), coord) in zip(self._data, reduced_2d)
+            ]
+            self._data_3d = [
+                (text, coord, sim, color)
+                for ((text, _, sim, color), coord) in zip(self._data, reduced_3d)
+            ]
 
     @property
     def is_submitted(self):
-        return self._text_similarities and self._reduced_2d and self._reduced_3d
+        return self._data and self._data_2d and self._data_3d
 
     @property
-    def text_similarities(self):
-        return self._text_similarities
+    def data(self):
+        return self._data
 
     @property
-    def reduced_2d(self):
-        return self._reduced_2d
+    def data_2d(self):
+        return self._data_2d
 
     @property
-    def reduced_3d(self):
-        return self._reduced_3d
+    def data_3d(self):
+        return self._data_3d
 
     @staticmethod
     def instance():
@@ -278,31 +292,24 @@ def render():
 
     if vm.is_submitted:
         with st.container(border=True):
-            st.write(vm.text_similarities)
-            st.write("------")
-            st.write(vm.reduced_2d)
-            st.write("------")
-            st.write(vm.reduced_3d)
-
-        with st.container(border=True):
-            df = pd.DataFrame(vm.text_similarities, columns=["Text", "Similarity"])
-            df["Color"] = df["Similarity"].apply(lambda x: _similarity_to_color(x))
-            st.dataframe(
-                df.style.applymap(lambda x: f"background-color: {x}", subset=["Color"])
+            df = pd.DataFrame(
+                vm.data, columns=["Text", "Embeddings", "Similarity", "Color"]
             )
+            df.drop(columns=["Embeddings"], inplace=True)
+
+            def style_row(row):
+                return f'<tr><td>{row["Text"]}</td><td style="background-color: {row["Color"]}">{row["Similarity"]:.2f}</td></tr>'
+
+            header = "<tr><th>Text</th><th>Similarity</th></tr>"
+            rows = "".join(df.apply(style_row, axis=1))
+            table_html = f"<table>{header}{rows}</table>"
+            st.markdown(table_html, unsafe_allow_html=True)
 
         with st.container(border=True):
-            plot_2d_embeddings_with_plotly(vm.reduced_2d)
+            _plot_2d_data(vm.data_2d)
 
         with st.container(border=True):
-            plot_3d_embeddings_with_plotly(vm.reduced_3d)
-
-
-def _similarity_to_color(similarity):
-    red = int(255 * (1 - similarity))
-    green = int(255 * similarity)
-
-    return f"rgb({red},{green},0)"
+            _plot_3d_data(vm.data_3d)
 
 
 def _render_sidebar_settings():
@@ -373,59 +380,101 @@ def _render_sidebar_settings():
         state_service.content_temperature = new_content_temperature
 
 
-def plot_2d_embeddings_with_plotly(embeddings):
-    x, y = zip(*embeddings)
+def _similarity_to_color(similarity):
+    rich_red = np.array([194, 24, 7])
+    yellow = np.array([255, 235, 59])
+    rich_green = np.array([67, 160, 71])
+
+    if similarity < 0.5:
+        color = rich_red + (yellow - rich_red) * (similarity * 2)
+    else:
+        color = yellow + (rich_green - yellow) * ((similarity - 0.5) * 2)
+
+    color = np.clip(color, 0, 255).astype(int)
+    return f"rgb({color[0]}, {color[1]}, {color[2]})"
+
+
+def _plot_2d_data(data_2d):
+    texts, coords, similarities, colors = zip(*data_2d)
+    x, y = zip(*coords)
+
+    custom_colorscale = [
+        [0.0, "rgb(194, 24, 7)"],
+        [0.5, "rgb(255, 235, 59)"],
+        [1.0, "rgb(67, 160, 71)"],
+    ]
 
     trace = go.Scatter(
         x=x,
         y=y,
-        mode="markers",
+        mode="markers+text",
         marker=dict(
-            size=10,
-            color=y,
-            colorscale="Viridis",
-            opacity=0.8,
+            size=12,
+            color=colors,
+            colorscale=custom_colorscale,
+            colorbar=dict(
+                title="Similarity",
+                tickvals=[0, 0.5, 1],
+                ticktext=["0", "0.5", "1"],
+            ),
+            cmin=0,
+            cmax=1,
         ),
+        text=[f"{sim:.2f}: {text[:25]}" for text, sim in zip(texts, similarities)],
+        textposition="top center",
     )
 
     layout = go.Layout(
-        margin=dict(l=0, r=0, b=0, t=0),
         title="2D Embeddings Visualization",
-        scene=dict(
-            xaxis=dict(title="X Axis"),
-            yaxis=dict(title="Y Axis"),
-        ),
+        xaxis=dict(title="Dimension 1"),
+        yaxis=dict(title="Dimension 2"),
+        hovermode="closest",
     )
-    fig = go.Figure(data=[trace], layout=layout)
 
+    fig = go.Figure(data=[trace], layout=layout)
     st.plotly_chart(fig, use_container_width=True)
 
 
-def plot_3d_embeddings_with_plotly(embeddings):
-    x, y, z = zip(*embeddings)
+def _plot_3d_data(data_3d):
+    texts, coords, similarities, colors = zip(*data_3d)
+    x, y, z = zip(*coords)
+
+    custom_colorscale = [
+        [0.0, "rgb(194, 24, 7)"],
+        [0.5, "rgb(255, 235, 59)"],
+        [1.0, "rgb(67, 160, 71)"],
+    ]
 
     trace = go.Scatter3d(
         x=x,
         y=y,
         z=z,
-        mode="markers",
+        mode="markers+text",
         marker=dict(
-            size=10,
-            color=z,
-            colorscale="Viridis",
-            opacity=0.8,
+            size=5,
+            color=colors,
+            colorscale=custom_colorscale,
+            colorbar=dict(
+                title="Similarity",
+                tickvals=[0, 0.5, 1],
+                ticktext=["0", "0.5", "1"],
+            ),
+            cmin=0,
+            cmax=1,
         ),
+        text=[f"{sim:.2f}: {text[:25]}" for text, sim in zip(texts, similarities)],
+        textposition="top center",
     )
 
     layout = go.Layout(
-        margin=dict(l=0, r=0, b=0, t=0),
         title="3D Embeddings Visualization",
         scene=dict(
-            xaxis=dict(title="X Axis"),
-            yaxis=dict(title="Y Axis"),
-            zaxis=dict(title="Z Axis"),
+            xaxis=dict(title="Dimension 1"),
+            yaxis=dict(title="Dimension 2"),
+            zaxis=dict(title="Dimension 3"),
         ),
+        hovermode="closest",
     )
-    fig = go.Figure(data=[trace], layout=layout)
 
+    fig = go.Figure(data=[trace], layout=layout)
     st.plotly_chart(fig, use_container_width=True)
