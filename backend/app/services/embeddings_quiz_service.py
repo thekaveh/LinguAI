@@ -31,5 +31,5 @@ class EmbeddingsQuizService:
             dst_lang=request.dst_lang,
             difficulty=request.difficulty,
             src_lang_question="Hello!",
-            dst_lang_question="And Goodbye!",
+            dst_lang_question="Hello!",
         )

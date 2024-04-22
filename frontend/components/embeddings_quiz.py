@@ -1,3 +1,4 @@
+import pandas as pd
 import streamlit as st
 import plotly.graph_objs as go
 from typing import Optional, List
@@ -24,21 +25,15 @@ class EmbeddingsQuizViewModel:
 
         self._current_src_lang = None
         self._current_dst_lang = None
-
         self._current_difficulty = None
 
         self._embeddings_quiz: Optional[EmbeddingsGetResponse] = None
 
         self._attempts: List[str] = [""]
 
-        self._show_ideal_answer = False
-
-        self._current_src_text = None
-        self._current_dst_text = None
-        self._current_src_text_embedding = None
-        self._current_dst_text_embedding = None
-        self._current_src_text_similarities = None
-        self._current_dst_text_similarities = None
+        self._text_similarities = None
+        self._reduced_2d = None
+        self._reduced_3d = None
 
     @property
     def src_langs(self):
@@ -102,10 +97,10 @@ class EmbeddingsQuizViewModel:
 
     def clear_embeddings_quiz(self):
         self._embeddings_quiz = None
-
-    @property
-    def show_ideal_answer(self):
-        return self._show_ideal_answer
+        self._text_similarities = None
+        self._reduced_2d = None
+        self._reduced_3d = None
+        self._attempts = [""]
 
     @property
     def attempts(self):
@@ -131,7 +126,46 @@ class EmbeddingsQuizViewModel:
         )
 
     def submit(self):
-        pass
+        if self.can_submit():
+            texts = [self._embeddings_quiz.dst_lang_question] + self.attempts
+
+            embeddings = EmbeddingsService.get(
+                EmbeddingsGetRequest(
+                    llm_id=self._state_service.embeddings_llm.id,
+                    texts=texts,
+                )
+            ).embeddings
+
+            similarities = EmbeddingsService.similarities(
+                EmbeddingsSimilaritiesRequest(embeddings=embeddings)
+            ).similarities
+
+            self._text_similarities = list(zip(texts, similarities))
+            self._text_similarities.sort(key=lambda x: x[1], reverse=True)
+
+            self._reduced_2d = EmbeddingsService.reduce(
+                EmbeddingsReduceRequest(embeddings=embeddings, target_dims=2)
+            ).reduced_embeddings
+
+            self._reduced_3d = EmbeddingsService.reduce(
+                EmbeddingsReduceRequest(embeddings=embeddings, target_dims=3)
+            ).reduced_embeddings
+
+    @property
+    def is_submitted(self):
+        return self._text_similarities and self._reduced_2d and self._reduced_3d
+
+    @property
+    def text_similarities(self):
+        return self._text_similarities
+
+    @property
+    def reduced_2d(self):
+        return self._reduced_2d
+
+    @property
+    def reduced_3d(self):
+        return self._reduced_3d
 
     @staticmethod
     def instance():
@@ -186,12 +220,13 @@ def render():
                 label="Generate Embeddings Quiz",
             ):
                 vm.generate_embeddings_quiz()
+                st.rerun()
 
         with col_clear_btn:
             if st.button(
                 type="primary",
                 use_container_width=True,
-                label="Clear Embeddings Quiz",
+                label="Clear",
                 disabled=not vm.has_embeddings_quiz(),
             ):
                 vm.clear_embeddings_quiz()
@@ -209,7 +244,7 @@ def render():
                 disabled=True,
                 label="Ideal Answer",
                 value=vm.embeddings_quiz.dst_lang_question
-                if vm.show_ideal_answer
+                if vm.is_submitted
                 else "●" * len(vm.embeddings_quiz.dst_lang_question),
             )
 
@@ -239,35 +274,35 @@ def render():
                     disabled=not vm.can_submit(),
                 ):
                     vm.submit()
+                    st.rerun()
 
-    # if st.form_submit_button("Submit", disabled=not all(attempts)):
-    #     emb = EmbeddingsService.get(
-    #         EmbeddingsGetRequest(
-    #             llm_id=state_service.embeddings_llm.id,
-    #             texts=[
-    #                 st.session_state.embeddings_quiz_response.target_question
-    #             ]
-    #             + st.session_state.attempts,
-    #         )
-    #     ).embeddings
+    if vm.is_submitted:
+        with st.container(border=True):
+            st.write(vm.text_similarities)
+            st.write("------")
+            st.write(vm.reduced_2d)
+            st.write("------")
+            st.write(vm.reduced_3d)
 
-    #     sim = EmbeddingsService.similarities(
-    #         EmbeddingsSimilaritiesRequest(embeddings=emb)
-    #     ).similarities
+        with st.container(border=True):
+            df = pd.DataFrame(vm.text_similarities, columns=["Text", "Similarity"])
+            df["Color"] = df["Similarity"].apply(lambda x: _similarity_to_color(x))
+            st.dataframe(
+                df.style.applymap(lambda x: f"background-color: {x}", subset=["Color"])
+            )
 
-    #     st.write(sim)
+        with st.container(border=True):
+            plot_2d_embeddings_with_plotly(vm.reduced_2d)
 
-    #     reduced_2d = EmbeddingsService.reduce(
-    #         EmbeddingsReduceRequest(embeddings=emb, target_dims=2)
-    #     ).reduced_embeddings
+        with st.container(border=True):
+            plot_3d_embeddings_with_plotly(vm.reduced_3d)
 
-    #     plot_2d_embeddings_with_plotly(reduced_2d)
 
-    #     reduced_3d = EmbeddingsService.reduce(
-    #         EmbeddingsReduceRequest(embeddings=emb, target_dims=3)
-    #     ).reduced_embeddings
+def _similarity_to_color(similarity):
+    red = int(255 * (1 - similarity))
+    green = int(255 * similarity)
 
-    #     plot_3d_embeddings_with_plotly(reduced_3d)
+    return f"rgb({red},{green},0)"
 
 
 def _render_sidebar_settings():
@@ -346,7 +381,7 @@ def plot_2d_embeddings_with_plotly(embeddings):
         y=y,
         mode="markers",
         marker=dict(
-            size=5,
+            size=10,
             color=y,
             colorscale="Viridis",
             opacity=0.8,
@@ -375,7 +410,7 @@ def plot_3d_embeddings_with_plotly(embeddings):
         z=z,
         mode="markers",
         marker=dict(
-            size=5,
+            size=10,
             color=z,
             colorscale="Viridis",
             opacity=0.8,

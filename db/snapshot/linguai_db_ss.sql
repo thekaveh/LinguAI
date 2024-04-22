@@ -724,14 +724,14 @@ COPY public.llm (id, is_active, vision, content, embeddings, provider, name) FRO
 7	t	2	11	-1	openai	gpt-4-vision-preview
 5	t	-1	2	-1	openai	gpt-4
 9	t	-1	1	-1	openai	gpt-4-turbo-preview
-1	t	-1	5	5	ollama	llama2:13b-chat
+1	t	-1	5	5	ollama	llama3:instruct
 2	t	-1	7	2	ollama	mistral:7b-instruct
 10	t	-1	-1	4	openai	text-embedding-3-small
 11	t	-1	-1	3	openai	text-embedding-3-large
 12	t	-1	-1	1	openai	text-embedding-ada-002
 13	t	-1	8	-1	groq	mixtral-8x7b-32768
 14	t	-1	9	-1	groq	llama2-70b-4096
-15	t	-1	-1	6	ollama	mxbai-embed-large
+15	t	-1	-1	6	ollama	mxbai-embed-large:latest
 16	t	-1	3	-1	groq	llama3-70b-8192
 17	t	-1	4	-1	groq	llama3-8b-8192
 \.
