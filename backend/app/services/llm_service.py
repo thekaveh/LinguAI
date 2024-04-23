@@ -25,7 +25,7 @@ class LLMService(CRUDService[LLM]):
 
         Returns:
             List[LLM]: A list of LLM models that match the specified conditions.
-        
+
         Raises:
             Exception: If there is an error fetching the models.
         """

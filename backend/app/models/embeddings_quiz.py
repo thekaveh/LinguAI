@@ -11,9 +11,5 @@ class EmbeddingsQuizRequest(SQLModel, table=False):
 
 
 class EmbeddingsQuizResponse(SQLModel, table=False):
-    src_lang: str = Field(nullable=False, default="English")
-    dst_lang: str = Field(nullable=False)
-    difficulty: str = Field(nullable=False, default="easy")
-
     src_lang_question: str = Field(nullable=False)
     dst_lang_question: str = Field(nullable=False)

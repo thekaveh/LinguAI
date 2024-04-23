@@ -38,7 +38,7 @@ class EmbeddingsQuizViewModel:
 
     @property
     def src_langs(self):
-        return ["English", "Spanish", "French"]
+        return ["English", "Spanish", "French", "German"]
 
     @property
     def current_src_lang(self):
@@ -52,7 +52,7 @@ class EmbeddingsQuizViewModel:
 
     @property
     def dst_langs(self):
-        return ["English", "Spanish", "French"]
+        return ["English", "Spanish", "French", "German"]
 
     @property
     def current_dst_lang(self):
@@ -256,10 +256,11 @@ def render():
 
             st.text_input(
                 disabled=True,
+                type="password",
                 label="Ideal Answer",
-                value=vm.embeddings_quiz.dst_lang_question
-                if vm.is_submitted
-                else "●" * len(vm.embeddings_quiz.dst_lang_question),
+                value=vm.embeddings_quiz.dst_lang_question,
+                # if vm.is_submitted
+                # else "●" * len(vm.embeddings_quiz.dst_lang_question),
             )
 
             for i in range(len(vm.attempts)):
