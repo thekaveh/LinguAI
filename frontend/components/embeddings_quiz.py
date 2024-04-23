@@ -341,29 +341,33 @@ def _render_sidebar_settings():
             new_embeddings_llm if new_embeddings_llm != "No LLMs available!" else None
         )
 
-        content_llms = LLMService.get_content()
-        new_content_llm = st.selectbox(
-            key="content_llm",
-            disabled=not content_llms,
+        structured_content_llms = LLMService.get_structured_content()
+        new_structured_content_llm = st.selectbox(
+            key="structured_content_llm",
+            disabled=not structured_content_llms,
             label="Large Language Model:",
-            help="Content Generation LLM Engine",
+            help="Structured Content Generation LLM Engine",
             format_func=lambda llm: llm.display_name(),
-            options=content_llms if content_llms else ["No LLMs available!"],
+            options=structured_content_llms
+            if structured_content_llms
+            else ["No LLMs available!"],
             index=0
-            if not (content_llms or state_service.content_llm)
-            else content_llms.index(
+            if not (structured_content_llms or state_service.content_llm)
+            else structured_content_llms.index(
                 next(
                     (
                         llm
-                        for llm in content_llms
+                        for llm in structured_content_llms
                         if llm.id == state_service.content_llm.id
                     ),
-                    content_llms[0],
+                    structured_content_llms[0],
                 )
             ),
         )
-        state_service.content_llm = (
-            new_content_llm if new_content_llm != "No LLMs available!" else None
+        state_service.structured_content_llm = (
+            new_structured_content_llm
+            if new_structured_content_llm != "No LLMs available!"
+            else None
         )
 
         new_content_temperature = st.slider(

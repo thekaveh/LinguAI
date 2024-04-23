@@ -75,6 +75,13 @@ class LLMService(CRUDService[LLM]):
         )
 
     @log_decorator
+    def get_structured_content(self) -> List[LLM]:
+        return sorted(
+            [llm for llm in self.get_all() if llm.structured_content > 0],
+            key=lambda llm: llm.structured_content,
+        )
+
+    @log_decorator
     def get_vision(self) -> List[LLM]:
         return sorted(
             [llm for llm in self.get_all() if llm.vision > 0],
