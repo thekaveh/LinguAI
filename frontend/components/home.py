@@ -55,9 +55,29 @@ def render():
             _add_linguai_note()
 
     else:
+        # User is authenticated; show the rest of the content
+        user = UserService.get_user_by_username_sync(state_service.username)
+
+        if user.preferred_name:
+            logged_in_user_display_name = f"{user.preferred_name} {user.last_name}"
+        else:
+            logged_in_user_display_name = f"{user.first_name} {user.last_name}"
+
+        st.write(
+            f"#### :orange[Welcome back to LinguAI, {logged_in_user_display_name}!]"
+        )
+
+        if state_service.just_logged_in:
+            NotificationService.celebrate(
+                message=f"Welcome back to LinguAI, **{logged_in_user_display_name}**!"
+            )
+            state_service.just_logged_in = False
+
+        _add_linguai_note()
+
         # Tour Feature
         if state_service.tour_mode is None:
-            start_ui_tour = st.button(label="Start UI Tour")
+            start_ui_tour = st.button(label="Take UI Tour", type="primary")
 
             if start_ui_tour:
                 modal = Modal(
@@ -85,35 +105,26 @@ def render():
                 )
 
                 st.markdown("Let's get started on the tour!")
+                st.write("")
 
-                st.button(f"Next Stop: Rewrite Content", key="switch_button")
+                col1, col2 = st.columns([1, 1], gap="large")
 
-                exit_tour = st.button("Exit Tour")
+                with col1:
+                    st.button(f"Next Stop: Rewrite Content", key="switch_button", type="primary", use_container_width=True)
+
+                with col2:
+                    exit_tour = st.button(f"Exit Tour", use_container_width=True)
+                
                 if exit_tour:
                     state_service.tour_mode = None
                     state_service.last_visited = -1
                     st.rerun()
 
-        # User is authenticated; show the rest of the content
-        user = UserService.get_user_by_username_sync(state_service.username)
-
-        if user.preferred_name:
-            logged_in_user_display_name = f"{user.preferred_name} {user.last_name}"
-        else:
-            logged_in_user_display_name = f"{user.first_name} {user.last_name}"
-
-        st.write(
-            f"#### :orange[Welcome back to LinguAI, {logged_in_user_display_name}!]"
-        )
-
-        if state_service.just_logged_in:
-            NotificationService.celebrate(
-                message=f"Welcome back to LinguAI, **{logged_in_user_display_name}**!"
-            )
-            state_service.just_logged_in = False
-
-        _add_linguai_note()
-        # Add the rest of your application's components here
+                st.markdown("""
+                    <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
+                    """,
+                    unsafe_allow_html=True
+                )
 
     col1, col2 = st.columns([2, 1])
 
