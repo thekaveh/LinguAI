@@ -254,11 +254,10 @@ def render():
 
             st.text_input(
                 disabled=True,
-                type="password",
                 label="Ideal Answer",
-                value=vm.embeddings_quiz.dst_lang_question,
-                # if vm.is_submitted
-                # else "●" * len(vm.embeddings_quiz.dst_lang_question),
+                value=vm.embeddings_quiz.dst_lang_question
+                if vm.is_submitted
+                else "●" * len(vm.embeddings_quiz.dst_lang_question),
             )
 
             for i in range(len(vm.attempts)):
