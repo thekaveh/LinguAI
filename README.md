@@ -55,12 +55,12 @@ Please note that you can optionally start services in detached mode using `docke
 10. In order to make sure recent DB schema and data changes are reflected in your DB container, make sure you bring down the docker compose using the command below (with `-v`):
     - `docker-compose down -v --remove-orphans`
 
-## Running Local Tests
+## Running Unit Tests
 
-Frontend services: cd into frontend/ and run `docker exec -it frontend python -m pytest tests/` to run all frontend service tests
+Frontend services: run `docker exec -it frontend python -m pytest tests/` to run all frontend service tests
 For coverage: run `docker exec -it frontend python -m pytest --cov=services tests/`
 
-Backend services: cd into backend/ and run `docker exec -it backend python -m pytest app/tests/` to run all backend service tests
+Backend services: run `docker exec -it backend python -m pytest app/tests/` to run all backend service tests
 For coverage: run `docker exec -it backend python -m pytest --cov=app/services app/tests/`
 
 ### Code Changes

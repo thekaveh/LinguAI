@@ -45,6 +45,7 @@ async def test_agenerate_content_success():
     # Test
     await ContentGenService.agenerate_content(
         request=ContentGenReq(
+            llm_id=1,
             user_id=1,
             user_topics=["topic1", "topic2"],
             content=Content(content_id=1, content_name="story"),
@@ -63,6 +64,7 @@ async def test_agenerate_content_success():
         {
             "url": Config.CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT,
             "request": ContentGenReq(
+                llm_id=1,
                 user_id=1,
                 user_topics=["topic1", "topic2"],
                 content=Content(content_id=1, content_name="story"),

@@ -46,6 +46,9 @@ class AsyncIteratorMock:
 
 @pytest.mark.asyncio
 async def test_achat_success():
+    # Define llm_id
+    llm_id = 1
+
     # Mock HttpUtils.apost_stream to return an instance of AsyncIteratorMock
     HttpUtils.apost_stream = AsyncIteratorMock(["chunk1", "chunk2"])
 
@@ -55,7 +58,7 @@ async def test_achat_success():
 
     # Test
     await ChatService.achat(
-        model="test_model",
+        llm_id=llm_id,
         messages=[ChatMessage(sender="user", text="Hello")],
         on_changed_fn=on_changed_fn,
         on_completed_fn=on_completed_fn
@@ -67,7 +70,7 @@ async def test_achat_success():
         {
             "url": Config.CHAT_SERVICE_ENDPOINT,
             "request": ChatRequest(
-                model="test_model",
+                llm_id=1,
                 persona="neutral",
                 messages=[ChatMessage(sender="user", text="Hello")],
                 temperature=0,

@@ -45,6 +45,7 @@ async def test_areview_writing_success():
     # Test
     await ReviewWritingService.areview_writing(
         request=ReviewWritingReq(
+            llm_id=1,
             user_id=1,
             language="English",
             curr_skill_level="beginner",
@@ -65,6 +66,7 @@ async def test_areview_writing_success():
         {
             "url": Config.REVIEW_WRITING_SERVICE_ENDPOINT,
             "request": ReviewWritingReq(
+                llm_id=1,
                 user_id=1,
                 language="English",
                 curr_skill_level="beginner",
