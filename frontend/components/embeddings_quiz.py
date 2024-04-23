@@ -9,14 +9,12 @@ from services.llm_service import LLMService
 from services.state_service import StateService
 from services.embeddings_service import EmbeddingsService
 from services.embeddings_quiz_service import EmbeddingsQuizService
-from models.embeddings_quiz import EmbeddingsQuizRequest, EmbeddingsQuizResponse
+from models.embeddings_quiz import EmbeddingsQuizRequest
 from models.embeddings import (
     EmbeddingsGetRequest,
     EmbeddingsGetResponse,
     EmbeddingsReduceRequest,
-    EmbeddingsReduceResponse,
     EmbeddingsSimilaritiesRequest,
-    EmbeddingsSimilaritiesResponse,
 )
 
 
@@ -30,7 +28,7 @@ class EmbeddingsQuizViewModel:
 
         self._embeddings_quiz: Optional[EmbeddingsGetResponse] = None
 
-        self._attempts: List[str] = [""]
+        self._attempts: List[str] = ["", ""]
 
         self._data = None
         self._data_2d = None
@@ -100,7 +98,7 @@ class EmbeddingsQuizViewModel:
         self._data = None
         self._data_2d = None
         self._data_3d = None
-        self._attempts = [""]
+        self._attempts = ["", ""]
         self._embeddings_quiz = None
 
     @property
@@ -110,8 +108,8 @@ class EmbeddingsQuizViewModel:
     def can_add_attempt(self):
         return (
             self.has_embeddings_quiz()
-            and len(self.attempts) > 0
-            and len(self.attempts) < 5
+            and len(self.attempts) >= 2
+            and len(self.attempts) <= 10
             and all(attempt.strip() != "" for attempt in self.attempts)
         )
 
@@ -122,7 +120,7 @@ class EmbeddingsQuizViewModel:
     def can_submit(self):
         return (
             self.has_embeddings_quiz()
-            and len(self.attempts) > 0
+            and len(self.attempts) >= 2
             and all(attempt.strip() != "" for attempt in self.attempts)
         )
 
