@@ -255,6 +255,7 @@ CREATE TABLE public.llm (
     is_active boolean DEFAULT true NOT NULL,
     vision integer DEFAULT '-1'::integer NOT NULL,
     content integer DEFAULT '-1'::integer NOT NULL,
+    structured_content integer DEFAULT '-1'::integer NOT NULL,
     embeddings integer DEFAULT '-1'::integer NOT NULL,
     provider character varying(20) NOT NULL,
     name character varying(100) NOT NULL
@@ -716,24 +717,24 @@ COPY public.language (language_id, language_name) FROM stdin;
 -- Data for Name: llm; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.llm (id, is_active, vision, content, embeddings, provider, name) FROM stdin;
-3	t	-1	10	-1	ollama	stablelm2:1.6b-zephyr-fp16
-4	f	-1	-1	-1	ollama	yi
-6	t	-1	5	-1	openai	gpt-3.5-turbo-0125
-8	f	1	-1	-1	ollama	llava:13b
-7	t	2	11	-1	openai	gpt-4-vision-preview
-5	t	-1	2	-1	openai	gpt-4
-9	t	-1	1	-1	openai	gpt-4-turbo-preview
-1	t	-1	5	5	ollama	llama3:instruct
-2	t	-1	7	2	ollama	mistral:7b-instruct
-10	t	-1	-1	4	openai	text-embedding-3-small
-11	t	-1	-1	3	openai	text-embedding-3-large
-12	t	-1	-1	1	openai	text-embedding-ada-002
-13	t	-1	8	-1	groq	mixtral-8x7b-32768
-14	t	-1	9	-1	groq	llama2-70b-4096
-15	t	-1	-1	6	ollama	mxbai-embed-large:latest
-16	t	-1	3	-1	groq	llama3-70b-8192
-17	t	-1	4	-1	groq	llama3-8b-8192
+COPY public.llm (id, is_active, vision, content, structured_content, embeddings, provider, name) FROM stdin;
+3	t	-1	10	-1	-1	ollama	stablelm2:1.6b-zephyr-fp16
+4	f	-1	-1	-1	-1	ollama	yi
+6	t	-1	5	3	-1	openai	gpt-3.5-turbo-0125
+8	f	1	-1	-1	-1	ollama	llava:13b
+7	t	2	11	-1	-1	openai	gpt-4-vision-preview
+5	t	-1	2	2	-1	openai	gpt-4
+9	t	-1	1	1	-1	openai	gpt-4-turbo-preview
+1	t	-1	5	-1	5	ollama	llama3:instruct
+2	t	-1	7	-1	4	ollama	mistral:7b-instruct
+10	t	-1	-1	-1	2	openai	text-embedding-3-small
+11	t	-1	-1	-1	1	openai	text-embedding-3-large
+12	t	-1	-1	-1	3	openai	text-embedding-ada-002
+13	t	-1	8	4	-1	groq	mixtral-8x7b-32768
+14	t	-1	9	-1	-1	groq	llama2-70b-4096
+15	t	-1	-1	-1	6	ollama	mxbai-embed-large:latest
+16	t	-1	3	-1	-1	groq	llama3-70b-8192
+17	t	-1	4	-1	-1	groq	llama3-8b-8192
 \.
 
 
