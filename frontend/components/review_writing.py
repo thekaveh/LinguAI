@@ -188,12 +188,23 @@ def render():
             st.markdown("On this page, you can get personal feedback on content that you've written yourself based on your skill level and in the language of your text.\n")
 
             st.markdown('Let\'s continue with the tour!')
+            st.write("")
 
-            st.button(f"Next Stop: Content Generation", key='switch_button')
+            col1, col2 = st.columns([1, 1], gap="large")
 
-            exit_tour = st.button("Exit Tour")
+            with col1:
+                st.button(f"Next Stop: Content Reading", key='switch_button', type="primary", use_container_width=True)
+            with col2:
+                exit_tour = st.button("Exit Tour", use_container_width=True)
+            
             if exit_tour:
                 state_service.tour_mode = None
+            
+            st.markdown("""
+                <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
+                """,
+                unsafe_allow_html=True
+            )
 
     state_service.review_writing = ""
 
