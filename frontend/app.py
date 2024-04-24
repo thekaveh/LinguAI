@@ -1,8 +1,9 @@
 import streamlit as st
+
 from core.config import Config
-from utils.logger_config import setup_global_logging
 from services.user_service import UserService
 from services.state_service import StateService
+from utils.logger_config import setup_global_logging
 from components import (
     sidebar,
     home,
@@ -15,6 +16,7 @@ from components import (
     foot_notes,
     header,
     register,
+    embeddings_quiz,
     assessment,
 )
 import asyncio
@@ -85,6 +87,7 @@ def main():
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
                 "Content Reading": {"icon": "body-text", "page": content_gen},
+                "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},
@@ -96,6 +99,7 @@ def main():
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
                 "Content Reading": {"icon": "body-text", "page": content_gen},
+                "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
                 "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},

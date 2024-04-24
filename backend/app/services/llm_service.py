@@ -25,7 +25,7 @@ class LLMService(CRUDService[LLM]):
 
         Returns:
             List[LLM]: A list of LLM models that match the specified conditions.
-        
+
         Raises:
             Exception: If there is an error fetching the models.
         """
@@ -72,6 +72,13 @@ class LLMService(CRUDService[LLM]):
         return sorted(
             [llm for llm in self.get_all() if llm.content > 0],
             key=lambda llm: llm.content,
+        )
+
+    @log_decorator
+    def get_structured_content(self) -> List[LLM]:
+        return sorted(
+            [llm for llm in self.get_all() if llm.structured_content > 0],
+            key=lambda llm: llm.structured_content,
         )
 
     @log_decorator

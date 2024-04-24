@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 from core.config import Config
 from utils.logger import log_decorator
@@ -12,12 +13,18 @@ class LanguageService:
         try:
             # Adjust Config.LANGUAGE_SERVICE_LIST_ENDPOINT to your actual configuration
             languages_list = await HttpUtils.get(
-                Config.LANGUAGE_SERVICE_LIST_ENDPOINT, response_model=List[LanguageSchema]
+                Config.LANGUAGE_SERVICE_LIST_ENDPOINT,
+                response_model=List[LanguageSchema],
             )
             return languages_list
         except Exception as e:
             raise e
-        
+
+    @log_decorator
+    @staticmethod
+    def list_sync() -> List[LanguageSchema]:
+        return asyncio.run(LanguageService.list())
+
     @log_decorator
     @staticmethod
     async def get_language_by_name(language_name: str) -> LanguageSchema:
