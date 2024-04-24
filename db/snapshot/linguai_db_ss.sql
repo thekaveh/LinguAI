@@ -725,7 +725,7 @@ COPY public.llm (id, is_active, vision, content, structured_content, embeddings,
 7	t	2	11	-1	-1	openai	gpt-4-vision-preview
 5	t	-1	2	2	-1	openai	gpt-4
 9	t	-1	1	1	-1	openai	gpt-4-turbo-preview
-1	t	-1	5	-1	5	ollama	llama3:instruct
+1	t	-1	5	-1	5	ollama	llama2:13b-chat
 2	t	-1	7	-1	4	ollama	mistral:7b-instruct
 10	t	-1	-1	-1	2	openai	text-embedding-3-small
 11	t	-1	-1	-1	1	openai	text-embedding-3-large
