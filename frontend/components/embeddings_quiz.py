@@ -194,6 +194,21 @@ def render():
 
     _render_sidebar_settings()
 
+    full_intro = "Embeddings are a powerful tool in natural language processing, representing words, phrases, or entire sentences as high-dimensional vectors. In LinguAI, embeddings are used to quantify and compare the semantic similarity between your translation attempts and an ideal translation. By converting the text into numerical vectors, the app utilizes algorithms to measure the closeness of meanings, effectively ranking each attempt based on how semantically close it is to the target translation. Furthermore, to make these comparisons more intuitive and visually engaging, the app employs t-SNE dimensionality reduction technique to project these high-dimensional vectors onto 2D or 3D spaces. This visualization not only aids in understanding the quality of translations but also helps learners see the nuances of language use and translation accuracy in a more interactive and comprehendible way."
+    head_intro = " ".join(full_intro.split(". ")[:2]) + "."
+    tail_intro = full_intro[len(head_intro) + 1 :]
+
+    st.markdown(
+        head_intro,
+        unsafe_allow_html=True,
+    )
+
+    with st.expander("Read more..."):
+        st.markdown(
+            tail_intro,
+            unsafe_allow_html=True,
+        )
+
     with st.container(border=True):
         col_src_lang, col_dst_lang, col_diff = st.columns([1, 1, 1])
 
@@ -436,6 +451,11 @@ def _plot_2d_data(data_2d):
     fig = go.Figure(data=[trace], layout=layout)
     st.plotly_chart(fig, use_container_width=True)
 
+    notice = "Note: This visualization simplifies complex, high-dimensional data into a 2D format for demonstration purposes. Please note that it cannot fully capture the intricacies of the original data. Use this tool as a general guide to understand translation similarities and differences visually."
+    st.markdown(
+        f'<p style="color:grey; font-size:11px;">{notice}</p>', unsafe_allow_html=True
+    )
+
 
 def _plot_3d_data(data_3d):
     texts, coords, similarities, colors = zip(*data_3d)
@@ -480,3 +500,8 @@ def _plot_3d_data(data_3d):
 
     fig = go.Figure(data=[trace], layout=layout)
     st.plotly_chart(fig, use_container_width=True)
+
+    notice = "Note: This visualization simplifies complex, high-dimensional data into a 3D format for demonstration purposes. Please note that it cannot fully capture the intricacies of the original data. Use this tool as a general guide to understand translation similarities and differences visually."
+    st.markdown(
+        f'<p style="color:grey; font-size:11px;">{notice}</p>', unsafe_allow_html=True
+    )
