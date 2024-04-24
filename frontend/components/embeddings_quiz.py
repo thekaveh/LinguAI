@@ -5,10 +5,13 @@ import plotly.graph_objs as go
 from typing import Optional, List
 
 from utils.logger import log_decorator
+
 from services.llm_service import LLMService
 from services.state_service import StateService
+from services.language_service import LanguageService
 from services.embeddings_service import EmbeddingsService
 from services.embeddings_quiz_service import EmbeddingsQuizService
+
 from models.embeddings_quiz import EmbeddingsQuizRequest
 from models.embeddings import (
     EmbeddingsGetRequest,
@@ -21,6 +24,9 @@ from models.embeddings import (
 class EmbeddingsQuizViewModel:
     def __init__(self, state_service: StateService) -> None:
         self._state_service = state_service
+
+        self._src_langs = None
+        self._dst_langs = None
 
         self._current_src_lang = None
         self._current_dst_lang = None
@@ -36,12 +42,18 @@ class EmbeddingsQuizViewModel:
 
     @property
     def src_langs(self):
-        return ["English", "Spanish", "French", "German"]
+        if self._src_langs is None:
+            self._src_langs = [
+                lang.language_name for lang in LanguageService.list_sync()
+            ]
+
+        return self._src_langs
 
     @property
     def current_src_lang(self):
         if self._current_src_lang is None:
             self._current_src_lang = self.src_langs[0]
+
         return self._current_src_lang
 
     @current_src_lang.setter
@@ -50,12 +62,18 @@ class EmbeddingsQuizViewModel:
 
     @property
     def dst_langs(self):
-        return ["English", "Spanish", "French", "German"]
+        if self._dst_langs is None:
+            self._dst_langs = [
+                lang.language_name for lang in LanguageService.list_sync()
+            ]
+
+        return self._dst_langs
 
     @property
     def current_dst_lang(self):
         if self._current_dst_lang is None:
             self._current_dst_lang = self.dst_langs[0]
+
         return self._current_dst_lang
 
     @current_dst_lang.setter
@@ -70,6 +88,7 @@ class EmbeddingsQuizViewModel:
     def current_difficulty(self):
         if self._current_difficulty is None:
             self._current_difficulty = self.difficulties[0]
+
         return self._current_difficulty
 
     @current_difficulty.setter
