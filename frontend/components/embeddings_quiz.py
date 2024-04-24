@@ -214,19 +214,15 @@ def render():
     _render_sidebar_settings()
 
     full_intro = "Embeddings are a powerful tool in natural language processing, representing words, phrases, or entire sentences as high-dimensional vectors. In LinguAI, embeddings are used to quantify and compare the semantic similarity between your translation attempts and an ideal translation. By converting the text into numerical vectors, the app utilizes algorithms to measure the closeness of meanings, effectively ranking each attempt based on how semantically close it is to the target translation. Furthermore, to make these comparisons more intuitive and visually engaging, the app employs t-SNE dimensionality reduction technique to project these high-dimensional vectors onto 2D or 3D spaces. This visualization not only aids in understanding the quality of translations but also helps learners see the nuances of language use and translation accuracy in a more interactive and comprehendible way."
-    head_intro = " ".join(full_intro.split(". ")[:2]) + "."
-    tail_intro = full_intro[len(head_intro) + 1 :]
 
-    st.markdown(
-        head_intro,
-        unsafe_allow_html=True,
-    )
+    sentences = full_intro.split(". ")
+    head_intro = ". ".join(sentences[:2]) + "."
+    tail_intro = ". ".join(sentences[2:])
+
+    st.markdown(head_intro, unsafe_allow_html=True)
 
     with st.expander("Read more..."):
-        st.markdown(
-            tail_intro,
-            unsafe_allow_html=True,
-        )
+        st.markdown(tail_intro, unsafe_allow_html=True)
 
     with st.container(border=True):
         col_src_lang, col_dst_lang, col_diff = st.columns([1, 1, 1])
