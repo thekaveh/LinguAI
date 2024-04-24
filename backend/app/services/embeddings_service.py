@@ -82,11 +82,8 @@ class EmbeddingsService:
 
             reduced_embeddings = tsne.fit_transform(np.array(request.embeddings))
 
-            print("Hello from reduction!")
-
             return EmbeddingsReduceResponse(
                 reduced_embeddings=reduced_embeddings.tolist()
             )
         except Exception as e:
-            print(e)
             raise e
