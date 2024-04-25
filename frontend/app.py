@@ -96,11 +96,11 @@ def main():
         else:
             components_info = {
                 "Home": {"icon": "house", "page": home},
+                "Chat": {"icon": "chat", "page": chat},                
+                "Content Reading": {"icon": "body-text", "page": content_gen},                
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
-                "Content Reading": {"icon": "body-text", "page": content_gen},
                 "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
-                "Chat": {"icon": "chat", "page": chat},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},
             }
