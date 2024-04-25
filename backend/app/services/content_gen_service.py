@@ -19,36 +19,35 @@ class ContentGenService:
         self.prompt_service = PromptService(db)
         self.sql_model_session = sql_model_session
 
-    class ContentGenService:
-        @log_decorator
-        async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
-            """
-            Generates content based on the given request.
 
-            Args:
-                request (ContentGenReq): The request object containing the necessary information.
+    async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
+        """
+        Generates content based on the given request.
 
-            Returns:
-                AsyncIterable[str]: An asynchronous iterable that yields the generated content.
+        Args:
+            request (ContentGenReq): The request object containing the necessary information.
 
-            Raises:
-                AssertionError: If the request is None.
-            """
+        Returns:
+            AsyncIterable[str]: An asynchronous iterable that yields the generated content.
 
-            assert request is not None, "Request is required"
+        Raises:
+            AssertionError: If the request is None.
+        """
 
-            prompt_text = self._generate_prompt(request)
+        assert request is not None, "Request is required"
 
-            system_message = SystemMessage(content=prompt_text)
-            prompt = ChatPromptTemplate.from_messages([system_message])
+        prompt_text = self._generate_prompt(request)
 
-            chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
-                llm_id=request.llm_id, temperature=request.temperature
-            )
-            parser = StrOutputParser()
-            chain = prompt | chat_runnable | parser
+        system_message = SystemMessage(content=prompt_text)
+        prompt = ChatPromptTemplate.from_messages([system_message])
 
-            return chain.astream(input={})
+        chat_runnable = LLMService(db_session=self.sql_model_session).get_chat_runnable(
+            llm_id=request.llm_id, temperature=request.temperature
+        )
+        parser = StrOutputParser()
+        chain = prompt | chat_runnable | parser
+
+        return chain.astream(input={})
 
     @log_decorator
     def _generate_prompt(self, request: ContentGenReq) -> str:
