@@ -56,7 +56,7 @@ Please note that you can optionally start services in detached mode using `docke
     - `docker-compose down -v --remove-orphans`
 
 ## Running Unit Tests
-
+(With the containers running)
 Frontend services: run `docker exec -it frontend python -m pytest tests/` to run all frontend service tests
 For coverage: run `docker exec -it frontend python -m pytest --cov=services tests/`
 
