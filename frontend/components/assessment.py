@@ -78,7 +78,7 @@ def render():
 
     # Tour mode
     if state_service.tour_mode != None:
-        state_service.last_visited = 6
+        state_service.last_visited = 7
         with state_service.tour_mode.container():
             st.markdown('This is our language assessment page!')
             st.markdown('On this page, you can assess your language skills and increase your skill level.')

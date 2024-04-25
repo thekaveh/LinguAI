@@ -182,7 +182,7 @@ def render():
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:
-        state_service.last_visited = 2
+        state_service.last_visited = 4
         with state_service.tour_mode.container():
             st.markdown('This is our review writing content page!')
             st.markdown("On this page, you can get personal feedback on content that you've written yourself based on your skill level and in the language of your text.\n")
@@ -193,7 +193,7 @@ def render():
             col1, col2 = st.columns([1, 1], gap="large")
 
             with col1:
-                st.button(f"Next Stop: Content Reading", key='switch_button', type="primary", use_container_width=True)
+                st.button(f"Next Stop: Translation Quiz", key='switch_button', type="primary", use_container_width=True)
             with col2:
                 exit_tour = st.button("Exit Tour", use_container_width=True)
             

@@ -75,56 +75,57 @@ def render():
 
         _add_linguai_note()
 
-        # Tour Feature
-        if state_service.tour_mode is None:
-            start_ui_tour = st.button(label="Take UI Tour", type="primary")
+        if user.user_type != 'admin':
+            # Tour Feature
+            if state_service.tour_mode is None:
+                start_ui_tour = st.button(label="Take UI Tour", type="primary")
 
-            if start_ui_tour:
-                modal = Modal(
-                    "LinguAI Tour",
-                    key="tour-modal",
-                    # Optional
-                    padding=20,  # default value
-                    max_width=500,  # default value
-                )
+                if start_ui_tour:
+                    modal = Modal(
+                        "LinguAI Tour",
+                        key="tour-modal",
+                        # Optional
+                        padding=20,  # default value
+                        max_width=500,  # default value
+                    )
 
-                state_service.tour_mode = modal
-                state_service.last_visited = None
-        else:
-            resume_tour = st.button(label="Resume Tour")
+                    state_service.tour_mode = modal
+                    state_service.last_visited = None
+            else:
+                resume_tour = st.button(label="Resume Tour")
 
-            if resume_tour:
-                state_service.last_visited = -1
-
-        if state_service.tour_mode is not None:
-            state_service.last_visited = 0
-            with state_service.tour_mode.container():
-                st.markdown("Hello! Welcome to the LinguAI tour!")
-                st.markdown(
-                    "This is our home page where you can read about LinguAI and start your language learning journey."
-                )
-
-                st.markdown("Let's get started on the tour!")
-                st.write("")
-
-                col1, col2 = st.columns([1, 1], gap="large")
-
-                with col1:
-                    st.button(f"Next Stop: Rewrite Content", key="switch_button", type="primary", use_container_width=True)
-
-                with col2:
-                    exit_tour = st.button(f"Exit Tour", use_container_width=True)
-                
-                if exit_tour:
-                    state_service.tour_mode = None
+                if resume_tour:
                     state_service.last_visited = -1
-                    st.rerun()
 
-                st.markdown("""
-                    <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
-                    """,
-                    unsafe_allow_html=True
-                )
+            if state_service.tour_mode is not None:
+                state_service.last_visited = 0
+                with state_service.tour_mode.container():
+                    st.markdown("Hello! Welcome to the LinguAI tour!")
+                    st.markdown(
+                        "This is our home page where you can read about LinguAI and start your language learning journey."
+                    )
+
+                    st.markdown("Let's get started on the tour!")
+                    st.write("")
+
+                    col1, col2 = st.columns([1, 1], gap="large")
+
+                    with col1:
+                        st.button(f"Next Stop: Chat", key="switch_button", type="primary", use_container_width=True)
+
+                    with col2:
+                        exit_tour = st.button(f"Exit Tour", use_container_width=True)
+                    
+                    if exit_tour:
+                        state_service.tour_mode = None
+                        state_service.last_visited = -1
+                        st.rerun()
+
+                    st.markdown("""
+                        <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
     col1, col2 = st.columns([2, 1])
 
