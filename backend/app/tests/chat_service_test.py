@@ -26,6 +26,7 @@ class TestChatService:
 
         chat_service = ChatService(db_session=setup)
         chat_request = ChatRequest(
+            llm_id=1,
             model="gpt-3",
             messages=[{"sender": "test-sender", "text": "Hello, world!"}],
             persona="existing_persona",
@@ -38,7 +39,7 @@ class TestChatService:
         # Assert
         assert isinstance(result, AsyncIterable), "Result must be an AsyncIterable"
         mock_get_by_name.assert_called_once_with(name="existing_persona")
-        mock_get_chat_runnable.assert_called_once_with(model="gpt-3", temperature=0.5)
+        mock_get_chat_runnable.assert_called_once_with(llm_id=1, temperature=0.5)
 
     @patch('app.services.persona_service.PersonaService.get_by_name')
     @patch('app.services.llm_service.LLMService.get_chat_runnable')
@@ -49,6 +50,7 @@ class TestChatService:
 
         chat_service = ChatService(db_session=setup)
         chat_request = ChatRequest(
+            llm_id=1,
             model="gpt-3",
             messages=[{"sender": "test-sender", "text": "Hello, world!"}],
             persona="non_existing_persona",
@@ -72,6 +74,7 @@ class TestChatService:
 
         chat_service = ChatService(db_session=setup)
         chat_request = ChatRequest(
+            llm_id=1,
             model="gpt-3",
             messages=[],
             persona="existing_persona",
