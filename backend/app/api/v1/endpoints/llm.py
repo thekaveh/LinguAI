@@ -20,7 +20,7 @@ def get_all(service: LLMService = Depends(_get_service)):
 
     Returns:
         List[LLM]: A list of all LLMs.
-    
+
     Raises:
         HTTPException: If there is an error retrieving the LLMs.
     """
@@ -34,12 +34,12 @@ def get_all(service: LLMService = Depends(_get_service)):
 @router.get("/llms/embeddings/")
 def get_embeddings(service: LLMService = Depends(_get_service)):
     """
-    Retrieve the embeddings for the LLMs.
+    Retrieve ordered list of LLMs that support generating embeddings.
 
     This endpoint returns the embeddings for the LLMs. It calls the `get_embeddings` method of the `LLMService` class.
 
     Returns:
-        The embeddings for the LLMs.
+        The ordered list of LLMs that support generating embeddings.
 
     Raises:
         HTTPException: If there is an error retrieving the embeddings.
@@ -54,13 +54,13 @@ def get_embeddings(service: LLMService = Depends(_get_service)):
 @router.get("/llms/content/")
 def get_content(service: LLMService = Depends(_get_service)):
     """
-    Retrieve the content for the LLMs.
+    Retrieve ordered list of LLMs that support generating content.
 
     Args:
         service (LLMService): The LLM service instance.
 
     Returns:
-        The content for the LLMs.
+        The ordered list of LLMs that support generating content.
 
     Raises:
         HTTPException: If there is an error retrieving the content.
@@ -72,16 +72,37 @@ def get_content(service: LLMService = Depends(_get_service)):
 
 
 @log_decorator
+@router.get("/llms/structured_content/")
+def get_structured_content(service: LLMService = Depends(_get_service)):
+    """
+    Retrieve ordered list of LLMs that support generating structured content.
+
+    Args:
+        service (LLMService): The LLM service instance.
+
+    Returns:
+        The ordered list of LLMs that support generating structured content.
+
+    Raises:
+        HTTPException: If there is an error retrieving the content.
+    """
+    try:
+        return service.get_structured_content()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@log_decorator
 @router.get("/llms/vision/")
 def get_vision(service: LLMService = Depends(_get_service)):
     """
-    Retrieve vision data from the LLM service.
+    Retrieve ordered list of LLMs that support vision.
 
     Parameters:
     - service: An instance of the LLMService class.
 
     Returns:
-    - The vision data retrieved from the LLM service.
+    - The ordered list of LLMs that support vision.
 
     Raises:
     - HTTPException: If an error occurs while retrieving the vision data.

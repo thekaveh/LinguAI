@@ -40,6 +40,22 @@ class LLMService:
 
     @log_decorator
     @staticmethod
+    async def aget_structured_content() -> List[LLM]:
+        try:
+            return await HttpUtils.get(
+                Config.LLM_SERVICE_GET_STRUCTURED_CONTENT_ENDPOINT,
+                response_model=List[LLM],
+            )
+        except Exception as e:
+            raise e
+
+    @log_decorator
+    @staticmethod
+    def get_structured_content() -> List[LLM]:
+        return asyncio.run(LLMService.aget_structured_content())
+
+    @log_decorator
+    @staticmethod
     async def aget_vision() -> List[LLM]:
         try:
             return await HttpUtils.get(

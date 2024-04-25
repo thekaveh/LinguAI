@@ -45,6 +45,7 @@ async def test_arewrite_content_success():
     # Test
     await RewriteContentService.arewrite_content(
         request=ContentRewriteReq(
+            llm_id=1,
             user_id=1,
             language="English",
             skill_level="beginner",
@@ -64,6 +65,7 @@ async def test_arewrite_content_success():
         {
             "url": Config.REWRITE_CONTENT_SERVICE_ENDPOINT,
             "request": ContentRewriteReq(
+                llm_id=1,
                 user_id=1,
                 language="English",
                 skill_level="beginner",

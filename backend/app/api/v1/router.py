@@ -14,7 +14,9 @@ from app.api.v1.endpoints import (
     language,
     review_writing,
     text_to_speech,
-    user_content,   
+    user_content,
+    embeddings,
+    embeddings_quiz,
 )
 
 router = APIRouter()
@@ -33,6 +35,8 @@ router.include_router(language.router, prefix="/v1", tags=["v1"])
 router.include_router(review_writing.router, prefix="/v1", tags=["v1"])
 router.include_router(text_to_speech.router, prefix="/v1", tags=["v1"])
 router.include_router(user_content.router, prefix="/v1", tags=["v1"])
+router.include_router(embeddings.router, prefix="/v1", tags=["v1"])
+router.include_router(embeddings_quiz.router, prefix="/v1", tags=["v1"])
 
 """
 This module defines the router for the API endpoints in the v1 version.

@@ -140,14 +140,26 @@ def render():
             st.markdown('We support 5 different skill levels and 5 different languages for this tool!\n')
 
             st.markdown('Let\'s continue with the tour!')
+            st.write("")
 
-            st.button(f"Next Stop: Review Writing", key='switch_button')
+            col1, col2 = st.columns([1, 1], gap="large")
 
-            exit_tour = st.button("Exit Tour")
+            with col1:
+                st.button(f"Next Stop: Review Writing", key="switch_button", type="primary", use_container_width=True)
+
+            with col2:
+                exit_tour = st.button(f"Exit Tour", use_container_width=True)
+
             if exit_tour:
                 state_service.tour_mode = None
                 state_service.last_visited = -1
                 st.rerun()
+            
+            st.markdown("""
+                <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
+                """,
+                unsafe_allow_html=True
+            )
 
     st.write("")
 
