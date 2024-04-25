@@ -119,7 +119,7 @@ def render():
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:
-        state_service.last_visited = 5
+        state_service.last_visited = 6
         with state_service.tour_mode.container():
             st.markdown('This is our profile page!')
             st.markdown('You can view your profile details here, view your progress, as well as update  your information!\n')

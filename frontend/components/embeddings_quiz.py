@@ -209,6 +209,33 @@ class EmbeddingsQuizViewModel:
 
 @log_decorator
 def render():
+    state_service = StateService.instance()
+
+    if state_service.tour_mode != None:
+        state_service.last_visited = 5
+        with state_service.tour_mode.container():
+            st.markdown('This is our translation quiz page!')
+            st.markdown('On this page, you can assess your language skills by typing in your answers to translation questions and seeing your accuracy!')
+
+            st.markdown('Let\'s continue with the tour!')
+            st.write("")
+
+            col1, col2 = st.columns([1, 1], gap="large")
+
+            with col1:
+                st.button(f"Next Stop: Profile", key='switch_button', type="primary", use_container_width=True)
+
+            with col2:
+                exit_tour = st.button("Exit Tour", use_container_width=True)
+            if exit_tour:
+                state_service.tour_mode = None
+            
+            st.markdown("""
+                <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
+                """,
+                unsafe_allow_html=True
+            )
+
     vm = EmbeddingsQuizViewModel.instance()
 
     _render_sidebar_settings()

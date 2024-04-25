@@ -16,7 +16,7 @@ def render():
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:
-        state_service.last_visited = 4
+        state_service.last_visited = 1
         with state_service.tour_mode.container():
             st.markdown('This is our chat page!')
             st.markdown('You can interact with the chatbot to practice your language skills as well as upload visual images to ask questions about!\n')
@@ -27,7 +27,7 @@ def render():
             col1, col2 = st.columns([1, 1], gap="large")
 
             with col1:
-                st.button(f"Next Stop: Profile", key='switch_button', type="primary", use_container_width=True)
+                st.button(f"Next Stop: Content Reading", key='switch_button', type="primary", use_container_width=True)
             
             with col2:
                 exit_tour = st.button("Exit Tour", use_container_width=True)

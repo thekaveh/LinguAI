@@ -210,7 +210,7 @@ def render():
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:
-        state_service.last_visited = 3
+        state_service.last_visited = 2
         with state_service.tour_mode.container():
             st.markdown('This is our content generation page!')
             st.markdown('On this page, you can select from different topics, content types, and languages to generate custom content to further your language learning journey!')
@@ -221,7 +221,7 @@ def render():
             col1, col2 = st.columns([1, 1], gap="large")
 
             with col1:
-                st.button(f"Next Stop: Chat", key='switch_button', type="primary", use_container_width=True)
+                st.button(f"Next Stop: Rewrite Content", key='switch_button', type="primary", use_container_width=True)
 
             with col2:
                 exit_tour = st.button("Exit Tour", use_container_width=True)

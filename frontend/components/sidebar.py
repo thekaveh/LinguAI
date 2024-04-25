@@ -15,7 +15,7 @@ def show(pages):
         state_service = StateService.instance()
 
         if st.session_state.get("switch_button", False):
-            manual_select = (state_service.last_visited + 1) % 7
+            manual_select = (state_service.last_visited + 1) % 8
         else:
             manual_select = None
 

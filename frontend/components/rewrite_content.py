@@ -133,7 +133,7 @@ def render():
     # st.subheader("Rewrite Content to Current Skill Level")
 
     if state_service.tour_mode is not None:
-        state_service.last_visited = 1
+        state_service.last_visited = 3
         with state_service.tour_mode.container():
             st.markdown('This is our rewrite content page!')
             st.markdown('You can paste in text that you might want to read at a different skill level or in a different language!')
@@ -191,7 +191,7 @@ def render():
 
     st.write("")
     st.write("")
-    st.markdown("#### Explore Rewritting in different levels and language")
+    st.markdown("#### Explore Rewriting in different levels and language")
 
     st.write("")
     col3, col4 = st.columns(2)
