@@ -24,7 +24,6 @@ class StateService:
         self._content_tts = False
         self._content_temperature = 0.0
         self._content_llm = LLMService.get_content()[0]
-        self._structured_content_llm = LLMService.get_structured_content()[0]
 
         self._username = None
         self._user_type = None
@@ -39,7 +38,6 @@ class StateService:
         self._switch_button = None
 
         self._vision_llm = LLMService.get_vision()[0]
-        self._embeddings_llm = LLMService.get_embeddings()[0]
 
         self._just_logged_in = False
         self._just_logged_out = False
@@ -155,19 +153,6 @@ class StateService:
             )
 
     @property
-    def structured_content_llm(self) -> LLM:
-        return self._structured_content_llm
-
-    @structured_content_llm.setter
-    def structured_content_llm(self, value: LLM) -> None:
-        if value != self._structured_content_llm:
-            self._structured_content_llm = value
-
-            NotificationService.success(
-                f"Structured Content LLM changed to **{value.display_name()}**"
-            )
-
-    @property
     def content_temperature(self) -> float:
         return self._content_temperature
 
@@ -188,19 +173,6 @@ class StateService:
             self._content_tts = value
 
             NotificationService.success(f"Content TTS changed to **{value}**")
-
-    @property
-    def embeddings_llm(self) -> LLM:
-        return self._embeddings_llm
-
-    @embeddings_llm.setter
-    def embeddings_llm(self, value: LLM) -> None:
-        if value != self._embeddings_llm:
-            self._embeddings_llm = value
-
-            NotificationService.success(
-                f"Embeddings LLM changed to **{value.display_name()}**"
-            )
 
     @property
     def just_logged_in(self) -> bool:

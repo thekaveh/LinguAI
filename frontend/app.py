@@ -16,7 +16,7 @@ from components import (
     foot_notes,
     header,
     register,
-    embeddings_quiz,
+    polyglot_puzzle,
     assessment,
 )
 import asyncio
@@ -79,7 +79,6 @@ def main():
 
     if state_service.username is not None:
         user = asyncio.run(UserService.get_user_by_username(state_service.username))
-        # _welcome(user)
 
         if user.user_type == "admin":
             components_info = {
@@ -87,8 +86,8 @@ def main():
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
                 "Content Reading": {"icon": "body-text", "page": content_gen},
-                "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
                 "Chat": {"icon": "chat", "page": chat},
+                "Polyglot Puzzle": {"icon": "puzzle", "page": polyglot_puzzle},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},
                 "Admin": {"icon": "person-gear", "page": admin},
@@ -96,11 +95,11 @@ def main():
         else:
             components_info = {
                 "Home": {"icon": "house", "page": home},
-                "Chat": {"icon": "chat", "page": chat},                
-                "Content Reading": {"icon": "body-text", "page": content_gen},                
+                "Chat": {"icon": "chat", "page": chat},
+                "Content Reading": {"icon": "body-text", "page": content_gen},
                 "Rewrite Content": {"icon": "pen", "page": rewrite_content},
                 "Review Writing": {"icon": "pencil-square", "page": review_writing},
-                "Embeddings Quiz": {"icon": "puzzle", "page": embeddings_quiz},
+                "Polyglot Puzzle": {"icon": "puzzle", "page": polyglot_puzzle},
                 "Profile": {"icon": "person-circle", "page": profile},
                 "Assessment": {"icon": "clipboard", "page": assessment},
             }
