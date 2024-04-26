@@ -12,10 +12,10 @@ from services.notification_service import NotificationService
 class StateService:
     @log_decorator
     def __init__(self):
-        self.reset_fields()
+        self.reinitialize()
 
     @log_decorator
-    def reset_fields(self):
+    def reinitialize(self) -> None:
         self._init_persona()
 
         self._chat_messages = []

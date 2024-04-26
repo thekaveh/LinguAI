@@ -25,6 +25,10 @@ from models.embeddings import (
 
 class PolyglotPuzzleViewModel:
     def __init__(self) -> None:
+        self.reinitialize()
+
+    @log_decorator
+    def reinitialize(self) -> None:
         self._src_langs = None
         self._dst_langs = None
         self._difficulties = None

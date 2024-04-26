@@ -8,6 +8,8 @@ from services.state_service import StateService
 from schema.authentication import AuthenticationRequest
 from services.notification_service import NotificationService
 
+from components.polyglot_puzzle import PolyglotPuzzleViewModel
+
 
 @log_decorator
 def show(pages):
@@ -34,8 +36,11 @@ def show(pages):
             # Visually separate the logout button from the menu
             if st.button("Logout", type="primary", use_container_width=True):
                 # Perform logout actions: Reset the authentication state
-                state_service.reset_fields()
+                state_service.reinitialize()
                 state_service.just_logged_out = True
+
+                PolyglotPuzzleViewModel.instance().reinitialize()
+
                 st.rerun()
         else:
             # Display the login form only if the user is not authenticated
