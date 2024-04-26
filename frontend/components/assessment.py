@@ -62,6 +62,16 @@ def create_user_assessment_sync(user_id, assessment_data):
 
 
 def render():
+    """
+    Renders the language assessment page.
+
+    This function initializes session state for managing quiz progress and displays the language assessment page.
+    Users can select a language to assess their skills and increase their skill level.
+    The function handles the quiz submission and updates the user's skill level based on the assessment results.
+
+    Returns:
+        None
+    """
     # Initialize session state for managing quiz progress
     if "quiz_started" not in st.session_state:
         st.session_state["quiz_started"] = False

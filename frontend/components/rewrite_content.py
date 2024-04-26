@@ -23,6 +23,7 @@ from services.user_content_service import UserContentService
 
 CONTENT_TYPE = 1  # trail purpose, need to move to enums
 
+# Helper functions for rewrite content page
 
 @log_decorator
 def _add_welcome(user):
@@ -129,6 +130,16 @@ def _render_language_dropdown(languages):
 
 @log_decorator
 def render():
+    """
+    Renders the rewrite content page.
+
+    This function is responsible for rendering the rewrite content page in the LinguAI application.
+    It allows users to paste in text that they want to read at a different skill level or in a different language.
+    The page supports 5 different skill levels and 5 different languages for rewriting the content.
+
+    Returns:
+        None
+    """
     state_service = StateService.instance()
     # st.subheader("Rewrite Content to Current Skill Level")
 
@@ -307,6 +318,7 @@ def render():
 
     _render_sidebar_settings()
 
+# More helper functions for rewrite content page
 
 def _save_content_for_later(
     user, original_content, generated_content, level, language_name

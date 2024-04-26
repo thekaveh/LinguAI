@@ -7,6 +7,18 @@ import asyncio
 
 @log_decorator
 def render():
+    """
+    Renders the User List page in the admin component.
+
+    This function displays a table of users with their usernames, emails, and user types.
+    It also provides a delete button for each user, allowing the admin to delete a user from the system.
+
+    Raises:
+        Exception: If there is an error deleting a user.
+
+    Returns:
+        None
+    """
     st.title("User List")
     if 'confirm_delete' not in st.session_state:
         st.session_state['confirm_delete'] = None

@@ -25,6 +25,7 @@ from services.user_content_service import UserContentService
 
 CONTENT_TYPE = 2  # trail purpose, need to move to enums
 
+# Helper functions for review writing page
 
 @log_decorator
 def _add_welcome(user):
@@ -179,6 +180,14 @@ def _find_last_user_assessment(
 
 @log_decorator
 def render():
+    """
+    Renders the review writing content page and provides feedback on user's writing.
+
+    This function is responsible for rendering the review writing content page and providing feedback on the user's writing based on their skill level and the language of their text.
+
+    Returns:
+        None
+    """
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:
@@ -372,6 +381,8 @@ def render():
     except Exception:
         announcement_placeholder.write("Please input content in a supported language.")
 
+
+# Additional helper functions
 
 def _save_content_for_later(
     user, original_content, generated_content, level, language_name
