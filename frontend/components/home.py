@@ -21,6 +21,16 @@ def _add_linguai_note():
 
 @log_decorator
 def render():
+    """
+    Renders the home page of the LinguAI application.
+
+    If the user is not authenticated, it shows login or registration options along with the features of LinguAI.
+    If the user is authenticated, it displays a welcome message and additional content based on the user's type.
+    The function also handles the UI tour feature for non-admin users.
+
+    Returns:
+        None
+    """
     state_service = StateService.instance()
 
     # st.image("./static/logo.png", width=100)

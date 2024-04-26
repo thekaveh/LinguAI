@@ -20,6 +20,15 @@ from schema.user_assessment import UserAssessmentCreate
 from datetime import date, datetime
 
 def get_language_sync(language_name):
+    """
+    Retrieves language details synchronously by name.
+
+    Args:
+        language_name (str): The name of the language.
+
+    Returns:
+        dict: A dictionary containing the language details.
+    """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     language_details = loop.run_until_complete(LanguageService.get_language_by_name(language_name))
@@ -28,6 +37,16 @@ def get_language_sync(language_name):
 
 
 def get_user_by_username_sync(username):
+    """
+    Retrieves user details by username synchronously.
+
+    Args:
+        username (str): The username of the user.
+
+    Returns:
+        dict: A dictionary containing user details.
+
+    """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     user_details = loop.run_until_complete(UserService.get_user_id_by_username(username))
@@ -36,6 +55,16 @@ def get_user_by_username_sync(username):
 
 
 def create_user_assessment_sync(user_id, assessment_data):
+    """
+    Synchronously creates a user assessment.
+
+    Args:
+        user_id (int): The ID of the user.
+        assessment_data (dict): The assessment data.
+
+    Returns:
+        The result of creating the user assessment.
+    """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     result = loop.run_until_complete(UserService.create_user_assessment(user_id, assessment_data))
@@ -44,6 +73,18 @@ def create_user_assessment_sync(user_id, assessment_data):
 
 @log_decorator
 def load_quiz_questions(language):
+    """
+    Load quiz questions for a specific language.
+
+    Args:
+        language (str): The language for which to load the quiz questions.
+
+    Returns:
+        list: A list of quiz questions for the specified language.
+
+    Raises:
+        FileNotFoundError: If the quiz file for the specified language is not found.
+    """
     try:
         with open(f"./starter_quizzes/{language.lower()}_quiz.json", "r", encoding="utf-8") as file:
             quiz = json.load(file)
@@ -54,6 +95,12 @@ def load_quiz_questions(language):
 
 @log_decorator
 def render_quiz():
+    """
+    Renders and handles the logic for the quiz section of the application.
+
+    Returns:
+        None
+    """
     if st.session_state.get('quiz_started', False):
         current_index = st.session_state.get('current_language_index', 0)
         selected_languages = st.session_state.get('selected_languages', [])
@@ -126,6 +173,7 @@ def render_quiz():
             # Reset quiz state when all quizzes are completed
             reset_quiz_state()
 
+# Additional helper functions for quiz
 
 def clear_quiz_state(language):
     if f'{language}_quiz_submitted' in st.session_state:
@@ -206,6 +254,17 @@ def _render_language_dropdown(languages):
         return ""
 
 def render():
+    """
+    Renders the registration form and handles form submission.
+
+    This function initializes session state variables for managing quiz progress and user registration details.
+    It displays a registration form with personal details, account and security information, and optional information.
+    Upon form submission, it validates the form inputs, creates a user object, and registers the user in the database.
+    If the form inputs are valid, it displays a success message and updates the session state variables.
+
+    Returns:
+        None
+    """
     # Initialize session state for managing quiz progress
     if 'quiz_started' not in st.session_state:
         st.session_state['quiz_started'] = False
@@ -316,6 +375,8 @@ def render():
                     st.experimental_rerun()
     else:        
         render_quiz()
+
+# Additional helper functions for quiz
 
 def create_user_language_list(selected_languages: List[str], language_list: List[Language]) -> List[UserLanguage]:
     user_languages = []

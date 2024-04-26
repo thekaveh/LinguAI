@@ -12,9 +12,19 @@ from schema.password_change import PasswordChange
 from schema.user_assessment import UserAssessmentCreate, UserAssessment
 
 class UserService:
+    """
+    This class provides methods to interact with the user service.
+    """
+
     @log_decorator
     @staticmethod
     async def list() -> List[User]:
+        """
+        Retrieves a list of users.
+
+        Returns:
+            A list of User objects.
+        """
         try:
             print(
                 "Config.USER_SERVICE_LIST_ENDPOINT :", Config.USER_SERVICE_LIST_ENDPOINT
@@ -28,6 +38,15 @@ class UserService:
     @log_decorator
     @staticmethod
     async def get_user_id_by_username(username: str) -> Optional[User]:
+        """
+        Retrieves the user ID by username.
+
+        Args:
+            username: The username of the user.
+
+        Returns:
+            The User object if found, None otherwise.
+        """
         try:
             user_service_endpoint = f"{Config.USER_SERVICE_USERNAME_ENDPOINT}{username}/id"
             # print("user_service_endpoint :", user_service_endpoint)
@@ -38,6 +57,15 @@ class UserService:
     @log_decorator
     @staticmethod
     async def get_user_by_username(username: str) -> Optional[User]:
+        """
+        Retrieves the user by username.
+
+        Args:
+            username: The username of the user.
+
+        Returns:
+            The User object if found, None otherwise.
+        """
         try:
             # Assuming Config.BASE_URL contains the base URL of your backend service
             # and you need to append '/users/username/{username}' to it
@@ -49,7 +77,15 @@ class UserService:
         
     @log_decorator
     def get_user_by_username_sync(username):
-        
+        """
+        Retrieves the user by username synchronously.
+
+        Args:
+            username: The username of the user.
+
+        Returns:
+            The User object if found, None otherwise.
+        """
         def _fetch_user_by_username_sync(username):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -67,6 +103,15 @@ class UserService:
     @log_decorator
     @staticmethod
     async def authenticate(request: AuthenticationRequest) -> AuthenticationResponse:
+        """
+        Authenticates a user.
+
+        Args:
+            request: The AuthenticationRequest object containing the authentication details.
+
+        Returns:
+            The AuthenticationResponse object.
+        """
         try:
             return await HttpUtils.apost(
                 Config.USER_SERVICE_AUTHENTICATE_ENDPOINT,
@@ -79,6 +124,15 @@ class UserService:
     @log_decorator    
     @staticmethod   
     async def create_user(request: UserCreate) -> User:
+        """
+        Creates a new user.
+
+        Args:
+            request: The UserCreate object containing the user details.
+
+        Returns:
+            The created User object.
+        """
         try:
             return await HttpUtils.apost(
                 Config.USER_SERVICE_CREATE_ENDPOINT,
@@ -91,6 +145,13 @@ class UserService:
     @log_decorator
     @staticmethod
     async def update_user_profile(username: str, user_update_data: UserCreate) -> None:
+        """
+        Updates the user profile.
+
+        Args:
+            username: The username of the user.
+            user_update_data: The UserCreate object containing the updated user details.
+        """
         try:
             return await HttpUtils.apost(
                 f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/update",
@@ -103,6 +164,13 @@ class UserService:
     @log_decorator    
     @staticmethod   
     async def update_topics(request: List[str], username:str):
+        """
+        Updates the user topics.
+
+        Args:
+            request: A list of strings representing the topics.
+            username: The username of the user.
+        """
         user_base_with_topics = User(
             user_id=-1,
             username="example_username",
@@ -124,6 +192,13 @@ class UserService:
     @log_decorator
     @staticmethod
     async def update_languages(languages: List[str], username:str):
+        """
+        Updates the user languages.
+
+        Args:
+            languages: A list of strings representing the languages.
+            username: The username of the user.
+        """
         current_user_data = await UserService.get_user_by_username(username)
         if not current_user_data:
             raise Exception(f"User {username} not found.")
@@ -140,6 +215,14 @@ class UserService:
     @log_decorator
     @staticmethod
     async def change_password(username: str, current_password: str, new_password: str):
+        """
+        Changes the user's password.
+
+        Args:
+            username: The username of the user.
+            current_password: The current password of the user.
+            new_password: The new password to set.
+        """
         password_change = PasswordChange(
             current_password=current_password,
             new_password=new_password,
@@ -153,6 +236,12 @@ class UserService:
     @log_decorator
     @staticmethod
     async def delete_user(username: str):
+        """
+        Deletes a user.
+
+        Args:
+            username: The username of the user.
+        """
         try:
             url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{username}/delete"
             await HttpUtils.delete(url)
@@ -163,6 +252,16 @@ class UserService:
     @log_decorator
     @staticmethod
     async def create_user_assessment(user_id: int, assessment_data: UserAssessmentCreate):
+        """
+        Creates a user assessment.
+
+        Args:
+            user_id: The ID of the user.
+            assessment_data: The UserAssessmentCreate object containing the assessment details.
+
+        Returns:
+            The created UserAssessment object.
+        """
         try:
             url = f"{Config.USER_SERVICE_CREATE_ENDPOINT}{user_id}/assessments/"
             return await HttpUtils.apost(

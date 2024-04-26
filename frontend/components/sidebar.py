@@ -11,6 +11,15 @@ from services.notification_service import NotificationService
 
 @log_decorator
 def show(pages):
+    """
+    Displays the sidebar with options for the user to select.
+
+    Args:
+        pages (dict): A dictionary containing the available pages and their corresponding information.
+
+    Returns:
+        tuple: A tuple containing the selected option and the corresponding page.
+    """
     with st.sidebar:
         state_service = StateService.instance()
 

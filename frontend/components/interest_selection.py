@@ -10,6 +10,16 @@ from services.state_service import StateService
 
 @log_decorator
 def render():
+    """
+    Renders the interest selection component.
+
+    This function displays a title, a subheader, and a multiselect widget for selecting interests.
+    It retrieves the list of available topics from the TopicService and the current user's topics from the UserService.
+    The selected interests are updated in the UserService and the page is rerun to reflect the changes.
+
+    Returns:
+        None
+    """
     st.title("LinguAI")
 
     st.write("")
