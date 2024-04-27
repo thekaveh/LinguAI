@@ -11,10 +11,10 @@ from services.state_service import StateService
 from services.language_service import LanguageService
 from services.embeddings_service import EmbeddingsService
 from services.notification_service import NotificationService
-from services.embeddings_quiz_service import EmbeddingsQuizService
+from services.polyglot_puzzle_service import PolyglotPuzzleService
 
 from models.llm import LLM
-from models.embeddings_quiz import EmbeddingsQuizRequest
+from models.polyglot_puzzle import PolyglotPuzzleRequest
 from models.embeddings import (
     EmbeddingsGetRequest,
     EmbeddingsGetResponse,
@@ -36,7 +36,7 @@ class PolyglotPuzzleViewModel:
 
         self._embeddings_llm = None
 
-        self._current_puzzle_request: Optional[EmbeddingsQuizRequest] = None
+        self._current_puzzle_request: Optional[PolyglotPuzzleRequest] = None
         self._current_puzzle_response: Optional[EmbeddingsGetResponse] = None
 
         self._attempts: List[str] = ["", ""]
@@ -80,7 +80,7 @@ class PolyglotPuzzleViewModel:
     @property
     def current_puzzle_request(self):
         if self._current_puzzle_request is None:
-            self._current_puzzle_request = EmbeddingsQuizRequest(
+            self._current_puzzle_request = PolyglotPuzzleRequest(
                 llm_temperature=0.0,
                 src_lang=self.src_langs[0],
                 dst_lang=self.dst_langs[0],
@@ -98,7 +98,9 @@ class PolyglotPuzzleViewModel:
         return self._current_puzzle_response
 
     def generate_puzzle_response(self):
-        self._current_puzzle_response = EmbeddingsQuizService.generate(
+        self.clear()
+
+        self._current_puzzle_response = PolyglotPuzzleService.generate(
             request=self.current_puzzle_request
         )
 
@@ -347,14 +349,14 @@ def render():
         with st.container(border=True):
             st.text_input(
                 disabled=True,
-                label="Source Language Question",
+                label="Source Language Sentence",
                 value=vm.current_puzzle_response.src_lang_question,
             )
 
             st.text_input(
                 disabled=True,
                 type="password",
-                label="Ideal Translation",
+                label="Ideal Target Language Translation",
                 value=vm.current_puzzle_response.dst_lang_question,
                 # if vm.is_submitted
                 # else "●" * len(vm.current_puzzle_response.dst_lang_question),
