@@ -207,6 +207,14 @@ def _select_learning_language(user):
 
 @log_decorator
 def render():
+    """
+    Renders the content generation page.
+
+    This function is responsible for rendering the content generation page, where users can select topics, content types, and languages to generate custom content for language learning.
+
+    Returns:
+        None
+    """
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:

@@ -13,6 +13,15 @@ from datetime import date, datetime
 
 @log_decorator
 def render_language_mastery(user):
+    """
+    Renders the language mastery for a given user.
+
+    Args:
+        user (User): The user object for which to render the language mastery.
+
+    Returns:
+        None
+    """
     if not hasattr(user, 'user_assessments') or len(user.user_assessments) == 0:
         st.write("No language assessments found.")
         return
@@ -62,6 +71,15 @@ def _render_language_dropdown(languages, current_lang):
     
 @log_decorator
 def render_awards(user):
+    """
+    Renders the awards earned by a user based on certain criteria.
+
+    Args:
+        user (User): The user object for which to render the awards.
+
+    Returns:
+        None
+    """
     today = date.today()
     awards = []
 
@@ -98,6 +116,15 @@ def render_awards(user):
         
 @log_decorator
 def render_awards_info():
+    """
+    Renders the awards information section in the profile page.
+
+    This function displays a collapsible section titled "Awards Information" in the profile page.
+    It then iterates over a dictionary of awards descriptions and displays each award along with its description.
+
+    Returns:
+        None
+    """
     with st.expander("Awards Information", expanded=False):
         st.subheader("Understand Your Awards")
 
@@ -116,6 +143,14 @@ def render_awards_info():
 
 @log_decorator
 def render():
+    """
+    Renders the profile page.
+
+    This function is responsible for rendering the profile page. It displays the user's profile details, progress, and allows them to update their information. It also handles the tour mode functionality and provides options for selecting interests and learning languages.
+
+    Returns:
+        None
+    """
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:

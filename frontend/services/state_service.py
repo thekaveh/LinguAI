@@ -10,6 +10,10 @@ from services.notification_service import NotificationService
 
 
 class StateService:
+    """
+    The StateService class manages the state of the application.
+    It stores and provides access to various properties and methods related to the application state.
+    """
     @log_decorator
     def __init__(self):
         self.reinitialize()

@@ -1,6 +1,15 @@
 import streamlit as st
 
 def render():
+    """
+    Renders the footer notes with a visual style.
+
+    This function generates and displays the footer notes for the LinguAI Inc. website.
+    The footer includes the company name and copyright information.
+
+    Returns:
+        None
+    """
     #st.image("./static/logo.png", width=100)
     # Footer notes rendering with a visual style
     st.markdown(

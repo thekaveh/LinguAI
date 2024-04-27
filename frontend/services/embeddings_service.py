@@ -15,9 +15,22 @@ from models.embeddings import (
 
 
 class EmbeddingsService:
+    """
+    A class that provides methods for interacting with the embeddings service.
+    """
+
     @log_decorator
     @staticmethod
     async def aget(request: EmbeddingsGetRequest) -> EmbeddingsGetResponse:
+        """
+        Retrieves embeddings asynchronously.
+
+        Args:
+            request (EmbeddingsGetRequest): The request object.
+
+        Returns:
+            EmbeddingsGetResponse: The response object.
+        """
         try:
             return await HttpUtils.apost(
                 request=request,
@@ -30,6 +43,15 @@ class EmbeddingsService:
     @log_decorator
     @staticmethod
     def get(request: EmbeddingsGetRequest) -> EmbeddingsGetResponse:
+        """
+        Retrieves embeddings.
+
+        Args:
+            request (EmbeddingsGetRequest): The request object.
+
+        Returns:
+            EmbeddingsGetResponse: The response object.
+        """
         return asyncio.run(EmbeddingsService.aget(request))
 
     @log_decorator
@@ -37,6 +59,15 @@ class EmbeddingsService:
     async def asimilarities(
         request: EmbeddingsSimilaritiesRequest,
     ) -> EmbeddingsSimilaritiesResponse:
+        """
+        Retrieves similarities between embeddings asynchronously.
+
+        Args:
+            request (EmbeddingsSimilaritiesRequest): The request object.
+
+        Returns:
+            EmbeddingsSimilaritiesResponse: The response object.
+        """
         try:
             return await HttpUtils.apost(
                 request=request,
@@ -51,11 +82,29 @@ class EmbeddingsService:
     def similarities(
         request: EmbeddingsSimilaritiesRequest,
     ) -> EmbeddingsSimilaritiesResponse:
+        """
+        Retrieves similarities between embeddings.
+
+        Args:
+            request (EmbeddingsSimilaritiesRequest): The request object.
+
+        Returns:
+            EmbeddingsSimilaritiesResponse: The response object.
+        """
         return asyncio.run(EmbeddingsService.asimilarities(request))
 
     @log_decorator
     @staticmethod
     async def areduce(request: EmbeddingsReduceRequest) -> EmbeddingsReduceResponse:
+        """
+        Reduces embeddings asynchronously.
+
+        Args:
+            request (EmbeddingsReduceRequest): The request object.
+
+        Returns:
+            EmbeddingsReduceResponse: The response object.
+        """
         try:
             return await HttpUtils.apost(
                 request=request,
@@ -68,4 +117,13 @@ class EmbeddingsService:
     @log_decorator
     @staticmethod
     def reduce(request: EmbeddingsReduceRequest) -> EmbeddingsReduceResponse:
+        """
+        Reduces embeddings.
+
+        Args:
+            request (EmbeddingsReduceRequest): The request object.
+
+        Returns:
+            EmbeddingsReduceResponse: The response object.
+        """
         return asyncio.run(EmbeddingsService.areduce(request))

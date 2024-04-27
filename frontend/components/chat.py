@@ -13,6 +13,16 @@ from services.text_to_speech_service import TextToSpeechService
 
 @log_decorator
 def render():
+    """
+    Renders the chat page.
+
+    This function is responsible for rendering the chat page, where users can interact with the chatbot
+    to practice their language skills and upload visual images to ask questions about. It also handles
+    the tour mode functionality, allowing users to navigate through the tour and exit the tour.
+
+    Returns:
+        None
+    """
     state_service = StateService.instance()
 
     if state_service.tour_mode != None:
@@ -41,6 +51,15 @@ def render():
             )
 
     def _render_chat_messages():
+        """
+        Renders the chat messages.
+
+        This function is responsible for rendering the chat messages on the chat page. It iterates through
+        the chat messages stored in the state service and displays them along with any uploaded images.
+
+        Returns:
+            None
+        """
         messages = state_service.chat_messages
         n = len(messages)
 
@@ -108,6 +127,15 @@ def render():
 
     @log_decorator
     def _file_uploader_on_change():
+        """
+        Handles the file uploader on change event.
+
+        This function is called when the user uploads images using the file uploader. It retrieves the
+        uploaded images and adds them to the current user chat message.
+
+        Returns:
+            None
+        """
         if uploaded_images := st.session_state[
             f"file_uploader_{state_service.chat_file_upload_key}"
         ]:
