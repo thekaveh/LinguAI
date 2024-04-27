@@ -10,9 +10,11 @@ from services.llm_service import LLMService
 from services.state_service import StateService
 from services.language_service import LanguageService
 from services.embeddings_service import EmbeddingsService
-from services.embeddings_quiz_service import EmbeddingsQuizService
+from services.notification_service import NotificationService
+from services.polyglot_puzzle_service import PolyglotPuzzleService
 
-from models.embeddings_quiz import EmbeddingsQuizRequest
+from models.llm import LLM
+from models.polyglot_puzzle import PolyglotPuzzleRequest
 from models.embeddings import (
     EmbeddingsGetRequest,
     EmbeddingsGetResponse,
@@ -21,18 +23,21 @@ from models.embeddings import (
 )
 
 
-class EmbeddingsQuizViewModel:
-    def __init__(self, state_service: StateService) -> None:
-        self._state_service = state_service
+class PolyglotPuzzleViewModel:
+    def __init__(self) -> None:
+        self.reinitialize()
 
+    @log_decorator
+    def reinitialize(self) -> None:
         self._src_langs = None
         self._dst_langs = None
+        self._difficulties = None
+        self._structured_content_llms = None
 
-        self._current_src_lang = None
-        self._current_dst_lang = None
-        self._current_difficulty = None
+        self._embeddings_llm = None
 
-        self._embeddings_quiz: Optional[EmbeddingsGetResponse] = None
+        self._current_puzzle_request: Optional[PolyglotPuzzleRequest] = None
+        self._current_puzzle_response: Optional[EmbeddingsGetResponse] = None
 
         self._attempts: List[str] = ["", ""]
 
@@ -50,17 +55,6 @@ class EmbeddingsQuizViewModel:
         return self._src_langs
 
     @property
-    def current_src_lang(self):
-        if self._current_src_lang is None:
-            self._current_src_lang = self.src_langs[0]
-
-        return self._current_src_lang
-
-    @current_src_lang.setter
-    def current_src_lang(self, value):
-        self._current_src_lang = value
-
-    @property
     def dst_langs(self):
         if self._dst_langs is None:
             self._dst_langs = [
@@ -70,55 +64,52 @@ class EmbeddingsQuizViewModel:
         return self._dst_langs
 
     @property
-    def current_dst_lang(self):
-        if self._current_dst_lang is None:
-            self._current_dst_lang = self.dst_langs[0]
-
-        return self._current_dst_lang
-
-    @current_dst_lang.setter
-    def current_dst_lang(self, value):
-        self._current_dst_lang = value
-
-    @property
     def difficulties(self):
-        return ["Easy", "Medium", "Hard"]
+        if self._difficulties is None:
+            self._difficulties = ["Easy", "Medium", "Hard"]
+
+        return self._difficulties
 
     @property
-    def current_difficulty(self):
-        if self._current_difficulty is None:
-            self._current_difficulty = self.difficulties[0]
+    def structured_content_llms(self):
+        if self._structured_content_llms is None:
+            self._structured_content_llms = LLMService.get_structured_content()
 
-        return self._current_difficulty
-
-    @current_difficulty.setter
-    def current_difficulty(self, value):
-        self._current_difficulty = value
+        return self._structured_content_llms
 
     @property
-    def embeddings_quiz(self):
-        return self._embeddings_quiz
-
-    def generate_embeddings_quiz(self):
-        self._embeddings_quiz = EmbeddingsQuizService.generate(
-            request=EmbeddingsQuizRequest(
-                src_lang=self.current_src_lang,
-                dst_lang=self.current_dst_lang,
-                difficulty=self.current_difficulty,
-                llm_id=self._state_service.content_llm.id,
-                llm_temperature=self._state_service.content_temperature,
+    def current_puzzle_request(self):
+        if self._current_puzzle_request is None:
+            self._current_puzzle_request = PolyglotPuzzleRequest(
+                llm_temperature=0.0,
+                src_lang=self.src_langs[0],
+                dst_lang=self.dst_langs[0],
+                difficulty=self.difficulties[0],
+                llm_id=LLMService.get_structured_content()[0].id,
             )
+
+        return self._current_puzzle_request
+
+    def has_puzzle_response(self):
+        return self._current_puzzle_response is not None
+
+    @property
+    def current_puzzle_response(self):
+        return self._current_puzzle_response
+
+    def generate_puzzle_response(self):
+        self.clear()
+
+        self._current_puzzle_response = PolyglotPuzzleService.generate(
+            request=self.current_puzzle_request
         )
 
-    def has_embeddings_quiz(self):
-        return self._embeddings_quiz is not None
-
-    def clear_embeddings_quiz(self):
+    def clear(self):
         self._data = None
         self._data_2d = None
         self._data_3d = None
         self._attempts = ["", ""]
-        self._embeddings_quiz = None
+        self._current_puzzle_response = None
 
     @property
     def attempts(self):
@@ -126,7 +117,7 @@ class EmbeddingsQuizViewModel:
 
     def can_add_attempt(self):
         return (
-            self.has_embeddings_quiz()
+            self.has_puzzle_response()
             and len(self.attempts) >= 2
             and len(self.attempts) <= 10
             and all(attempt.strip() != "" for attempt in self.attempts)
@@ -136,21 +127,72 @@ class EmbeddingsQuizViewModel:
         if self.can_add_attempt():
             self._attempts.append("")
 
+    @property
+    def embeddings_llm(self):
+        if self._embeddings_llm is None:
+            self._embeddings_llm = LLMService.get_embeddings()[0]
+
+        return self._embeddings_llm
+
+    @embeddings_llm.setter
+    def embeddings_llm(self, value: LLM) -> None:
+        if value != self._embeddings_llm:
+            self._embeddings_llm = value
+
+            NotificationService.success(
+                f"Embeddings LLM changed to **{value.display_name()}**"
+            )
+
+        return self._embeddings_llm
+
+    @property
+    def current_structured_content_llm(self):
+        return next(
+            (
+                llm
+                for llm in self.structured_content_llms
+                if llm.id == self.current_puzzle_request.llm_id
+            ),
+            self.structured_content_llms[0],
+        )
+
+    @current_structured_content_llm.setter
+    def current_structured_content_llm(self, value: LLM) -> None:
+        if value.id != self.current_puzzle_request.llm_id:
+            self.current_puzzle_request.llm_id = value.id
+
+            NotificationService.success(
+                f"Structured Content LLM changed to **{value.display_name()}**"
+            )
+
+    @property
+    def current_structured_content_temperature(self) -> float:
+        return self.current_puzzle_request.llm_temperature
+
+    @current_structured_content_temperature.setter
+    def current_structured_content_temperature(self, value: float) -> None:
+        if value != self.current_puzzle_request.llm_temperature:
+            self.current_puzzle_request.llm_temperature = value
+
+            NotificationService.success(
+                f"Structured Content Temperature changed to **{value}**"
+            )
+
     def can_submit(self):
         return (
-            self.has_embeddings_quiz()
+            self.has_puzzle_response()
             and len(self.attempts) >= 2
             and all(attempt.strip() != "" for attempt in self.attempts)
         )
 
     def submit(self):
         if self.can_submit():
-            texts = [self._embeddings_quiz.dst_lang_question] + self.attempts
+            texts = [self.current_puzzle_response.dst_lang_question] + self.attempts
 
             embeddings = EmbeddingsService.get(
                 EmbeddingsGetRequest(
-                    llm_id=self._state_service.embeddings_llm.id,
                     texts=texts,
+                    llm_id=self.embeddings_llm.id,
                 )
             ).embeddings
 
@@ -200,11 +242,10 @@ class EmbeddingsQuizViewModel:
 
     @staticmethod
     def instance():
-        if "embeddings_quiz_view_model" not in st.session_state:
-            st.session_state["embeddings_quiz_view_model"] = EmbeddingsQuizViewModel(
-                state_service=StateService.instance()
-            )
-        return st.session_state["embeddings_quiz_view_model"]
+        if "polyglot_puzzle_view_model" not in st.session_state:
+            st.session_state["polyglot_puzzle_view_model"] = PolyglotPuzzleViewModel()
+
+        return st.session_state["polyglot_puzzle_view_model"]
 
 
 @log_decorator
@@ -214,29 +255,37 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 5
         with state_service.tour_mode.container():
-            st.markdown('This is our translation quiz page!')
-            st.markdown('On this page, you can assess your language skills by typing in your answers to translation questions and seeing your accuracy!')
+            st.markdown("This is our polyglot puzzle page!")
+            st.markdown(
+                "On this page, you can assess your language skills by typing in your answers to translation questions and seeing your accuracy!"
+            )
 
-            st.markdown('Let\'s continue with the tour!')
+            st.markdown("Let's continue with the tour!")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")
 
             with col1:
-                st.button(f"Next Stop: Profile", key='switch_button', type="primary", use_container_width=True)
+                st.button(
+                    f"Next Stop: Profile",
+                    key="switch_button",
+                    type="primary",
+                    use_container_width=True,
+                )
 
             with col2:
                 exit_tour = st.button("Exit Tour", use_container_width=True)
             if exit_tour:
                 state_service.tour_mode = None
-            
-            st.markdown("""
+
+            st.markdown(
+                """
                 <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
-    vm = EmbeddingsQuizViewModel.instance()
+    vm = PolyglotPuzzleViewModel.instance()
 
     _render_sidebar_settings()
 
@@ -255,30 +304,25 @@ def render():
         col_src_lang, col_dst_lang, col_diff = st.columns([1, 1, 1])
 
         with col_src_lang:
-            new_src_lang = st.selectbox(
+            vm.current_puzzle_request.src_lang = st.selectbox(
                 label="Choose source language:",
                 options=vm.src_langs,
-                index=vm.src_langs.index(vm.current_src_lang),
+                index=vm.src_langs.index(vm.current_puzzle_request.src_lang),
             )
-            vm.current_src_lang = new_src_lang
 
         with col_dst_lang:
-            new_dst_lang = st.selectbox(
+            vm.current_puzzle_request.dst_lang = st.selectbox(
                 label="Choose target language:",
                 options=vm.dst_langs,
-                index=vm.dst_langs.index(vm.current_dst_lang),
+                index=vm.dst_langs.index(vm.current_puzzle_request.dst_lang),
             )
-            vm.current_dst_lang = new_dst_lang
-            print("dst_lang changed")
 
         with col_diff:
-            new_difficulty = st.select_slider(
+            vm.current_puzzle_request.difficulty = st.select_slider(
                 label="Select difficulty:",
                 options=vm.difficulties,
-                value=vm.current_difficulty,
+                value=vm.current_puzzle_request.difficulty,
             )
-            vm.current_difficulty = new_difficulty
-            print("difficulty changed!")
 
         col_gen_btn, col_clear_btn = st.columns([2, 1])
 
@@ -286,9 +330,9 @@ def render():
             if st.button(
                 type="primary",
                 use_container_width=True,
-                label="Generate Embeddings Quiz",
+                label="Generate Polyglot Puzzle",
             ):
-                vm.generate_embeddings_quiz()
+                vm.generate_puzzle_response()
                 st.rerun()
 
         with col_clear_btn:
@@ -296,25 +340,26 @@ def render():
                 type="primary",
                 use_container_width=True,
                 label="Clear",
-                disabled=not vm.has_embeddings_quiz(),
+                disabled=not vm.has_puzzle_response(),
             ):
-                vm.clear_embeddings_quiz()
+                vm.clear()
                 st.rerun()
 
-    if vm.has_embeddings_quiz():
+    if vm.has_puzzle_response():
         with st.container(border=True):
             st.text_input(
                 disabled=True,
-                label="Source Language Question",
-                value=vm.embeddings_quiz.src_lang_question,
+                label="Source Language Sentence",
+                value=vm.current_puzzle_response.src_lang_question,
             )
 
             st.text_input(
                 disabled=True,
-                label="Ideal Answer",
-                value=vm.embeddings_quiz.dst_lang_question
-                if vm.is_submitted
-                else "●" * len(vm.embeddings_quiz.dst_lang_question),
+                type="password",
+                label="Ideal Target Language Translation",
+                value=vm.current_puzzle_response.dst_lang_question,
+                # if vm.is_submitted
+                # else "●" * len(vm.current_puzzle_response.dst_lang_question),
             )
 
             for i in range(len(vm.attempts)):
@@ -365,78 +410,6 @@ def render():
 
         with st.container(border=True):
             _plot_3d_data(vm.data_3d)
-
-
-def _render_sidebar_settings():
-    state_service = StateService.instance()
-
-    st.sidebar.write("---")
-
-    with st.sidebar.expander("⚙️", expanded=True):
-        embeddings_llms = LLMService.get_embeddings()
-        new_embeddings_llm = st.selectbox(
-            key="embeddings_llm",
-            disabled=not embeddings_llms,
-            label="Embeddings Model:",
-            help="Embeddings Generation LLM Engine",
-            format_func=lambda llm: llm.display_name(),
-            options=embeddings_llms if embeddings_llms else ["No LLMs available!"],
-            index=0
-            if not (embeddings_llms or state_service.embeddings_llm)
-            else embeddings_llms.index(
-                next(
-                    (
-                        llm
-                        for llm in embeddings_llms
-                        if llm.id == state_service.embeddings_llm.id
-                    ),
-                    embeddings_llms[0],
-                )
-            ),
-        )
-        state_service.embeddings_llm = (
-            new_embeddings_llm if new_embeddings_llm != "No LLMs available!" else None
-        )
-
-        structured_content_llms = LLMService.get_structured_content()
-        new_structured_content_llm = st.selectbox(
-            key="structured_content_llm",
-            disabled=not structured_content_llms,
-            label="Large Language Model:",
-            help="Structured Content Generation LLM Engine",
-            format_func=lambda llm: llm.display_name(),
-            options=structured_content_llms
-            if structured_content_llms
-            else ["No LLMs available!"],
-            index=0
-            if not (structured_content_llms or state_service.content_llm)
-            else structured_content_llms.index(
-                next(
-                    (
-                        llm
-                        for llm in structured_content_llms
-                        if llm.id == state_service.content_llm.id
-                    ),
-                    structured_content_llms[0],
-                )
-            ),
-        )
-        state_service.structured_content_llm = (
-            new_structured_content_llm
-            if new_structured_content_llm != "No LLMs available!"
-            else None
-        )
-
-        new_content_temperature = st.slider(
-            step=0.1,
-            min_value=0.0,
-            max_value=1.0,
-            label="Creativity:",
-            key="content_temperature",
-            value=state_service.content_temperature,
-            help="Content Generation LLM Engine Temperature",
-        )
-        state_service.content_temperature = new_content_temperature
 
 
 def _similarity_to_color(similarity):
@@ -547,3 +520,60 @@ def _plot_3d_data(data_3d):
     st.markdown(
         f'<p style="color:grey; font-size:11px;">{notice}</p>', unsafe_allow_html=True
     )
+
+
+def _render_sidebar_settings():
+    vm = PolyglotPuzzleViewModel.instance()
+
+    st.sidebar.write("---")
+
+    with st.sidebar.expander("⚙️", expanded=True):
+        embeddings_llms = LLMService.get_embeddings()
+        new_embeddings_llm = st.selectbox(
+            key="embeddings_llm",
+            disabled=not embeddings_llms,
+            label="Embeddings Model:",
+            help="Embeddings Generation LLM Engine",
+            format_func=lambda llm: llm.display_name(),
+            options=embeddings_llms if embeddings_llms else ["No LLMs available!"],
+            index=0
+            if not (embeddings_llms or vm.embeddings_llm)
+            else embeddings_llms.index(
+                next(
+                    (llm for llm in embeddings_llms if llm.id == vm.embeddings_llm.id),
+                    embeddings_llms[0],
+                )
+            ),
+        )
+        vm.embeddings_llm = (
+            new_embeddings_llm if new_embeddings_llm != "No LLMs available!" else None
+        )
+
+        new_structured_content_llm = st.selectbox(
+            key="structured_content_llm",
+            disabled=not vm.structured_content_llms,
+            label="Structured Large Language Model:",
+            help="Structured Content Generation LLM Engine",
+            format_func=lambda llm: llm.display_name(),
+            options=vm.structured_content_llms
+            if vm.structured_content_llms
+            else ["No LLMs available!"],
+            index=0
+            if not (vm.structured_content_llms or vm.current_structured_content_llm)
+            else vm.structured_content_llms.index(vm.current_structured_content_llm),
+        )
+        vm.current_structured_content_llm = (
+            new_structured_content_llm
+            if new_structured_content_llm != "No LLMs available!"
+            else None
+        )
+
+        vm.current_structured_content_temperature = st.slider(
+            step=0.1,
+            min_value=0.0,
+            max_value=1.0,
+            label="Creativity:",
+            key="structured_content_temperature",
+            value=vm.current_structured_content_temperature,
+            help="Structured Content Generation LLM Engine Temperature",
+        )

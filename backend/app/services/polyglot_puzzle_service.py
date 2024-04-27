@@ -4,19 +4,19 @@ from langchain.output_parsers import PydanticOutputParser
 
 from app.utils.logger import log_decorator
 from app.services.llm_service import LLMService
-from app.models.embeddings_quiz import (
-    EmbeddingsQuizRequest,
-    EmbeddingsQuizResponse,
+from app.models.polyglot_puzzle import (
+    PolyglotPuzzleRequest,
+    PolyglotPuzzleResponse,
 )
 
 
-class EmbeddingsQuizService:
+class PolyglotPuzzleService:
     @log_decorator
     def __init__(self, db_session: Session):
         self.db_session = db_session
 
     @log_decorator
-    async def agenerate(self, request: EmbeddingsQuizRequest) -> EmbeddingsQuizResponse:
+    async def agenerate(self, request: PolyglotPuzzleRequest) -> PolyglotPuzzleResponse:
         assert request is not None, "message is required"
         assert request.llm_id is not None, "llm_id is required"
         assert request.llm_temperature is not None, "llm_temperature is required"
@@ -28,7 +28,7 @@ class EmbeddingsQuizService:
         runnable = llm_service.get_chat_runnable(
             llm_id=request.llm_id, temperature=request.llm_temperature
         )
-        parser = PydanticOutputParser(pydantic_object=EmbeddingsQuizResponse)
+        parser = PydanticOutputParser(pydantic_object=PolyglotPuzzleResponse)
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
