@@ -255,12 +255,16 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 5
         with state_service.tour_mode.container():
-            st.markdown("This is our polyglot puzzle page!")
+            st.markdown("### 🧩 Welcome to the Polyglot Puzzle Page!")
             st.markdown(
-                "On this page, you can assess your language skills by typing in your answers to translation questions and seeing your accuracy!"
+                "This is your personal language challenge arena! On this page, you can assess your language skills by typing in your answers to translation questions and seeing your accuracy. It's like a fun and interactive language quiz that helps you learn and improve! 🎯"
             )
 
-            st.markdown("Let's continue with the tour!")
+            st.markdown(
+                "Whether you're a beginner or an advanced learner, these puzzles will help you test your knowledge and learn new words and phrases in a fun and engaging way. Up for the challenge? 🏁"
+            )
+
+            st.markdown("Ready to continue the journey? Let's go! 🚀")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")

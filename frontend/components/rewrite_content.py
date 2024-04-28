@@ -146,11 +146,16 @@ def render():
     if state_service.tour_mode is not None:
         state_service.last_visited = 3
         with state_service.tour_mode.container():
-            st.markdown('This is our rewrite content page!')
-            st.markdown('You can paste in text that you might want to read at a different skill level or in a different language!')
-            st.markdown('We support 5 different skill levels and 5 different languages for this tool!\n')
+            st.markdown("### 🖊 Welcome to the Rewrite Content Page!")
+            st.markdown(
+                "This is your personal language transformation tool! Here, you can paste in text that you might want to read at a different skill level or in a different language. It's like having a personal translator and language tutor in one! 🌍"
+            )
 
-            st.markdown('Let\'s continue with the tour!')
+            st.markdown(
+                "We support 5 different skill levels and 5 different languages for this tool, so you can customize the content to match your learning needs. Whether you're a beginner or an advanced learner, we've got you covered! 🎯"
+            )
+
+            st.markdown("Ready to continue the journey? Let's go! 🚀")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")

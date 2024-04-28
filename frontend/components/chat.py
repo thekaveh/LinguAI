@@ -28,10 +28,16 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 1
         with state_service.tour_mode.container():
-            st.markdown('This is our chat page!')
-            st.markdown('You can interact with the chatbot to practice your language skills as well as upload visual images to ask questions about!\n')
+            st.markdown("### 🗣️ Welcome to the Chat Page!")
+            st.markdown(
+                "This is where the magic happens! Our chat page is your personal language practice playground. You can interact with our AI chatbot to practice your language skills. 🤖"
+            )
 
-            st.markdown('Let\'s continue with the tour!')
+            st.markdown(
+                "But that's not all! You can also upload visual images and ask questions about them. It's a great way to learn new vocabulary and concepts. 🖼️"
+            )
+
+            st.markdown("Ready to continue the journey? Let's go! 🚀")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")

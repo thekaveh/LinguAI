@@ -156,10 +156,16 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 6
         with state_service.tour_mode.container():
-            st.markdown('This is our profile page!')
-            st.markdown('You can view your profile details here, view your progress, as well as update  your information!\n')
+            st.markdown("### 👤 Welcome to the Profile Page!")
+            st.markdown(
+                "This is your personal dashboard! Here, you can view your profile details, track your progress, and update your information. It's like your personal language learning hub! 📊"
+            )
 
-            st.markdown('Let\'s continue with the tour!')
+            st.markdown(
+                "Keep track of your learning journey, see how much you've improved, and set new goals for yourself. Remember, every step forward is a step towards mastery! 🏆"
+            )
+
+            st.markdown("Ready to continue the journey? Let's go! 🚀")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")

@@ -110,12 +110,16 @@ def render():
             if state_service.tour_mode is not None:
                 state_service.last_visited = 0
                 with state_service.tour_mode.container():
-                    st.markdown("Hello! Welcome to the LinguAI tour!")
+                    st.markdown("### 🎉 Welcome to the LinguAI Tour! 🎉")
                     st.markdown(
-                        "This is our home page where you can read about LinguAI and start your language learning journey."
+                        "We're thrilled to have you here! LinguAI is a state-of-the-art language learning platform that leverages artificial intelligence to provide a personalized learning experience. 🧠"
                     )
 
-                    st.markdown("Let's get started on the tour!")
+                    st.markdown(
+                        "On this home page, you'll find an overview of LinguAI, our mission, and how we can help you on your language learning journey. You can also start your learning journey right from here! 🚀"
+                    )
+
+                    st.markdown("Ready to explore more? Let's dive in! 🏊‍♀️")
                     st.write("")
 
                     col1, col2 = st.columns([1, 1], gap="large")
