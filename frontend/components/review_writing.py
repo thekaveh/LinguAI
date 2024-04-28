@@ -193,10 +193,16 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 4
         with state_service.tour_mode.container():
-            st.markdown('This is our review writing content page!')
-            st.markdown("On this page, you can get personal feedback on content that you've written yourself based on your skill level and in the language of your text.\n")
+            st.markdown("### ✍️ Welcome to the Review Writing Content Page!")
+            st.markdown(
+                "This is your personal language feedback tool! On this page, you can get personal feedback on content that you've written yourself. It's like having a personal language tutor that provides feedback tailored to your skill level and in the language of your text. 📝"
+            )
 
-            st.markdown('Let\'s continue with the tour!')
+            st.markdown(
+                "Whether you're writing a short story, an essay, or a simple sentence, you can get feedback that helps you improve your language skills. It's a great way to practice and learn! 🎓"
+            )
+
+            st.markdown("Ready to continue the journey? Let's go! 🚀")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")

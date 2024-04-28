@@ -90,10 +90,16 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 7
         with state_service.tour_mode.container():
-            st.markdown('This is our language assessment page!')
-            st.markdown('On this page, you can assess your language skills and increase your skill level.')
+            st.markdown("### 📝 Welcome to the Language Assessment Page!")
+            st.markdown(
+                "This is your personal language testing ground! On this page, you can assess your language skills and increase your skill level. It's like a personal language exam that helps you understand your strengths and areas for improvement. 🎯"
+            )
 
-            st.markdown('We\'ve completed the tour!')
+            st.markdown(
+                "Take the assessment, see your results, and use the feedback to guide your learning journey. Remember, every assessment is a step towards language mastery! 🏆"
+            )
+
+            st.markdown("🎉 Congratulations! We've completed the tour! 🎉")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")

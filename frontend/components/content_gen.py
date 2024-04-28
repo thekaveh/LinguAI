@@ -25,6 +25,7 @@ CONTENT_TYPE = (
     3  # move to enums later, tells this content is about the reading page content
 )
 
+# Helper functions
 
 @log_decorator
 def _render_content_types(content_types):
@@ -220,10 +221,16 @@ def render():
     if state_service.tour_mode != None:
         state_service.last_visited = 2
         with state_service.tour_mode.container():
-            st.markdown('This is our content generation page!')
-            st.markdown('On this page, you can select from different topics, content types, and languages to generate custom content to further your language learning journey!')
+            st.markdown("### 📚 Welcome to the Content Generation Page!")
+            st.markdown(
+                "This is your personal language learning library! On this page, you can select from different topics, content types, and languages to generate custom content. It's like having a language tutor that creates personalized lessons just for you! 🎓"
+            )
 
-            st.markdown('Let\'s continue with the tour!')
+            st.markdown(
+                "Whether you're interested in sports, science, art, or any of our many other supported topics, you can generate content that matches your interests and helps you learn at the same time. 🌐"
+            )
+
+            st.markdown("Ready to continue the journey? Let's go! 🚀")
             st.write("")
 
             col1, col2 = st.columns([1, 1], gap="large")
