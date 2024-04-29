@@ -53,6 +53,7 @@ services:
       - ./logs/frontend:/app/logs
     depends_on:
       - backend
+      - db-dashboard
     environment:
       - APP_CONTEXT=frontend
       - BACKEND_ENDPOINT=http://backend:8000

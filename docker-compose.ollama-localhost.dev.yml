@@ -54,6 +54,7 @@ services:
       - ./logs/frontend:/app/logs
     depends_on:
       - backend
+      - db-dashboard
     env_file:
       - .env
     environment:
