@@ -43,17 +43,23 @@ def render():
             col1, col2 = st.columns([1, 1], gap="large")
 
             with col1:
-                st.button(f"Next Stop: Content Reading", key='switch_button', type="primary", use_container_width=True)
-            
+                st.button(
+                    f"Next Stop: Content Reading",
+                    key="switch_button",
+                    type="primary",
+                    use_container_width=True,
+                )
+
             with col2:
                 exit_tour = st.button("Exit Tour", use_container_width=True)
             if exit_tour:
                 state_service.tour_mode = None
-            
-            st.markdown("""
+
+            st.markdown(
+                """
                 <span style="font-size: x-small; font-style: italic;">Note: please use the "exit tour" button instead of the 'X' to exit out of the tour!</span>
                 """,
-                unsafe_allow_html=True
+                unsafe_allow_html=True,
             )
 
     def _render_chat_messages():
@@ -186,6 +192,10 @@ def render():
 
     with st.sidebar.expander("⚙️", expanded=True):
         content_llms = LLMService.get_content()
+        cur_content_llm = next(
+            (llm for llm in content_llms if llm.id == state_service.content_llm.id),
+            content_llms[0],
+        )
         new_content_llm = st.selectbox(
             key="content_llm",
             disabled=not content_llms,
@@ -195,20 +205,13 @@ def render():
             options=content_llms if content_llms else ["No LLMs available!"],
             index=0
             if not (content_llms or state_service.content_llm)
-            else content_llms.index(
-                next(
-                    (
-                        llm
-                        for llm in content_llms
-                        if llm.id == state_service.content_llm.id
-                    ),
-                    content_llms[0],
-                )
-            ),
+            else content_llms.index(cur_content_llm),
         )
         state_service.content_llm = (
             new_content_llm if new_content_llm != "No LLMs available!" else None
         )
+        if cur_content_llm != new_content_llm:
+            st.rerun()
 
         new_content_temperature = st.slider(
             step=0.1,

@@ -731,7 +731,7 @@ COPY public.llm (id, is_active, vision, content, structured_content, embeddings,
 11	t	-1	-1	-1	1	openai	text-embedding-3-large
 12	t	-1	-1	-1	3	openai	text-embedding-ada-002
 13	t	-1	8	4	-1	groq	mixtral-8x7b-32768
-14	t	-1	9	-1	-1	groq	llama2-70b-4096
+14	f	-1	9	-1	-1	groq	llama2-70b-4096
 15	t	-1	-1	-1	6	ollama	mxbai-embed-large:latest
 16	t	-1	3	-1	-1	groq	llama3-70b-8192
 17	t	-1	4	-1	-1	groq	llama3-8b-8192
