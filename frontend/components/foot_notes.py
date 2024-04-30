@@ -22,7 +22,7 @@ def render():
             width: 100%;
             color: #ffffff;
             background-color: #ff6600;
-            padding: 5px;
+            padding: 2px;
             display: flex;
             justify-content: space-between;
             z-index: 2; /* Ensure footer is above other content */
@@ -31,7 +31,7 @@ def render():
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: left;
+            align-items: center; /* Center align items horizontally */
             width: 33.33%;
         }
         .footer-column.right {
@@ -40,12 +40,14 @@ def render():
             padding-right: 20px;
         }
         .footer-column.center p {
-            font-size: 24px;
+            font-size: 16px;
             font-weight: bold;
             text-align: left;
+            margin-left: auto; /* Aligns text to the right */
+            margin-right: 150px; /* Adjusts the space to the right */
         }
         .footer-column.right p {
-            font-size: 16px;
+            font-size: 10px;
             font-weight: normal;
         }
         .content {
@@ -60,10 +62,11 @@ def render():
                 <p>LinguAI Inc.</p>
             </div>
             <div class="footer-column right">
-                <p class="copyright">© 2024 LinguAI Inc. All rights reserved.</p>
+                <p class="copyright">Made with ♥️ in VA © 2024</p>
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
+
     
