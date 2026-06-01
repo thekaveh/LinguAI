@@ -12,8 +12,10 @@ RUN apt-get install -y tzdata && \
 # Copying pyproject.toml and poetry.lock* first to leverage Docker cache
 COPY ./pyproject.toml ./poetry.lock* /app/
 
-# Install Poetry and dependencies
-RUN pip install poetry && \
+# Install Poetry and dependencies. Pin to <2 so the legacy `--no-dev` flag
+# (removed in Poetry 2.x) keeps working; backend's pyproject.toml hasn't been
+# migrated to Poetry 2 yet.
+RUN pip install "poetry<2" && \
 	poetry config virtualenvs.create false && \
 	poetry install --no-dev
 

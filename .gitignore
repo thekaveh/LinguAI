@@ -168,3 +168,9 @@ video1386280615.mp4
 *.mp4
 french-menu-card2.png
 french-menu-card.png
+
+# Superpowers brainstorming session artifacts (visual companion mockups)
+.superpowers/
+
+# NiceGUI runtime session storage (per-browser-session JSON files)
+frontend/.nicegui/

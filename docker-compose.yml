@@ -58,13 +58,16 @@ services:
       - OLLAMA_API_ENDPOINT=http://ollama:11434
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: frontend
     restart: unless-stopped
     ports:
-      - "${FRONTEND_PORT}:8501"
+      - "${FRONTEND_PORT}:8080"
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app/frontend
+      - ./external/vmx:/app/external/vmx
       - ./logs/frontend:/app/logs
     depends_on:
       - backend
@@ -74,6 +77,11 @@ services:
     environment:
       - APP_CONTEXT=frontend
       - BACKEND_ENDPOINT=http://backend:8000
+      # In-container listener must always be 8080 (the right-side of the port
+      # mapping above). Without this override, AppConfig would read the host's
+      # FRONTEND_PORT from .env and bind NiceGUI to the host port internally,
+      # causing the mapping to forward to a closed port.
+      - FRONTEND_PORT=8080
 
 volumes:
   db-data:

@@ -7,23 +7,121 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-streamlit = "^1.31.0"
-requests = "^2.31.0"
-streamlit-option-menu = "^0.3.12"
-websockets = "^12.0"
+nicegui = "^2.0"
+vmx = {path = "../external/vmx/langs/python", develop = true}
+httpx = "^0.27"
 pydantic = {extras = ["email"], version = "^2.6.3"}
-httpx = "^0.26.0"
+pydantic-settings = "^2.2"
 email-validator = "^2.1.1"
 langdetect = "^1.0.9"
-sqlmodel = "^0.0.16"
-streamlit-modal = "^0.1.2"
-pytest = "^8.1.1"
-pytest-asyncio = "^0.23.6"
-pytest-cov = "^5.0.0"
 plotly = "^5.20.0"
 pandas = "^2.2.2"
 numpy = "^1.26.4"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pytest-asyncio = "^0.23.6"
+pytest-cov = "^5.0.0"
+respx = "^0.21"
+import-linter = "^2.0"
+mypy = "^1.10"
+ruff = "^0.5"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+
+[tool.importlinter]
+# Runtime imports are `models.X`, `viewmodels.X`, `views.X`, `core.X` — no `frontend.` prefix
+# (pythonpath = ["."] from frontend/ makes these top-level packages).
+root_packages = ["models", "viewmodels", "views", "core"]
+# Required because the "forbidden_modules" contracts reference `nicegui` (external dep).
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "MVVM layering"
+type = "layers"
+layers = [
+    "views",
+    "viewmodels",
+    "models",
+    "core",
+]
+# `core.di` is the composition root — by design it imports from every layer to wire them together.
+# It's the only `core.*` module allowed to do this.
+ignore_imports = [
+    "core.di -> models.services.auth_service",
+    "core.di -> viewmodels.app_shell_vm",
+    "core.di -> viewmodels.shell.navigation_vm",
+    "core.di -> viewmodels.shell.notification_center_vm",
+    "core.di -> viewmodels.shell.settings_vm",
+    "core.di -> viewmodels.shell.user_session_vm",
+    "core.di -> viewmodels.home.home_vm",
+    "core.di -> models.services.polyglot_puzzle_service",
+    "core.di -> models.services.embeddings_service",
+    "core.di -> models.services.language_service",
+    "core.di -> models.services.llm_service",
+    "core.di -> viewmodels.polyglot_puzzle.polyglot_puzzle_vm",
+    "core.di -> viewmodels.polyglot_puzzle.embeddings_view_vm",
+    "core.di -> models.services.user_service",
+    "core.di -> models.services.topic_service",
+    "core.di -> viewmodels.profile.profile_vm",
+    "core.di -> viewmodels.assessment.assessment_vm",
+    "core.di -> models.services.chat_service",
+    "core.di -> models.services.persona_service",
+    "core.di -> models.services.text_to_speech_service",
+    "core.di -> viewmodels.chat.chat_vm",
+    "core.di -> models.services.content_gen_service",
+    "core.di -> models.services.rewrite_content_service",
+    "core.di -> models.services.review_writing_service",
+    "core.di -> viewmodels.content_gen.content_gen_vm",
+    "core.di -> viewmodels.rewrite_content.rewrite_content_vm",
+    "core.di -> viewmodels.review_writing.review_writing_vm",
+    "core.di -> models.services.ping_service",
+    "core.di -> viewmodels.admin.admin_vm",
+    "core.di -> models.services.user_content_service",
+]
+
+[[tool.importlinter.contracts]]
+name = "viewmodels are UI-free"
+type = "forbidden"
+source_modules = ["viewmodels"]
+forbidden_modules = ["nicegui"]
+# Direct imports only — transitive paths through models/core are not a violation.
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "models are UI-free"
+type = "forbidden"
+source_modules = ["models"]
+forbidden_modules = ["nicegui"]
+allow_indirect_imports = true
+
+[[tool.importlinter.contracts]]
+name = "views do not call services directly"
+type = "forbidden"
+source_modules = ["views"]
+forbidden_modules = ["models.services"]
+# Transitive paths through viewmodels are exactly the right architecture (views bind to VMs,
+# VMs call services). Only DIRECT views → models.services imports are violations.
+allow_indirect_imports = true
+
+[tool.mypy]
+strict = true
+# VMx exposes generic protocols (MessageHub[Message], etc.). Strict parameterization
+# is a polish pass; for the overhaul, accept unparameterized usage.
+disable_error_code = ["type-arg"]
+
+[[tool.mypy.overrides]]
+# Pre-existing schema files with missing annotations / redefinitions — tightened in later phases.
+module = [
+    "models.schemas.chat",
+    "models.schemas.user",
+    "models.schemas.authentication",
+]
+ignore_errors = true
+

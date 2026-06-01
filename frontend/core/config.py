@@ -1,63 +1,16 @@
-import os
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Config:
-    BACKEND_ENDPOINT = os.environ.get("BACKEND_ENDPOINT", "")
-    # Use this to run tests locally
-    # BACKEND_ENDPOINT = "http://localhost:50003"
+class AppConfig(BaseSettings):
+    """Process-wide configuration sourced from environment variables."""
 
-    # Defaults for the frontend and for demo purposes
-    # DEFAULT_USER_NAME = os.environ.get("DEFAULT_USER_NAME", "")
-    DEFAULT_SKILL_LEVEL = os.environ.get("DEFAULT_SKILL_LEVEL", "")
-    DEFAULT_LANGUAGE = os.environ.get("DEFAULT_LANGUAGE", "")
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
-    LLM_SERVICE_GET_ALL_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/all/"
-    LLM_SERVICE_GET_CHAT_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/chat/"
-    LLM_SERVICE_GET_VISION_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/vision/"
-    LLM_SERVICE_GET_CONTENT_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/content/"
-    LLM_SERVICE_GET_EMBEDDINGS_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/llms/embeddings/"
-    LLM_SERVICE_GET_STRUCTURED_CONTENT_ENDPOINT = (
-        f"{BACKEND_ENDPOINT}/v1/llms/structured_content/"
-    )
-
-    EMBEDDINGS_SERVICE_GET_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/embeddings/get/"
-    EMBEDDINGS_SERVICE_SIMILARITIES_ENDPOINT = (
-        f"{BACKEND_ENDPOINT}/v1/embeddings/similarities/"
-    )
-    EMBEDDINGS_SERVICE_REDUCE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/embeddings/reduce/"
-
-    POLYGLOT_PUZZLE_GENERATE_SERVICE = f"{BACKEND_ENDPOINT}/v1/polyglot_puzzle/generate"
-
-    CHAT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/chat"
-
-    PERSONA_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/personas/"
-
-    CONTENT_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/contents/list"
-    CONTENT_GEN_SERVICE_CONTENT_TOPIC_ENDPOINT = (
-        f"{BACKEND_ENDPOINT}/v1/content_gen/gen_by_content_topic"
-    )
-
-    # Logger
-    FRONTEND_LOG_LEVEL = os.getenv("FRONTEND_LOG_LEVEL", "INFO")
-    FRONTEND_LOGGER_NAME = os.getenv("FRONTEND_LOGGER_NAME", "LinguAI-FRONTEND")
-    FRONTEND_LOG_FILE = os.getenv("FRONTEND_LOG_FILE", "/app/logs/front-app.log")
-
-    LANGUAGE_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/languages/list"
-    LANGUAGE_SERVICE_GET_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/languages"
-    REWRITE_CONTENT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/rewrite_content/"
-    REVIEW_WRITING_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/review_writing/"
-
-    SKILL_LEVEL_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/skill_levels/list"
-
-    TOPIC_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/topics/list"
-
-    USER_SERVICE_LIST_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/users/list"
-    USER_SERVICE_USERNAME_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/users/username/"
-
-    TEXT_TO_SPEECH_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/text_to_speech"
-
-    USER_SERVICE_AUTHENTICATE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/users/authenticate"
-    USER_SERVICE_CREATE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/users/"
-
-    USER_CONTENT_SERVICE_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/user-contents/"
-    USER_CONTENT_SERVICE_SEARCH_ENDPOINT = f"{BACKEND_ENDPOINT}/v1/user-contents/search"
+    backend_endpoint: str = Field(default="http://backend:8000")
+    frontend_port: int = Field(default=8080)
+    frontend_log_level: str = Field(default="INFO")
+    frontend_log_file: str = Field(default="/app/logs/frontend.log")
+    frontend_logger_name: str = Field(default="linguai.frontend")
+    http_connect_timeout_s: float = Field(default=5.0)
+    http_read_timeout_s: float = Field(default=15.0)
