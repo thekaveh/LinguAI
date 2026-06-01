@@ -174,3 +174,8 @@ french-menu-card.png
 
 # NiceGUI runtime session storage (per-browser-session JSON files)
 frontend/.nicegui/
+
+# Claude Code workspace (worktrees, plugin caches, agent transcripts).
+# Per-developer; not committed.
+.claude/
+CLAUDE.md
