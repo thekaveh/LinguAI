@@ -2,7 +2,7 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from app.core.config import Config
 
-db_engine = create_engine(Config.DATABASE_URL, echo=True)
+db_engine = create_engine(Config.DATABASE_URL, echo=Config.DB_ECHO)
 
 
 def init_db() -> None:

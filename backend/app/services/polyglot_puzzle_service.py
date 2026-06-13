@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from sqlmodel import Session
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.output_parsers import PydanticOutputParser
@@ -17,12 +18,18 @@ class PolyglotPuzzleService:
 
     @log_decorator
     async def agenerate(self, request: PolyglotPuzzleRequest) -> PolyglotPuzzleResponse:
-        assert request is not None, "message is required"
-        assert request.llm_id is not None, "llm_id is required"
-        assert request.llm_temperature is not None, "llm_temperature is required"
-        assert request.src_lang is not None, "src_lang is required"
-        assert request.dst_lang is not None, "dst_lang is required"
-        assert request.difficulty is not None, "difficulty is required"
+        # `assert` is stripped under `python -O`, so we validate explicitly.
+        missing: list[str] = []
+        if request is None:
+            raise HTTPException(status_code=422, detail="request body is required")
+        for field in ("llm_id", "llm_temperature", "src_lang", "dst_lang", "difficulty"):
+            if getattr(request, field, None) is None:
+                missing.append(field)
+        if missing:
+            raise HTTPException(
+                status_code=422,
+                detail=f"missing required fields: {', '.join(missing)}",
+            )
 
         llm_service = LLMService(self.db_session)
         runnable = llm_service.get_chat_runnable(

@@ -13,9 +13,13 @@ from app.data_access.models.topic import Topic
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
 
 import bcrypt
+import logging
 
 from app.services.language_service import LanguageService
+from app.core.config import Config
 from datetime import date, datetime
+
+_logger = logging.getLogger(Config.BACKEND_LOGGER_NAME)
 
 class UserService:
     @log_decorator
@@ -156,9 +160,9 @@ class UserService:
                     user_topic = UserTopic(user_id=user.user_id, topic_name=topic.topic_name)
                     self.db.add(user_topic)
             self.db.commit()
-            print("UserTopics updated for user:", username)
+            _logger.info("UserTopics updated for user: %s", username)
         else:
-            print("User not found with username:", username)
+            _logger.info("User not found with username: %s", username)
 
     @log_decorator
     def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:
@@ -189,7 +193,7 @@ class UserService:
     def get_user_topics(self, user_id: int) -> list:
         db_user = self.user_repo.find_by_id(user_id)
         if db_user:
-            return db_user.topics
+            return db_user.user_topics
         return []
 
     @log_decorator
@@ -304,9 +308,9 @@ class UserService:
         Returns:
             None
         """
-        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        db_user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         if db_user:
-            # get current languages 
+            # get current languages
             current_languages = set(db_user.learning_languages)
             new_languages = set(user.learning_languages)
             # determine the newly added languages
@@ -349,7 +353,7 @@ class UserService:
         Raises:
             ValueError: If the user with the given username is not found in the database.
         """
-        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        db_user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         if not db_user:
             raise ValueError("user not found")
         # update fields 
@@ -382,7 +386,7 @@ class UserService:
         Returns:
             None
         """
-        db_user = self.db.query(DBUser).filter(DBUser.username == username).first()
+        db_user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         if not db_user or not self.verify_password(current_password, db_user.password_hash):
             raise ValueError("Current password is incorrect")
         db_user.password_hash = self.hash_password(new_password)
