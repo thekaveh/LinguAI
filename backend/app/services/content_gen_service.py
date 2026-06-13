@@ -1,4 +1,5 @@
 from typing import AsyncIterable
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlmodel import Session as SqlModelSession
 from langchain.schema.messages import SystemMessage
@@ -6,35 +7,23 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 from app.utils.logger import log_decorator
-from app.schema.prompt import PromptSearch
 from app.services.llm_service import LLMService
 from app.schema.content_gen import ContentGenReq
-from app.services.prompt_service import PromptService
 
 
 class ContentGenService:
     @log_decorator
     def __init__(self, db: Session, sql_model_session: SqlModelSession):
         self.db = db
-        self.prompt_service = PromptService(db)
         self.sql_model_session = sql_model_session
 
 
     async def agenerate_content(self, request: ContentGenReq) -> AsyncIterable[str]:
         """
         Generates content based on the given request.
-
-        Args:
-            request (ContentGenReq): The request object containing the necessary information.
-
-        Returns:
-            AsyncIterable[str]: An asynchronous iterable that yields the generated content.
-
-        Raises:
-            AssertionError: If the request is None.
         """
-
-        assert request is not None, "Request is required"
+        if request is None:
+            raise HTTPException(status_code=422, detail="request body is required")
 
         prompt_text = self._generate_prompt(request)
 
@@ -51,40 +40,18 @@ class ContentGenService:
 
     @log_decorator
     def _generate_prompt(self, request: ContentGenReq) -> str:
+        """Build the system prompt for content generation.
+
+        The previous implementation queried ``prompts`` for a DB-stored
+        template but both branches returned the same hardcoded string, so
+        the lookup was dead. Collapsed to the single template — moving the
+        prompt back into the DB will require a real template-substitution
+        path (PromptService + ``str.format``) and is tracked as future work.
         """
-        Generate a prompt based on the given request.
-
-        Args:
-            request (ContentGenReq): The request object containing the necessary information for generating the prompt.
-
-        Returns:
-            str: The generated prompt.
-
-        Raises:
-            None
-        """
-        # Define the search criteria
-        search_criteria = PromptSearch(
-            prompt_type="system", prompt_category="content-gen-by-topics-content"
+        topics = ", ".join(request.user_topics)
+        return (
+            f"Generate a {request.content.content_name} for a user at "
+            f"{request.skill_level} reading skill level, for the following "
+            f"topics: {topics}.\n\nContent should be generated only in "
+            f"{request.language.language_name} language."
         )
-        # Fetch the prompt based on the defined criteria
-        db_prompt = self.prompt_service.get_prompt_by_search_criteria(search_criteria)
-
-        if db_prompt:
-            # Assuming the prompt text in the database is a template that needs to be formatted
-            # formatted_prompt = db_prompt.prompt_text.format(
-            #     content_name=request.content.content_name,
-            #     topics=", ".join(request.user_topics),
-            #     language_name=request.language.language_name,
-            # )
-            # return formatted_prompt
-            return f"""Generate a {request.content.content_name} for a user at {request.skill_level} reading skill level, 
-                       for the following topics: {', '.join(request.user_topics)}. 
-                       
-                       \n Content should be generated only in {request.language.language_name} language."""
-        else:
-            # Handle cases where no matching prompt is found
-            return f"""Generate a {request.content.content_name} for a user at {request.skill_level} reading skill level, 
-                       for the following topics: {', '.join(request.user_topics)}. 
-                       
-                       \n Content should be generated only in {request.language.language_name} language."""

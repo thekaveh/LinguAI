@@ -1,16 +1,34 @@
 from sqlmodel import Session
 from typing import AsyncIterable
+from fastapi import HTTPException
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain.schema.messages import HumanMessage, SystemMessage
+from langchain.schema.messages import AIMessage, HumanMessage, SystemMessage
 
-from app.models.persona import Persona
-from app.schema.chat import ChatRequest
+from app.schema.chat import ChatMessage, ChatRequest
 from app.utils.logger import log_decorator
 from app.services.llm_service import LLMService
 from app.services.persona_service import PersonaService
 import logging
 from app.core.config import Config
+
+
+def _to_langchain_message(message: ChatMessage):
+    """Translate a ChatMessage into the matching langchain message type.
+
+    Assistant turns become AIMessage so the model sees its prior responses
+    as its own — feeding them back as HumanMessage misleads the LLM about
+    who said what.
+
+    Image attachments are only emitted for the final user turn (the typical
+    multimodal call shape). Earlier turns use plain text content; this avoids
+    breaking providers like Groq/Ollama that don't accept the multimodal
+    list-of-parts format.
+    """
+    if message.sender and message.sender.lower() in {"assistant", "ai", "bot"}:
+        return AIMessage(content=message.text)
+    return HumanMessage(content=message.text)
+
 
 class ChatService:
     """
@@ -34,13 +52,12 @@ class ChatService:
             AsyncIterable[str]: An asynchronous iterable that yields the chat responses.
 
         Raises:
-            ValueError: If the request or any required fields are missing.
+            HTTPException: 422 if the request body is malformed; 404 if the persona is unknown.
 
         """
-        assert request is not None, "message is required"
-        assert request.llm_id is not None, "llm_id is required"
-        assert request.messages is not None, "messages is required"
-        assert len(request.messages) > 0, "messages must not be empty"
+        # `assert` is stripped under `python -O`; validate explicitly.
+        if request is None or request.llm_id is None or not request.messages:
+            raise HTTPException(status_code=422, detail="llm_id and at least one message are required")
 
         persona_service = PersonaService(self.db_session)
         llm_service = LLMService(self.db_session)
@@ -48,18 +65,19 @@ class ChatService:
         persona = persona_service.get_by_name(name=request.persona)
 
         if persona is None:
-            raise ValueError("Persona not found")
+            raise HTTPException(status_code=404, detail="Persona not found")
 
-        chat_messages = [SystemMessage(content=persona.description)] + [
-            message.text for message in request.messages[:-1]
-        ]
-        self.logger.info(f"chat_messages: {chat_messages}")
-        self.logger.info(f"request.messages[-1]: {request.messages[-1]}")
-        
-        # Append the last message from the request to the chat messages list
-        # The content of the message is converted to a dictionary
+        chat_messages = [SystemMessage(content=persona.description)]
+        chat_messages.extend(_to_langchain_message(m) for m in request.messages[:-1])
 
-        chat_messages.append(HumanMessage(content=request.messages[-1].to_dict()))
+        # The final turn keeps its multimodal payload (text + image parts) when
+        # images are present; otherwise we emit the plain string form which all
+        # providers accept.
+        last = request.messages[-1]
+        if last.images:
+            chat_messages.append(HumanMessage(content=last.to_dict()))
+        else:
+            chat_messages.append(_to_langchain_message(last))
         # Create a chat prompt template from the chat messages
 
         prompt = ChatPromptTemplate.from_messages(chat_messages)
