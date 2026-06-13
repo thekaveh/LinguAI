@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   db:
     image: postgres:16.2-bullseye
@@ -43,20 +42,27 @@ services:
       - APP_CONTEXT=backend
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: frontend
     restart: unless-stopped
     ports:
-      - "${FRONTEND_PORT}:8501"
+      - "${FRONTEND_PORT}:8080"
     volumes:
-      - ./frontend:/app.
+      - ./frontend:/app/frontend
+      - ./external/vmx:/app/external/vmx
       - ./logs/frontend:/app/logs
     depends_on:
       - backend
       - db-dashboard
+    env_file:
+      - .env
     environment:
       - APP_CONTEXT=frontend
       - BACKEND_ENDPOINT=http://backend:8000
+      # In-container listener must be 8080 — see docker-compose.yml for context.
+      - FRONTEND_PORT=8080
 
 volumes:
   db-data:

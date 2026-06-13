@@ -157,23 +157,20 @@ node_modules/
 *.bak
 *.tmp
 *.temp
-db/snapshot/linguai_db_ss.sql
-/logs
-/logs
+/logs/
 
 .metals
 .env.old
-places to visit in Paris.jpg
-video1386280615.mp4
 *.mp4
-french-menu-card2.png
-french-menu-card.png
 
 # Superpowers brainstorming session artifacts (visual companion mockups)
 .superpowers/
 
 # NiceGUI runtime session storage (per-browser-session JSON files)
 frontend/.nicegui/
+
+# import-linter cache (per-developer; regenerated on each lint run)
+.import_linter_cache/
 
 # Claude Code workspace (worktrees, plugin caches, agent transcripts).
 # Per-developer; not committed.

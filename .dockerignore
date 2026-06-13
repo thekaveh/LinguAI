@@ -1,0 +1,58 @@
+# Repo-root Docker build context filter.
+# Both frontend/Dockerfile (context = repo root) and any future root-context
+# build benefit from a tight context — faster uploads, no .env leak risk,
+# cleaner layer caches.
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# VCS
+.git/
+.gitignore
+.gitattributes
+.gitmodules
+
+# Dev-only directories
+.claude/
+.superpowers/
+.vscode/
+.idea/
+.metals/
+.trunk/
+
+# Python tooling caches
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.import_linter_cache/
+
+# Frontend-specific caches
+frontend/__pycache__/
+frontend/.mypy_cache/
+frontend/.pytest_cache/
+frontend/.import_linter_cache/
+frontend/.nicegui/
+
+# Backend-specific caches
+backend/__pycache__/
+backend/.mypy_cache/
+backend/.pytest_cache/
+
+# Logs and runtime artifacts
+logs/
+*.log
+
+# Docs and images (not needed inside images)
+docs/
+images/
+*.md
+!frontend/README.md
+!backend/README.md
+
+# OS metadata
+.DS_Store
+Thumbs.db
