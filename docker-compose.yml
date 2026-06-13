@@ -13,7 +13,7 @@ services:
       - "${DB_PORT}:5432"
 
   db-dashboard:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:8.13
     container_name: db-dashboard
     restart: unless-stopped
     depends_on:

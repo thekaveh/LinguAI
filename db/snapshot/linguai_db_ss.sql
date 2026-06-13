@@ -939,13 +939,13 @@ COPY public.users (user_id, username, email, password_hash, first_name, last_nam
 3	blackwidow123	blackwidow@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Natasha	Romanoff		345-678-9012		email	external	Russian	{Spanish,German}	\N	\N	\N	\N	\N	\N	\N	0
 4	thor123	thor@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Thor	Odinson		456-789-0123		email	external	Asgardian	{French}	\N	\N	\N	\N	\N	\N	\N	0
 5	hulk123	hulk@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Bruce	Banner		567-890-1234		mobile_phone	external	English	{English,Mandarin}	\N	\N	\N	\N	\N	\N	\N	0
-2	kumar	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}	\N	\N	\N	\N	\N	\N	\N	0
-6	spiderman	peter.parker@marvel.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Peter	Parker	Ben	+1 212 914 2124	+1 212 914 2124	\N	external	English	{Mandarin}	\N	\N	\N	\N	\N	\N	\N	0
-23	captainamerica	rameshkumar@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	kumar	govindaraju				\N	external	English	{Spanish}	\N	\N	\N	\N	\N	\N	\N	0
+2	kumar	kumar@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kumar	Govindaraju		234-567-8901		mobile_phone	external	English	{Spanish,German}	\N	\N	\N	\N	\N	\N	\N	0
+6	spiderman	spiderman@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Peter	Parker	Ben	555-0100	555-0100	\N	external	English	{Mandarin}	\N	\N	\N	\N	\N	\N	\N	0
+23	captainamerica	captainamerica@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	kumar	govindaraju				\N	external	English	{Spanish}	\N	\N	\N	\N	\N	\N	\N	0
 32	hellokitty	hello@kitty.com	$2b$12$IUyX5an.Q7mxHxIBf.fnwuwhAFCf.7p..PjZsjj8571nSFbyiXciO	hello	kitty				email	external	English	{English,Mandarin,Spanish,German,French}		15	Nonbinary			2024-04-08	2024-04-08	1
 33	bluesclues	blues@clues.com	$2b$12$cx7ZmrjoJD3I9xizd9LcU.Id0mYVlnsboKMOec2SpWK1CbHIa4cv6	blues	clues				email	external	English	{Spanish,Mandarin}		15	Nonbinary			2024-04-09	2024-04-09	1
 34	testuser	test@user.com	$2b$12$gweCRW6hOrUYXoqd0kGTwupRujenEL/j1eLERrl8u9SMuV3qocjGm	test	user				email	external	English	{Spanish}		15	Nonbinary			2024-04-09	2024-04-09	1
-1	kaveh	razavi@vt.edu	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		123-456-7890		email	admin	English	{German,English}	\N	\N	\N	\N	\N	\N	2024-04-29	1
+1	kaveh	kaveh@example.com	$2b$12$9j.nskqFUeApU9.BBUImQO4r2y3f8N4azCMlKddE69xPs56NfhTnq	Kaveh	Razavi		555-0101		email	admin	English	{German,English}	\N	\N	\N	\N	\N	\N	2024-04-29	1
 \.
 
 
