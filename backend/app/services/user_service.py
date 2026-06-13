@@ -290,11 +290,23 @@ class UserService:
         else:
             return None
 
-    def delete_user_assessment(self, assessment_id: int) -> None:
+    def delete_user_assessment(self, assessment_id: int) -> bool:
+        """Delete an assessment by id. Returns True on success, False if it didn't exist."""
         db_assessment = self.get_user_assessment(assessment_id)
         if db_assessment:
             self.db.delete(db_assessment)
             self.db.commit()
+            return True
+        return False
+
+    def delete_user_by_username(self, username: str) -> bool:
+        """Delete a user by username. Returns True on success, False if absent."""
+        db_user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
+        if db_user:
+            self.db.delete(db_user)
+            self.db.commit()
+            return True
+        return False
 
     @log_decorator
     def update_user_languages(self, username: str, user: User):

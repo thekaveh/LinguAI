@@ -14,3 +14,11 @@ class AppConfig(BaseSettings):
     frontend_logger_name: str = Field(default="linguai.frontend")
     http_connect_timeout_s: float = Field(default=5.0)
     http_read_timeout_s: float = Field(default=15.0)
+    # Read timeout for streaming responses (chat, content_gen, etc.). Longer
+    # than http_read_timeout_s because LLM completions can take many seconds.
+    http_stream_read_timeout_s: float = Field(default=60.0)
+    # Signing key for NiceGUI's app.storage.user cookie. The hardcoded default
+    # below is for dev only; production deployments MUST override via env so
+    # the cookie cannot be forged. Logged as a warning at startup when the
+    # default is in use.
+    frontend_storage_secret: str = Field(default="linguai-frontend-dev-secret")

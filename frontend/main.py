@@ -1,5 +1,6 @@
 from __future__ import annotations
 import asyncio
+import logging
 
 from nicegui import ui, app
 
@@ -11,6 +12,14 @@ from views.app_shell import mount
 
 _CFG = AppConfig()
 setup_logging(_CFG.frontend_logger_name, _CFG.frontend_log_level, _CFG.frontend_log_file)
+
+# Warn if storage_secret is left at its dev default. NiceGUI uses this to sign
+# `app.storage.user`; an attacker who knows the secret can forge auth_token.
+if _CFG.frontend_storage_secret == "linguai-frontend-dev-secret":
+    logging.getLogger(_CFG.frontend_logger_name).warning(
+        "FRONTEND_STORAGE_SECRET is using the built-in dev default; "
+        "set it to a private value in production."
+    )
 
 # Process-scoped objects. NiceGUI's main thread runs uvicorn, which creates the loop later;
 # at module-import time there is no running loop. Create one for the dispatcher to bind to;
@@ -63,7 +72,7 @@ if __name__ in {"__main__", "__mp_main__"}:
         port=_CFG.frontend_port,
         title="LinguAI",
         dark=True,
-        storage_secret="linguai-frontend-dev-secret",  # production: env-injected
+        storage_secret=_CFG.frontend_storage_secret,
         show=False,
         reload=False,
     )

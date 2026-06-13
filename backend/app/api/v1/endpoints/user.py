@@ -1,7 +1,5 @@
-import logging
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
 
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
@@ -11,7 +9,6 @@ from app.schema.password_change import PasswordChange
 from app.services.user_service import UserService
 from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
 from app.schema.authentication import AuthenticationRequest, AuthenticationResponse
-from app.data_access.models.user import User as UserModel
 
 router = APIRouter()
 
@@ -237,6 +234,19 @@ def create_user_assessment(
     return user_service.create_user_assessment(user_id, assessment_data)
 
 
+def _load_owned_assessment(service: UserService, user_id: int, assessment_id: int):
+    """Fetch an assessment and verify it belongs to ``user_id``.
+
+    Raises 404 if the assessment is missing or owned by a different user;
+    keeps the failure mode identical between "no such row" and "row exists
+    but wrong owner" to avoid leaking row presence.
+    """
+    db_assessment = service.get_user_assessment(assessment_id)
+    if db_assessment is None or getattr(db_assessment, "user_id", None) != user_id:
+        raise HTTPException(status_code=404, detail="Assessment not found")
+    return db_assessment
+
+
 @log_decorator
 @router.get(
     "/users/{user_id}/assessments/{assessment_id}", response_model=UserAssessment
@@ -246,18 +256,9 @@ def get_user_assessment(
 ):
     """
     Retrieve a user's assessment by user ID and assessment ID.
-
-    Parameters:
-    - user_id (int): The ID of the user.
-    - assessment_id (int): The ID of the assessment.
-    - db (Session, optional): The database session. Defaults to Depends(get_db).
-
-    Returns:
-    - UserAssessment: The user's assessment.
-
     """
     user_service = UserService(db)
-    return user_service.get_user_assessment(assessment_id)
+    return _load_owned_assessment(user_service, user_id, assessment_id)
 
 
 @log_decorator
@@ -271,40 +272,32 @@ def update_user_assessment(
     db: Session = Depends(get_db),
 ):
     """
-    Update a user's assessment.
-
-    Args:
-        user_id (int): The ID of the user.
-        assessment_id (int): The ID of the assessment.
-        assessment_data (UserAssessmentCreate): The data for the updated assessment.
-        db (Session, optional): The database session. Defaults to Depends(get_db).
-
-    Returns:
-        UserAssessment: The updated user assessment.
+    Update a user's assessment. 404 if the assessment doesn't belong to ``user_id``.
     """
     user_service = UserService(db)
-    return user_service.update_user_assessment(assessment_id, assessment_data)
+    _load_owned_assessment(user_service, user_id, assessment_id)
+    updated = user_service.update_user_assessment(assessment_id, assessment_data)
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Assessment not found")
+    return updated
 
 
 @log_decorator
-@router.delete("/users/{user_id}/assessments/{assessment_id}")
+@router.delete(
+    "/users/{user_id}/assessments/{assessment_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 def delete_user_assessment(
     user_id: int, assessment_id: int, db: Session = Depends(get_db)
 ):
     """
-    Delete a user assessment.
-
-    Args:
-        user_id (int): The ID of the user.
-        assessment_id (int): The ID of the assessment to be deleted.
-        db (Session, optional): The database session. Defaults to Depends(get_db).
-
-    Returns:
-        dict: A dictionary with a success message.
+    Delete a user assessment. 404 if the assessment doesn't belong to ``user_id``.
     """
     user_service = UserService(db)
-    user_service.delete_user_assessment(assessment_id)
-    return {"message": "User assessment deleted successfully"}
+    _load_owned_assessment(user_service, user_id, assessment_id)
+    if not user_service.delete_user_assessment(assessment_id):
+        raise HTTPException(status_code=404, detail="Assessment not found")
+    return None
 
 @log_decorator
 @router.post("/users/{username}/languages", response_model=None)
@@ -378,24 +371,12 @@ def change_user_password(password_change: PasswordChange, username: str, db: Ses
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     
 @log_decorator
-@router.delete("/users/{username}/delete")
+@router.delete("/users/{username}/delete", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(username: str, db: Session = Depends(get_db)):
     """
-    Delete a user from the database.
-
-    Args:
-        username (str): The username of the user to be deleted.
-        db (Session, optional): The database session. Defaults to Depends(get_db).
-
-    Raises:
-        HTTPException: If the user is not found in the database.
-
-    Returns:
-        None
+    Delete a user from the database. Returns 404 if the user does not exist.
     """
-    db_user = db.query(UserModel).filter(UserModel.username == username).first()
-    if db_user:
-        db.delete(db_user)
-        db.commit()
-    else:
+    user_service = UserService(db)
+    if not user_service.delete_user_by_username(username):
         raise HTTPException(status_code=404, detail="User not found")
+    return None
