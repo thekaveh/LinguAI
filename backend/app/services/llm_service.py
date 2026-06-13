@@ -29,36 +29,35 @@ class LLMService(CRUDService[LLM]):
         Raises:
             Exception: If there is an error fetching the models.
         """
-        try:
-            query = select(LLM).where(LLM.is_active)
+        query = select(LLM).where(LLM.is_active)
 
-            conditions = []
+        conditions = []
 
-            if Config.OPENAI_API_KEY:
-                conditions.append((LLM.provider == "openai"))
+        if Config.OPENAI_API_KEY:
+            conditions.append((LLM.provider == "openai"))
 
-            if Config.GROQ_API_KEY:
-                conditions.append((LLM.provider == "groq"))
+        if Config.GROQ_API_KEY:
+            conditions.append((LLM.provider == "groq"))
 
-            if Config.OLLAMA_API_ENDPOINT:
-                pulled_ollama_models = [
-                    model["model"]
-                    for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()[
-                        "models"
-                    ]
+        if Config.OLLAMA_API_ENDPOINT:
+            pulled_ollama_models = [
+                model["model"]
+                for model in Client(host=Config.OLLAMA_API_ENDPOINT).list()[
+                    "models"
                 ]
-                conditions.append(
-                    (LLM.provider == "ollama") & (LLM.name.in_(pulled_ollama_models))
-                )
+            ]
+            conditions.append(
+                (LLM.provider == "ollama") & (LLM.name.in_(pulled_ollama_models))
+            )
 
-            if conditions:
-                query = query.where(or_(*conditions))
-            else:
-                query = query.where(LLM.provider == None)
+        if conditions:
+            query = query.where(or_(*conditions))
+        else:
+            # No provider creds configured — return an empty result rather
+            # than every active row.
+            query = query.where(LLM.provider == None)  # noqa: E711
 
-            return self.db_session.exec(query).all()
-        except Exception as e:
-            raise Exception("Error fetching models") from e
+        return self.db_session.exec(query).all()
 
     @log_decorator
     def get_embeddings(self) -> List[LLM]:
@@ -115,39 +114,34 @@ class LLMService(CRUDService[LLM]):
         Raises:
             Exception: If the LLM with the specified ID is not found or if the provider is not supported.
         """
-        try:
-            llm = self.get_by_id(id=llm_id)
+        llm = self.get_by_id(id=llm_id)
 
-            if not llm:
-                raise Exception(f"LLM with id {llm_id} not found!")
+        if not llm:
+            raise ValueError(f"LLM with id {llm_id} not found")
 
-            if llm.provider == "openai":
-                return ChatOpenAI(
-                    model=llm.name,
-                    streaming=True,
-                    temperature=temperature,
-                    base_url=Config.OPENAI_API_ENDPOINT,
-                    openai_api_key=Config.OPENAI_API_KEY,
-                )
-            elif llm.provider == "groq":
-                return ChatGroq(
-                    streaming=True,
-                    model_name=llm.name,
-                    temperature=temperature,
-                    groq_api_key=Config.GROQ_API_KEY,
-                    # groq_api_base=Config.GROQ_API_ENDPOINT,
-                )
-            elif llm.provider == "ollama":
-                return ChatOllama(
-                    model=llm.name,
-                    streaming=True,
-                    temperature=temperature,
-                    base_url=Config.OLLAMA_API_ENDPOINT,
-                )
-            else:
-                raise Exception(f"Provider {llm.provider} not supported!")
-        except Exception as e:
-            raise e
+        if llm.provider == "openai":
+            return ChatOpenAI(
+                model=llm.name,
+                streaming=True,
+                temperature=temperature,
+                base_url=Config.OPENAI_API_ENDPOINT,
+                openai_api_key=Config.OPENAI_API_KEY,
+            )
+        if llm.provider == "groq":
+            return ChatGroq(
+                streaming=True,
+                model_name=llm.name,
+                temperature=temperature,
+                groq_api_key=Config.GROQ_API_KEY,
+            )
+        if llm.provider == "ollama":
+            return ChatOllama(
+                model=llm.name,
+                streaming=True,
+                temperature=temperature,
+                base_url=Config.OLLAMA_API_ENDPOINT,
+            )
+        raise ValueError(f"Provider {llm.provider} not supported")
 
     @log_decorator
     def init_ollama(self) -> None:
@@ -157,24 +151,23 @@ class LLMService(CRUDService[LLM]):
         Raises:
             Exception: If an error occurs during the initialization process.
         """
-        try:
-            if Config.OLLAMA_API_ENDPOINT:
-                query = select(LLM).where(LLM.is_active).where(LLM.provider == "ollama")
-                required_ollama_model_names = [
-                    m.name for m in self.db_session.exec(query).all()
-                ]
+        if not Config.OLLAMA_API_ENDPOINT:
+            return
 
-                ollama_client = Client(host=Config.OLLAMA_API_ENDPOINT)
-                exiting_ollama_model_names = [
-                    model["model"] for model in ollama_client.list()["models"]
-                ]
+        query = select(LLM).where(LLM.is_active).where(LLM.provider == "ollama")
+        required_ollama_model_names = [
+            m.name for m in self.db_session.exec(query).all()
+        ]
 
-                diff_model_names = [
-                    model_name
-                    for model_name in required_ollama_model_names
-                    if model_name not in exiting_ollama_model_names
-                ]
-                for model_name in diff_model_names:
-                    ollama_client.pull(model=model_name, stream=False)
-        except Exception as e:
-            raise e
+        ollama_client = Client(host=Config.OLLAMA_API_ENDPOINT)
+        existing_ollama_model_names = [
+            model["model"] for model in ollama_client.list()["models"]
+        ]
+
+        diff_model_names = [
+            model_name
+            for model_name in required_ollama_model_names
+            if model_name not in existing_ollama_model_names
+        ]
+        for model_name in diff_model_names:
+            ollama_client.pull(model=model_name, stream=False)
