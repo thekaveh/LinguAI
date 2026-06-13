@@ -37,3 +37,19 @@ class LLM(BaseModel):
             str: The display name of the LLM in the format "{name} | {provider}".
         """
         return f"{self.name} | {self.provider}"
+
+
+def llm_label(llm: object) -> str:
+    """Best-effort human label for an LLM-like object.
+
+    Used by the page views to populate the LLM selector. Accepts the canonical
+    :class:`LLM` domain type plus any duck-typed alternative that exposes
+    ``display_name()`` or ``model_name``.
+    """
+    dn = getattr(llm, "display_name", None)
+    if callable(dn):
+        return dn()
+    if dn:
+        return str(dn)
+    model_name = getattr(llm, "model_name", None)
+    return str(model_name) if model_name else str(llm)

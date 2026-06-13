@@ -4,6 +4,7 @@ from nicegui import ui
 
 from viewmodels.app_shell_vm import AppShellVM
 from viewmodels.chat.chat_vm import ChatVM
+from models.domain.llm import llm_label as _llm_label
 from views.theme.components import card, pill_button, section_header, bind_button_enabled
 from views.chat.message_bubble import render as render_bubble
 
@@ -158,13 +159,6 @@ def render(shell: AppShellVM) -> None:
     audio_el.bind_visibility_from(
         vm.state, "model", backward=lambda m: bool(m.last_audio_data_url)
     )
-
-
-def _llm_label(llm: object) -> str:
-    dn = getattr(llm, "display_name", None)
-    if callable(dn):
-        return dn()
-    return str(dn) if dn else getattr(llm, "model_name", str(llm))
 
 
 def _on_persona_change(vm: ChatVM):  # type: ignore[return]

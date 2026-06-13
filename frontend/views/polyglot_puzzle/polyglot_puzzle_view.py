@@ -6,29 +6,9 @@ from nicegui import ui
 from viewmodels.app_shell_vm import AppShellVM
 from viewmodels.polyglot_puzzle.polyglot_puzzle_vm import PolyglotPuzzleVM
 from views.theme.components import card, pill_button, section_header, bind_button_enabled
+from views.polyglot_puzzle._colors import similarity_color as _similarity_color
 from views.polyglot_puzzle.attempt_row import render as render_attempt
 from views.polyglot_puzzle.embeddings_plot import render as render_plot
-
-
-# ---------------------------------------------------------------------------
-# Color helper
-# ---------------------------------------------------------------------------
-
-def _similarity_color(sim: float) -> str:
-    """Red→amber→emerald gradient for similarity in [0, 1]."""
-    s = max(0.0, min(1.0, sim))
-    if s < 0.5:
-        t = s / 0.5
-        r1, g1, b1 = 0xEF, 0x44, 0x44
-        r2, g2, b2 = 0xF5, 0x9E, 0x0B
-    else:
-        t = (s - 0.5) / 0.5
-        r1, g1, b1 = 0xF5, 0x9E, 0x0B
-        r2, g2, b2 = 0x10, 0xB9, 0x81
-    r = int(r1 + (r2 - r1) * t)
-    g = int(g1 + (g2 - g1) * t)
-    b = int(b1 + (b2 - b1) * t)
-    return f"rgb({r}, {g}, {b})"
 
 
 # ---------------------------------------------------------------------------

@@ -4,6 +4,7 @@ from nicegui import ui
 
 from viewmodels.app_shell_vm import AppShellVM
 from viewmodels.content_gen.content_gen_vm import ContentGenVM
+from models.domain.llm import llm_label as _llm_label
 from views.theme.components import card, pill_button, section_header, bind_button_enabled
 
 
@@ -180,13 +181,6 @@ def render(shell: AppShellVM) -> None:
 
         _render_history("model")
         vm.state.property_changed.subscribe(_render_history)
-
-
-def _llm_label(llm: object) -> str:
-    dn = getattr(llm, "display_name", None)
-    if callable(dn):
-        return dn()
-    return str(dn) if dn else getattr(llm, "model_name", str(llm))
 
 
 def _on_lang(vm: ContentGenVM):  # type: ignore[return]
