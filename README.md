@@ -1,127 +1,215 @@
-# Name
-LinguaAI, a language processing and improvement assistant!
+# 1. LinguAI
 
-# Description
-This project integrates a Streamlit frontend with a FastAPI+LangChain+SqlAlchemy backend, leveraging AI services of either Ollama or OpenAI, each within their respective Docker containers, alongside a prospective PostgreSQL database.
+A containerised language-learning assistant. The stack pairs a NiceGUI +
+VMx frontend with a FastAPI + LangChain + SQLModel backend and ships
+optional in-container or host-side LLM runtimes (Ollama, OpenAI, Groq)
+backed by PostgreSQL.
 
-This documentation is designed to provide a seamless development and deployment workflow for this application.
+## 2. Architecture
 
-## Prerequisites
+The application is orchestrated by Docker Compose and is composed of five
+services:
 
-Ensure you have Git, Docker, Docker Compose, installed on your machine. Python 3.10 and Poetry are optional for local setups but recommended for managing dependencies and running the application outside of Docker.
+| Service        | Purpose                                                            |
+| -------------- | ------------------------------------------------------------------ |
+| `db`           | PostgreSQL 16; loads `db/snapshot/linguai_db_ss.sql` on first boot |
+| `db-dashboard` | pgAdmin 4 for browsing the DB                                      |
+| `backend`      | FastAPI + LangChain + SQLModel; all routes under `/v1`             |
+| `frontend`     | NiceGUI + VMx (strict MVVM); served on the configured `FRONTEND_PORT` |
+| `ollama`       | Optional local LLM runtime (omitted in some compose variants)      |
 
-## Setup
+The diagram below renders from [`architecture.py`](architecture.py); see
+the source for the regeneration command.
 
-This section provides a step-by-step guide for getting started and setting up the project.
+![LinguAI System Architecture](images/linguai_system_architecture.jpg)
 
-For both development and deployment, `Docker Compose` is used to orchestrate the application's services, enabling live code reloading for rapid development.
+For deeper internal documentation, see the [docs index](docs/README.md),
+[backend README](backend/README.md), and [frontend README](frontend/README.md).
 
-1. Clone the project repository: `git clone https://github.com/thekaveh/LinguAI.git && cd LinguAI`
+## 3. Prerequisites
 
-2. Copy the vanilla `.env.example` file as `.env`
+Required:
 
-3. If you intend to use OpenAI's LLMs, fill in the optional `OPENAI_API_KEY` environment variable entry in the `.env` file with your own OpenAI API key.
+- Git
+- Docker (Engine 24+) with Docker Compose v2
 
-4. If you intend to use Ollama's LLMs Modify the optional `OLLAMA_MODELS` environment variable entry in the `.env` to specify the models you expect to use via Ollama.
+Optional, for working outside the containers:
 
-5.1. First choose the relevant docker-compose.yml file based on the information in the table below.
+- Python 3.10
+- Poetry (used by both services for dependency management)
 
-|     **docker-compose-file-name**    | **environment** | **Ollama Source** | **Ollama processing** |
-|:-----------------------------------:|:---------------:|:-----------------:|-----------------------|
-|          docker-compose.yml         |       dev       |     dockerized    |          CPU          |
-| docker-compose.ollama-localhost.dev |       dev       |     localhost     |        depends        |
-|    docker-compose.ollama-none.dev   |       dev       |        none       |          N/A          |
-|    docker-compose-gpu-nvidia.prod   |       prod      | dockerized        |       gpu/nvidia      |
+## 4. Setup
 
-5.2. Then run the following command to build and start the container services. This setup mounts your local code into the containers, enabling live reloading:
+### 4.1. Clone with submodules
 
-   `docker-compose -f {docker-compose-file-name} up --build`
-
-Please note that you can optionally start services in detached mode using `docker-compose -f {docker-compose-file-name} up --build -d` but you won't be able to see the live logs any longer.
-
-6. Accessing the Application
-
-   - Streamlit frontend will be accessible at: `http://localhost:{FRONTEND_PORT}`
-   - FastAPI backend (Swagger UI) at: `http://localhost:{BACKEND_PORT}/docs`
-   - pgAdmin DB-dashboard will be accessible at: `http://localhost:{DB_DASHBOARD_PORT}`
-
-7. Optionally, Use VSCode's Remote Container extension to connect to and develop directly inside one of the backend or frontend containers. To do this, find the `Remote Explorer` from VSCode's tools pane on the left, select `Dev Containers`, locate either the `linguai backend` or `linguai frontend` running container, and then `Attach in New Window`
-
-8. To bring down the LinguAI services: `docker-compose down --remove-orphans`
-
-9. When you have db changes including schema or data changes, simply run the following command in your terminal to take a snapshot of the database and replace the current snapshot:
-    - `docker exec db sh ./scripts/db-snapshot.sh`
-
-10. In order to make sure recent DB schema and data changes are reflected in your DB container, make sure you bring down the docker compose using the command below (with `-v`):
-    - `docker-compose down -v --remove-orphans`
-
-## Running Unit Tests
-(With the containers running)
-Frontend services: run `docker exec -it frontend python -m pytest tests/` to run all frontend service tests
-For coverage: run `docker exec -it frontend python -m pytest --cov=services tests/`
-
-Backend services: run `docker exec -it backend python -m pytest app/tests/` to run all backend service tests
-For coverage: run `docker exec -it backend python -m pytest --cov=app/services app/tests/`
-
-### Code Changes
-
-Thanks to Docker volumes that mount the code inside the containers, changes made to the codebase will automatically reflect in the running containers and will, in turn, show up on both the running frontend and backend services. Once happy with your changes, you can simply commit them to Git branch you're working on regardless of whether you applied the changes from inside the running containers or outside.
-
-## Production Deployment
-
-For production, the application should be deployed with Docker, ensuring that the code is copied into the images rather than mounted.
-
-For now the only supported and tested deployment scenario is to setup an EC2 instance, select the Ubuntu-Nvidia-PyTorch2 image, SSH into the newly deployed and running instance, and run the same environment setup steps as above before running the slightly modified docker compose command below:
-
-`docker-compose -f docker-compose-gpu-nvidia.prod.yml up --build`
-
-## Dependency Management
-
-This project uses Poetry for Python dependency management in both the frontend and backend. Here's how to manage those dependencies:
-
-1. **Adding a Dependency**:
-   - Navigate to the respective directory (`frontend` or `backend`):
-     ```bash
-     cd frontend # or backend
-     ```
-   - Run Poetry to add a new dependency:
-     ```bash
-     poetry add <package-name>
-     ```
-   - This command updates `pyproject.toml` and `poetry.lock`. Commit these changes to your repository.
-
-Please, note that you can also optionally attach to the running container and then run the `poetry add <package-name>` command.
-
-2. **Removing a Dependency**:
-   - Navigate to the respective directory (`frontend` or `backend`):
-     ```bash
-     cd frontend # or backend
-     ```
-   - Run Poetry to remove a dependency:
-     ```bash
-     poetry remove <package-name>
-     ```
-   - This command updates `pyproject.toml` and `poetry.lock`. Commit these changes to your repository.
-
-Please, note that you can also optionally attach to the running container and then run the `poetry remove <package-name>` command.
-
-3. **Running Commands with Poetry**:
-   - Use `poetry run` to execute commands within the virtual environment created by Poetry, for example:
-     ```bash
-     poetry run pytest
-     ```
-
-Please, note that you can also optionally attach to the running container and then run the `poetry run` command.
-
-**Note**: While developing within Docker containers, you typically won't need to run Poetry commands directly, as dependencies are installed during the Docker build process. However, these steps are essential for local development, adding/updating dependencies, or when setting up CI/CD pipelines.
-
-### Reflecting Dependency Changes in Docker Containers
-
-After updating dependencies, ensure to rebuild your Docker images to apply these changes in your containers:
+VMx is consumed as a git submodule under `external/vmx/`. Either clone
+recursively or initialise the submodule afterwards:
 
 ```bash
-docker-compose build
+git clone --recurse-submodules https://github.com/thekaveh/LinguAI.git
+cd LinguAI
+
+# or, if you cloned without --recurse-submodules:
+git submodule update --init --recursive
 ```
 
-### System Architecture
-![LinguAI System Architecture](/images/linguai_system_architecture.jpg)
+### 4.2. Configure environment
+
+Copy the example and fill in any provider keys you intend to use. `.env`
+is gitignored.
+
+```bash
+cp .env.example .env
+```
+
+- `OPENAI_API_KEY` — leave blank to disable OpenAI-backed LLMs.
+- `GROQ_API_KEY` — leave blank to disable Groq-backed LLMs.
+- `OLLAMA_MODELS` — comma-separated list of Ollama models to pre-pull at
+  container start (consumed by `ollama/start.sh`).
+
+The backend's LLM service hides any LLM row whose provider credentials
+are absent, so a missing key simply removes that provider's models from
+the UI listing.
+
+### 4.3. Pick a compose variant
+
+| Compose file                                  | Environment | Ollama source                | Notes                                  |
+| --------------------------------------------- | ----------- | ---------------------------- | -------------------------------------- |
+| `docker-compose.yml`                          | dev         | containerised (CPU)          | Default; works out of the box          |
+| `docker-compose.ollama-localhost.dev.yml`     | dev         | host (`host.docker.internal`)| Faster on Apple Silicon                |
+| `docker-compose.ollama-none.dev.yml`          | dev         | none                         | OpenAI / Groq only                     |
+| `docker-compose-gpu-nvidia.prod.yml`          | prod        | containerised (NVIDIA GPU)   | EC2 + NVIDIA target                    |
+
+The bare `docker-compose` / `docker compose` command will not find these
+non-default files automatically — pass `-f` explicitly.
+
+### 4.4. Bring the stack up
+
+```bash
+# Default dev stack
+docker compose up --build
+
+# Or pick a variant
+docker compose -f docker-compose.ollama-localhost.dev.yml up --build
+```
+
+The default ports from `.env.example` are:
+
+- Frontend: `http://localhost:50004`
+- Backend Swagger UI: `http://localhost:50003/docs`
+- pgAdmin (db-dashboard): `http://localhost:50001`
+
+Use `-d` to run detached (logs not streamed); `docker compose logs -f
+<service>` to follow logs after the fact.
+
+To tear down the stack while preserving the data volume:
+
+```bash
+docker compose down --remove-orphans
+```
+
+To drop the data volume too (required to re-apply a snapshot — see §5):
+
+```bash
+docker compose down -v --remove-orphans
+```
+
+### 4.5. Default users
+
+The seed snapshot ships a small set of users for local development. All
+seeded user passwords are `linguai`; pick any username from the snapshot
+to authenticate.
+
+## 5. Database
+
+The schema is managed without a migration framework — the file
+`db/snapshot/linguai_db_ss.sql` is the source of truth. Postgres' entry-
+point loads it from `docker-entrypoint-initdb.d` only when the `db-data`
+volume is empty.
+
+To re-snapshot the running DB after schema or data changes:
+
+```bash
+docker exec db sh ./scripts/db-snapshot.sh
+```
+
+For collaborators to see your schema changes locally, they must drop the
+data volume first (`docker compose down -v --remove-orphans`) so the next
+`up` reloads the snapshot.
+
+## 6. Development
+
+Source trees are bind-mounted into the containers (`./backend` → `/app`,
+`./frontend` → `/app/frontend`, plus `./external/vmx` for the submodule).
+Edits to Python files are picked up live by the backend (uvicorn `--reload`).
+The frontend container must be restarted to pick up changes (NiceGUI's
+in-process reload is intentionally disabled).
+
+VS Code's *Dev Containers* extension can attach directly to the running
+`backend` or `frontend` container if you want an in-container shell with
+the venv available.
+
+## 7. Running tests
+
+The stack must be up. From the host:
+
+```bash
+# Backend
+docker exec -it backend python -m pytest app/tests/
+docker exec -it backend python -m pytest --cov=app/services app/tests/
+
+# Frontend
+docker exec -it frontend python -m pytest tests/
+docker exec -it frontend python -m pytest --cov=models/services tests/
+```
+
+Run a single file or test with the usual pytest argument syntax
+(e.g. `app/tests/user_service_test.py::test_create_user`).
+
+## 8. Dependency management
+
+Both services use Poetry. Inside a container:
+
+```bash
+# Add a new dependency
+poetry add <package>
+
+# Remove one
+poetry remove <package>
+```
+
+This updates the relevant `pyproject.toml` and `poetry.lock`; commit
+both. Rebuild the image afterwards:
+
+```bash
+docker compose build
+```
+
+## 9. Production deployment
+
+The only currently supported production path is an EC2 instance using
+the Ubuntu-NVIDIA-PyTorch2 AMI:
+
+```bash
+# On the EC2 host, after cloning and configuring .env
+docker compose -f docker-compose-gpu-nvidia.prod.yml up --build
+```
+
+In production the code is built into the images rather than bind-mounted.
+`PROD_ENV_CPUS` and `PROD_ENV_MEM_LIMIT` in `.env` cap the Ollama
+container's resources.
+
+## 10. Documentation
+
+- [`docs/README.md`](docs/README.md) — entry point to deeper docs: design
+  specs, implementation plans, VMx API quickref, audit notes.
+- [`backend/README.md`](backend/README.md) — backend layout, layering, DB
+  session caveats, LLM provider filtering.
+- [`frontend/README.md`](frontend/README.md) — MVVM rules, import-linter
+  contracts, page-VM lifecycle, VMx submodule handling.
+- [`CHANGELOG.md`](CHANGELOG.md) — user-visible changes.
+- [`architecture.py`](architecture.py) — source for the diagram above.
+
+## 11. License
+
+[MIT](LICENSE).
