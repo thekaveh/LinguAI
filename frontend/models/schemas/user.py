@@ -29,16 +29,13 @@ class UserBase(BaseModel):
     landline_phone: Optional[str] = None
     contact_preference: Optional[str] = None
     user_topics: Optional[List[UserTopicBase]] = None
-
-    user_assessments: Optional[List[UserAssessmentBase]] = None    
+    user_assessments: Optional[List[UserAssessmentBase]] = None
     user_contents: Optional[List[UserContentBase]] = None
+    user_languages: Optional[List[UserLanguage]] = None
 
     enrollment_date: Optional[date] = None
     last_login_date: Optional[date] = None
     consecutive_login_days: Optional[int] = None
-
-    user_assessments: Optional[List[UserAssessmentBase]] = None
-    user_languages: Optional[List[UserLanguage]] = None    
 
 
 class UserCreate(UserBase):
