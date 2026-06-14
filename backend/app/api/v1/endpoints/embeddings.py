@@ -27,6 +27,8 @@ def get(
 ):
     try:
         return service.get(request)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -39,6 +41,8 @@ def similarities(
 ):
     try:
         return service.similarities(request)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -50,5 +54,7 @@ def reduce(
 ):
     try:
         return service.reduce(request)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

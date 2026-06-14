@@ -34,5 +34,7 @@ async def generate_content_by_topic(
     try:
         stream = await service.agenerate_content(request)
         return StreamingResponse(content=stream, media_type="text/event-stream")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

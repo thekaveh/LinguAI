@@ -20,5 +20,7 @@ async def generate(
     try:
         service = PolyglotPuzzleService(db_session)
         return await service.agenerate(request=request)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

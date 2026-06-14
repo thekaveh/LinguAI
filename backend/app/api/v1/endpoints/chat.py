@@ -32,5 +32,7 @@ async def chat(
         service = ChatService(db_session)
         stream = await service.achat(request=request)
         return StreamingResponse(content=stream, media_type="text/event-stream")
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

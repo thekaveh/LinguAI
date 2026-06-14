@@ -52,6 +52,10 @@ images/
 *.md
 !frontend/README.md
 !backend/README.md
+# vmx is a path dependency; its pyproject.toml's `readme = "README.md"`
+# means Poetry needs the README at install time. Re-include the entire
+# external/ tree so any path-dep package metadata survives the filter.
+!external/**
 
 # OS metadata
 .DS_Store

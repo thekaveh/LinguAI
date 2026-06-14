@@ -25,5 +25,7 @@ async def chat(request: TextToSpeechRequest) -> TextToSpeechResponse:
     try:
         service = TextToSpeechService()
         return service.generate(request=request)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
