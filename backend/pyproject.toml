@@ -7,16 +7,34 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pydantic = "^2.6.1"
-langchain-core = "^0.1.18"
-langchain-community = "^0.0.17"
-langchain-openai = "^0.0.5"
+pydantic = {extras = ["email"], version = "^2.6.3"}
 uvicorn = "^0.27.0.post1"
 sqlalchemy = "^2.0.25"
 fastapi = "^0.109.2"
 ollama = "^0.1.6"
-langserve = {extras = ["all"], version = "^0.0.41"}
+psycopg2-binary = "^2.9.9"
+email-validator = "^2.1.1"
+gtts = "^2.5.1"
+sqlmodel = "^0.0.16"
+bcrypt = "^4.1.2"
+scikit-learn = "^1.4.1.post1"
+numpy = "^1.26.4"
+pytz = "^2024.1"
+apscheduler = "^3.10.4"
+groq = "^0.4.2"
+langchain-groq = "^0.1.0"
+langchain-community = "^0.0.32"
+langchain-openai = "^0.1.2"
+langchain-core = "^0.1.41"
+langchain = "^0.1.15"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pytest-asyncio = "^0.23.6"
+pytest-cov = "^5.0.0"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
 
 [build-system]
 requires = ["poetry-core"]

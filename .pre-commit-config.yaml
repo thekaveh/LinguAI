@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: ruff
+        name: ruff (lint + format)
+        entry: bash -c 'cd frontend && poetry run ruff check --fix .'
+        language: system
+        files: ^frontend/.*\.py$
+        pass_filenames: false
+
+      - id: mypy-strict-mvm
+        name: mypy --strict on models/ viewmodels/ core/ views/theme/
+        entry: bash -c 'cd frontend && poetry run mypy --strict models viewmodels core views/theme'
+        language: system
+        files: ^frontend/.*\.py$
+        pass_filenames: false
+
+      - id: import-linter
+        name: layer boundary contracts
+        entry: bash -c 'cd frontend && poetry run lint-imports'
+        language: system
+        files: ^frontend/.*\.py$
+        pass_filenames: false

@@ -1,19 +1,23 @@
-# Using Python 3.10 as the base image for compatibility with both Streamlit and FastAPI
 FROM python:3.10-slim
 
-# Set the working directory in the container to /app
-WORKDIR /app
+# Mirror the repo layout inside the image so the pyproject's relative
+# path-dep `vmx = {path = "../external/vmx/langs/python"}` resolves correctly:
+# /app/frontend/pyproject.toml + /app/external/vmx/ → `../external/...` works.
+WORKDIR /app/frontend
 
-# Copy only the dependency management files initially to leverage Docker cache
-COPY ./pyproject.toml ./poetry.lock* /app/
+RUN apt-get update && apt-get install -y --no-install-recommends tzdata && \
+    ln -snf /usr/share/zoneinfo/America/New_York /etc/localtime && \
+    echo America/New_York > /etc/timezone && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install Poetry and dependencies in a single layer to keep the image size down
-RUN pip install poetry && \
+# Build context is repo root (see docker-compose.yml). Copy deps first for cache.
+COPY frontend/pyproject.toml frontend/poetry.lock* /app/frontend/
+COPY external/vmx /app/external/vmx
+
+RUN pip install --no-cache-dir poetry && \
     poetry config virtualenvs.create false && \
-    poetry install --no-dev
+    poetry install --no-root --without dev
 
-# Copy the rest of the application's code into the container
-COPY . /app
+COPY frontend /app/frontend
 
-# Specify the command to run the Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["python", "-m", "main"]

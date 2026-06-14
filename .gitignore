@@ -157,3 +157,22 @@ node_modules/
 *.bak
 *.tmp
 *.temp
+/logs/
+
+.metals
+.env.old
+*.mp4
+
+# Superpowers brainstorming session artifacts (visual companion mockups)
+.superpowers/
+
+# NiceGUI runtime session storage (per-browser-session JSON files)
+frontend/.nicegui/
+
+# import-linter cache (per-developer; regenerated on each lint run)
+.import_linter_cache/
+
+# Claude Code workspace (worktrees, plugin caches, agent transcripts).
+# Per-developer; not committed.
+.claude/
+CLAUDE.md
