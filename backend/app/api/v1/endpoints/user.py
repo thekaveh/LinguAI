@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.data_access.session import get_db
 from app.schema.user import User, UserBase, UserCreate
@@ -179,7 +178,7 @@ def remove_topic_from_user(
 
 
 @log_decorator
-@router.get("/users/{user_id}/topics", response_model=list[Topic])
+@router.get("/users/{user_id}/topics", response_model=list[UserTopicBase])
 def read_user_topics(user_id: int, db: Session = Depends(get_db)):
     """
     Retrieve the topics associated with a specific user.
@@ -189,7 +188,7 @@ def read_user_topics(user_id: int, db: Session = Depends(get_db)):
         db (Session, optional): The database session. Defaults to Depends(get_db).
 
     Returns:
-        list[Topic]: A list of topics associated with the user.
+        list[UserTopicBase]: The user's topics (user_id + topic_name).
     """
     user_service = UserService(db)
     return user_service.get_user_topics(user_id)
