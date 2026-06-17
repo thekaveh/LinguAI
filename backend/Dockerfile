@@ -12,12 +12,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends tzdata && \
     echo America/New_York > /etc/timezone && \
     rm -rf /var/lib/apt/lists/*
 
-# Copying pyproject.toml and poetry.lock* first to leverage Docker cache
-COPY ./pyproject.toml ./poetry.lock* /app/
+# Copying pyproject.toml and poetry.lock first to leverage Docker cache. The
+# lock is required (no glob fallback) so a missing lock fails the build loudly
+# instead of silently resolving fresh versions.
+COPY ./pyproject.toml ./poetry.lock /app/
 
-# Install Poetry and runtime dependencies. Pin to <2 for now; `--without dev`
-# is forward-compatible with Poetry 2.x, replacing the deprecated `--no-dev`.
-RUN pip install --no-cache-dir "poetry<2" && \
+# Install Poetry and runtime dependencies. Pinned to the same version that
+# generated poetry.lock (matches the frontend image); `--without dev` replaces
+# the deprecated `--no-dev`.
+RUN pip install --no-cache-dir "poetry==2.4.1" && \
 	poetry config virtualenvs.create false && \
 	poetry install --no-root --without dev
 

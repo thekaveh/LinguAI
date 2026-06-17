@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends tzdata && \
 # Build context is repo root (see docker-compose.yml). Copy deps first for cache.
 COPY frontend/pyproject.toml frontend/poetry.lock* /app/frontend/
 
-RUN pip install --no-cache-dir poetry && \
+RUN pip install --no-cache-dir "poetry==2.4.1" && \
     poetry config virtualenvs.create false && \
     poetry install --no-root --without dev
 
