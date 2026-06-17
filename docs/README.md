@@ -42,7 +42,7 @@ guides, audits, and known-issue trackers.
 
 - [VMx API quickref](superpowers/notes/vmx-api-quickref.md) — Concise
   cheat sheet for the consumer-facing VMx API as it actually behaves in
-  the version vendored under `external/vmx/`. **This is the authoritative
+  the `vmx` PyPI release pinned by `frontend/pyproject.toml`. **This is the authoritative
   API reference** for VMx as used by LinguAI; prefer it over the design
   spec when the two disagree.
 - [VMx upstream-improvement backlog](superpowers/notes/vmx-issues-report.md)

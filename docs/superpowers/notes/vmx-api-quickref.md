@@ -1,6 +1,6 @@
 # VMx Python API Quickref
 
-> Reconnaissance for the frontend MVVM overhaul. Verified against `vmx==2.1.0` installed editable from this repo's `external/vmx/langs/python` git submodule (commit `e2b23f8`) on 2026-05-30. **Treat this file — not the spec pseudo-code — as ground truth for VMx APIs.**
+> Reconnaissance for the frontend MVVM overhaul. Verified against `vmx==2.1.0` (historical: installed editable from `external/vmx/langs/python`, commit `e2b23f8`) on 2026-05-30. VMx is now consumed as `vmx = "^2.6.0"` from PyPI; the import surface is unchanged. **Treat this file — not the spec pseudo-code — as ground truth for VMx APIs.**
 
 ## TL;DR for the implementer
 
@@ -10,7 +10,7 @@ The spec/plan uses informal pseudo-code like `super().__init__(name=..., service
 
 | Spec/plan said | Reality |
 |---|---|
-| `vmx = "^2.1.0"` on PyPI | **VMx is NOT on PyPI yet.** Use Poetry path dep against the **git submodule** at `external/vmx/`: `vmx = {path = "../external/vmx/langs/python", develop = true}` (from `frontend/pyproject.toml`'s perspective — `frontend/` and `external/` are siblings under the repo root). |
+| `vmx = "^2.1.0"` on PyPI | VMx now ships on PyPI. `frontend/pyproject.toml` pins `vmx = "^2.6.0"`; Poetry resolves it normally — no submodule, no path dep. (This quickref's API notes were verified against 2.1.0; the import surface is unchanged through 2.6.0.) |
 | `super().__init__(name=..., services=(hub, dispatcher), model=...)` in a VM subclass | Build via `ComponentVMOf.builder().name(...).services(hub, disp).model(...).build()`. **Do NOT subclass to override `__init__` for the basic VMs** — wire them up in `core/di.py` (or a builder helper) using the fluent builder. |
 | `CompositeVMOf[ChildVM, ModelType]` (composite with both children AND a model) | **Doesn't exist.** `CompositeVMOf` only has children + `current`. For "composite with a model", compose: hold a separate `ComponentVMOf[Model]` as an aggregate attribute on the composite. |
 | `RelayCommand(execute=..., can_execute=..., can_execute_trigger=...)` | `RelayCommand.builder().task(callable).predicate(callable).triggers(observable).triggers(another_observable).build()`. Triggers are added one observable at a time (NOT a list). |
@@ -23,35 +23,17 @@ The spec/plan uses informal pseudo-code like `super().__init__(name=..., service
 | `notifications.children_changed.subscribe(...)` | `notifications.on_collection_changed.subscribe(...)` (it's `on_collection_changed`, not `children_changed`). |
 | `LifecycleStatus.DESTRUCTED → CONSTRUCTING → CONSTRUCTED → ...` | Enum is `ConstructionStatus` (not `LifecycleStatus`). Values: `DISPOSED=0, DESTRUCTING=1, DESTRUCTED=2, CONSTRUCTING=3, CONSTRUCTED=4`. After `.build()`, status is `DESTRUCTED` (2). Call `vm.construct()` to reach `CONSTRUCTED` (4). |
 
-## 1. Installing VMx (git submodule + Poetry path dep)
+## 1. Installing VMx (PyPI + Poetry)
 
-VMx lives in this repo as a git submodule at `external/vmx`, pinned to a specific commit. To pull it after a fresh `git clone`:
-
-```bash
-git submodule update --init external/vmx
-```
-
-In `frontend/pyproject.toml`:
+VMx is a published PyPI package — there is no submodule. In `frontend/pyproject.toml`:
 
 ```toml
 [tool.poetry.dependencies]
 python = "^3.10"
-vmx = {path = "../external/vmx/langs/python", develop = true}
+vmx = "^2.6.0"
 ```
 
-(`frontend/` and `external/` are siblings under the repo root; relative path traverses one level up then into the submodule.)
-
-Then:
-
-```bash
-cd frontend
-poetry lock --no-update
-poetry install
-```
-
-### Docker
-
-Because VMx is now inside the LinguAI repo tree, expanding the Docker build context up to the repo root makes VMx available during image build. See § 11 for the concrete Dockerfile + docker-compose.yml change.
+Poetry resolves it from PyPI on `poetry install`; the lock file (`frontend/poetry.lock`) pins the exact resolved version and hashes.
 
 ## 2. Imports cheat sheet
 
@@ -429,65 +411,13 @@ def bind_button_enabled(btn, cmd) -> None:
 
 Use everywhere we'd otherwise have written `btn.bind_enabled_from(cmd, "can_execute")`.
 
-## 11. Dockerfile + docker-compose change for the VMx submodule
+## 11. Dockerfile + docker-compose (historical)
 
-The current `frontend/Dockerfile` builds with `frontend/` as its context (set in `docker-compose.yml`: `build: ./frontend`). VMx lives at the repo root, outside `frontend/`, so the build context must be expanded.
-
-### `docker-compose.yml`
-
-Change the `frontend` service from:
-
-```yaml
-frontend:
-  build: ./frontend
-```
-
-to:
-
-```yaml
-frontend:
-  build:
-    context: .                # repo root — gives the image access to both frontend/ and external/vmx/
-    dockerfile: frontend/Dockerfile
-```
-
-The other services (backend, db, ollama) keep their current context — they don't need VMx.
-
-### `frontend/Dockerfile`
-
-Change the existing dependency-copy block from:
-
-```dockerfile
-COPY ./pyproject.toml ./poetry.lock* /app/
-RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
-COPY . /app
-```
-
-to:
-
-```dockerfile
-# Build context is the repo root (see docker-compose.yml). Paths are repo-relative.
-COPY frontend/pyproject.toml frontend/poetry.lock* /app/
-COPY external/vmx /app/external/vmx
-RUN pip install poetry && poetry config virtualenvs.create false && poetry install --no-dev
-COPY frontend /app
-```
-
-(Adjust the final `COPY` if your existing Dockerfile copies specific subdirs — just make sure VMx's Python source is in the image at `/app/external/vmx/langs/python/` before `poetry install` runs, because Poetry's path-dep resolution happens at install time.)
-
-The relative path in `frontend/pyproject.toml`'s `vmx = {path = "../external/vmx/langs/python", develop = true}` resolves correctly in the container because we mirror the same `/app/` ↔ `/app/external/vmx/` sibling layout.
-
-### Fresh-clone setup checklist
-
-Any developer cloning LinguAI must run:
-
-```bash
-git clone --recurse-submodules <linguai-repo-url>
-# OR if already cloned:
-git submodule update --init --recursive external/vmx
-```
-
-Add a note to the repo-root `README.md` (or a short `frontend/README.md`) calling this out — otherwise `poetry install` will fail with "path 'external/vmx/langs/python' does not exist".
+> **Superseded.** VMx is now a PyPI dependency, so none of the submodule
+> plumbing below is needed. The frontend image installs `vmx` from PyPI via
+> `poetry install`; no source copy or bind mount is required, and a fresh
+> clone needs no submodule initialisation step. This section is retained only as a
+> historical record of the pre-2.6.0 setup.
 
 ## 12. Working example: minimal VM + Command end-to-end
 

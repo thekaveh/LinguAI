@@ -1,7 +1,7 @@
 # 1. Frontend (`frontend/`)
 
 The LinguAI frontend is a NiceGUI single-page app built on top of
-[VMx](../external/vmx/) for the ViewModel layer. The architecture is
+[VMx](https://pypi.org/project/vmx/) for the ViewModel layer. The architecture is
 strict MVVM with import-linter contracts enforcing the layering.
 
 For project setup, compose variants, and the end-to-end workflow, see the
@@ -105,16 +105,16 @@ The integration suite (`tests/integration/test_vm_tree.py`) builds the
 real DI graph and uses `respx` to mock the backend; it catches end-to-end
 wiring regressions early.
 
-## 1.7. VMx submodule
+## 1.7. VMx dependency
 
-VMx is consumed as a git submodule under `external/vmx/`. After cloning,
-initialise it:
+VMx is a published PyPI package. `frontend/pyproject.toml` pins it as a normal
+dependency:
 
-```bash
-git submodule update --init --recursive
+```toml
+vmx = "^2.6.0"
 ```
 
-`frontend/pyproject.toml` references it as a path dependency
-(`vmx = {path = "../external/vmx/langs/python", develop = true}`); the
-frontend Docker image bind-mounts both `./frontend` and `./external/vmx`
-so iterating on VMx does not require a container rebuild.
+Poetry resolves and installs it from PyPI during `poetry install` (and during
+the Docker build), so there is no submodule to initialise and nothing extra to
+mount into the container. To move to a newer VMx, bump the constraint and run
+`poetry lock` in `frontend/`.

@@ -40,18 +40,16 @@ Optional, for working outside the containers:
 
 ## 4. Setup
 
-### 4.1. Clone with submodules
-
-VMx is consumed as a git submodule under `external/vmx/`. Either clone
-recursively or initialise the submodule afterwards:
+### 4.1. Clone
 
 ```bash
-git clone --recurse-submodules https://github.com/thekaveh/LinguAI.git
+git clone https://github.com/thekaveh/LinguAI.git
 cd LinguAI
-
-# or, if you cloned without --recurse-submodules:
-git submodule update --init --recursive
 ```
+
+VMx is a published PyPI dependency (`vmx`, pinned in
+`frontend/pyproject.toml`); Poetry resolves it during the frontend build, so
+there is no submodule to initialise.
 
 ### 4.2. Configure environment
 
@@ -140,7 +138,7 @@ data volume first (`docker compose down -v --remove-orphans`) so the next
 ## 6. Development
 
 Source trees are bind-mounted into the containers (`./backend` → `/app`,
-`./frontend` → `/app/frontend`, plus `./external/vmx` for the submodule).
+`./frontend` → `/app/frontend`).
 Edits to Python files are picked up live by the backend (uvicorn `--reload`).
 The frontend container must be restarted to pick up changes (NiceGUI's
 in-process reload is intentionally disabled).
@@ -206,7 +204,7 @@ container's resources.
 - [`backend/README.md`](backend/README.md) — backend layout, layering, DB
   session caveats, LLM provider filtering.
 - [`frontend/README.md`](frontend/README.md) — MVVM rules, import-linter
-  contracts, page-VM lifecycle, VMx submodule handling.
+  contracts, page-VM lifecycle, the VMx dependency.
 - [`CHANGELOG.md`](CHANGELOG.md) — user-visible changes.
 - [`architecture.py`](architecture.py) — source for the diagram above.
 

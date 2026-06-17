@@ -43,6 +43,10 @@ into `develop`.
   they no longer ship to production.
 - Backend `@log_decorator` now redacts password/secret/token/api_key fields
   before writing args/kwargs to the debug log.
+- Frontend now consumes VMx as a published PyPI dependency (`vmx = "^2.6.0"`,
+  upgraded from the vendored `2.1.0`) instead of a git submodule path dep.
+  The `external/vmx` submodule and all associated Docker mounts have been removed
+  (so has the submodule clone step formerly in the docs).
 
 ### 1.1.3. Fixed
 - Backend `UserService.get_user_topics` returned `db_user.topics` (no such

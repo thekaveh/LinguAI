@@ -13,7 +13,7 @@ Each item lists: **what** (the issue), **observed in** (where I hit it during re
 - **What:** `pip install vmx` fails with "No matching distribution found for vmx". The package's `pyproject.toml` is configured for publication (`hatchling` backend, full metadata), but no release has been uploaded to PyPI.
 - **Observed in:** README §3.1 ("`pip install vmx`"), README §4.1 quickstart, `docs/getting-started/python.md` §1.
 - **Impact:** **High.** Any external consumer reading the docs will hit a wall in the first command. The compatibility-matrix table also implies stable releases.
-- **Suggested action:** Either (a) publish `2.1.0` to PyPI (and likely backfill `2.0.0` / `1.x` if you want the matrix to be honest), or (b) update README and getting-started docs to say "currently distributed via GitHub source / editable install only; PyPI publication tracked in #N" with a link to the tracking issue. Option (a) is much higher leverage if you intend external adoption.
+- **Suggested action:** **Resolved** — VMx is published to PyPI as of 2.6.0, so `pip install vmx` now works and the README/getting-started docs that reference it are accurate. LinguAI consumes it as `vmx = "^2.6.0"` in `frontend/pyproject.toml`.
 
 ### A2. No CI/release workflow visible for PyPI publication
 
@@ -27,7 +27,7 @@ Each item lists: **what** (the issue), **observed in** (where I hit it during re
 - **What:** Consumers wanting to use a local checkout must either use Poetry's `path = "..."` dep (machine-specific paths in `pyproject.toml`) or pip-install in editable mode at runtime. Docker doesn't play nicely with either unless the consumer carefully arranges the build context.
 - **Observed in:** Setting up `frontend/pyproject.toml` for the LinguAI overhaul.
 - **Impact:** **Medium.** Friction for anyone integrating VMx as a dependency rather than reading/copying patterns. Largely mitigated if A1 is fixed.
-- **Suggested action:** None on the VMx side beyond fixing A1. Document the "while we're pre-PyPI, use a submodule / `pip install git+https://github.com/thekaveh/VMx.git#subdirectory=langs/python`" path in README §4.1.
+- **Suggested action:** Resolved — VMx now publishes to PyPI, and LinguAI consumes `vmx` as a normal Poetry dependency (`frontend/pyproject.toml`). The submodule/path-dep workaround has been removed.
 
 ---
 
