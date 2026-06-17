@@ -29,5 +29,10 @@ class UserContent(Base):
     user_content = Column(Text)
     gen_content = Column(Text)
     type = Column(Integer)
-    created_date = Column(DateTime, default=datetime.datetime.utcnow)
+    # Naive UTC (matches the naive DateTime column); datetime.utcnow() is
+    # deprecated from Python 3.12, so derive naive UTC from an aware now().
+    created_date = Column(
+        DateTime,
+        default=lambda: datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
+    )
     expiry_date = Column(DateTime)
