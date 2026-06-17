@@ -197,8 +197,13 @@ class PolyglotPuzzleVM:
             response = await self._puzzle.generate(self.state.model.request)
             self.state.set_model(self.state.model.with_response(response))
             self.embeddings.clear()
+        except Exception as e:
+            self._notify.push_error(f"Puzzle generation failed: {e}")
         finally:
             self._busy = False
+            # Re-nudge state so the command predicates re-evaluate and the button
+            # re-enables even on the error path (where no set_model fired).
+            self.state.set_model(replace(self.state.model))
 
     async def _do_submit(self) -> None:
         s = self.state.model
@@ -233,8 +238,11 @@ class PolyglotPuzzleVM:
             self.embeddings.update(
                 labels, r2.reduced_embeddings, r3.reduced_embeddings, attempt_scores
             )
+        except Exception as e:
+            self._notify.push_error(f"Scoring failed: {e}")
         finally:
             self._busy = False
+            self.state.set_model(replace(self.state.model))
 
     # ---------- command builders ----------
 
