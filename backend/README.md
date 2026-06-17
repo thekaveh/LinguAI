@@ -85,7 +85,7 @@ schema is `db/snapshot/linguai_db_ss.sql`. To change schema:
 2. Re-snapshot the running DB:
    `docker exec db sh ./scripts/db-snapshot.sh`
 3. For others to pick up the new schema, they must drop the data volume:
-   `docker-compose down -v --remove-orphans`
+   `docker compose down -v --remove-orphans`
 
 The snapshot is loaded by Postgres' `docker-entrypoint-initdb.d` only when
 the data volume is empty.
