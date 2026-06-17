@@ -142,32 +142,3 @@ class LLMService(CRUDService[LLM]):
                 base_url=Config.OLLAMA_API_ENDPOINT,
             )
         raise ValueError(f"Provider {llm.provider} not supported")
-
-    @log_decorator
-    def init_ollama(self) -> None:
-        """
-        Initializes the Ollama service by checking for required models and pulling them if necessary.
-
-        Raises:
-            Exception: If an error occurs during the initialization process.
-        """
-        if not Config.OLLAMA_API_ENDPOINT:
-            return
-
-        query = select(LLM).where(LLM.is_active).where(LLM.provider == "ollama")
-        required_ollama_model_names = [
-            m.name for m in self.db_session.exec(query).all()
-        ]
-
-        ollama_client = Client(host=Config.OLLAMA_API_ENDPOINT)
-        existing_ollama_model_names = [
-            model["model"] for model in ollama_client.list()["models"]
-        ]
-
-        diff_model_names = [
-            model_name
-            for model_name in required_ollama_model_names
-            if model_name not in existing_ollama_model_names
-        ]
-        for model_name in diff_model_names:
-            ollama_client.pull(model=model_name, stream=False)
