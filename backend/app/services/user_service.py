@@ -322,9 +322,9 @@ class UserService:
         """
         db_user = self.db.query(DBUser).filter(DBUser.username == username.lower()).first()
         if db_user:
-            # get current languages
-            current_languages = set(db_user.learning_languages)
-            new_languages = set(user.learning_languages)
+            # get current languages (both sides may be NULL/None — treat as empty)
+            current_languages = set(db_user.learning_languages or [])
+            new_languages = set(user.learning_languages or [])
             # determine the newly added languages
             added_languages = new_languages - current_languages
             # update learning languages

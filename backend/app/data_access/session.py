@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from app.core.config import Config
 
 
-engine = create_engine(Config.DATABASE_URL, echo=True)  # echo=True for debugging
+engine = create_engine(Config.DATABASE_URL, echo=Config.DB_ECHO)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
