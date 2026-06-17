@@ -1,4 +1,5 @@
 import time
+import inspect
 import logging
 import functools
 
@@ -53,9 +54,15 @@ def log_decorator(func):
 
     Args and kwargs are redacted via ``_redact`` so that requests carrying
     passwords/tokens do not surface their plaintext in the application log.
+
+    Works for both sync and ``async def`` callables: when ``func`` is a
+    coroutine function the wrapper awaits it, so the measured execution time
+    reflects the real async work and exceptions raised inside the coroutine
+    are logged. A sync wrapper around an async function would instead time
+    only coroutine *creation* and never see its exceptions.
     """
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+
+    def _log_entry(args, kwargs):
         logger = logging.getLogger(Config.BACKEND_LOGGER_NAME)
         if logger.isEnabledFor(logging.DEBUG):
             safe_args = tuple(_redact(a) for a in args)
@@ -67,22 +74,49 @@ def log_decorator(func):
                 safe_kwargs,
             )
         logger.info("Entering function: %s", func.__name__)
+        return logger
 
+    def _log_result(logger, result):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Function %s returned %r", func.__name__, _redact(result))
+
+    def _log_exit(logger, start_time):
+        logger.info(
+            "Exiting function: %s, Execution time: %.4f seconds",
+            func.__name__,
+            time.time() - start_time,
+        )
+
+    if inspect.iscoroutinefunction(func):
+
+        @functools.wraps(func)
+        async def async_wrapper(*args, **kwargs):
+            logger = _log_entry(args, kwargs)
+            start_time = time.time()
+            try:
+                result = await func(*args, **kwargs)
+                _log_result(logger, result)
+                return result
+            except Exception as e:
+                logger.exception("Exception occurred in function %s: %s", func.__name__, e)
+                raise
+            finally:
+                _log_exit(logger, start_time)
+
+        return async_wrapper
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        logger = _log_entry(args, kwargs)
         start_time = time.time()
         try:
             result = func(*args, **kwargs)
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug("Function %s returned %r", func.__name__, _redact(result))
+            _log_result(logger, result)
             return result
         except Exception as e:
             logger.exception("Exception occurred in function %s: %s", func.__name__, e)
             raise
         finally:
-            end_time = time.time()
-            logger.info(
-                "Exiting function: %s, Execution time: %.4f seconds",
-                func.__name__,
-                end_time - start_time,
-            )
+            _log_exit(logger, start_time)
 
     return wrapper
