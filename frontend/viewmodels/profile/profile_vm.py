@@ -229,6 +229,9 @@ class ProfileVM:
                 }
             )
             await self._user_svc.update(m.username, updated)
+            # learning_languages is handled by a separate backend endpoint;
+            # /update ignores it, so persist it explicitly or it's silently lost.
+            await self._user_svc.update_languages(m.username, updated)
 
             uid = m.user_id or 0
             selected_topics = [

@@ -32,6 +32,15 @@ class UserService:
         r.raise_for_status()
         return User.model_validate(r.json())
 
+    async def update_languages(self, username: str, payload: User) -> None:
+        """Persist learning_languages — a separate backend endpoint from /update,
+        which only handles scalar profile fields. The backend reads
+        payload.learning_languages and seeds assessments for newly added ones."""
+        r = await self._http.post(
+            f"/users/{username}/languages", json=payload.model_dump(mode="json")
+        )
+        r.raise_for_status()
+
     async def set_topics(self, username: str, topics: list[UserTopicBase]) -> None:
         r = await self._http.post(
             f"/users/{username}/topics",
