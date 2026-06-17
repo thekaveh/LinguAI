@@ -3,8 +3,9 @@ import asyncio
 from nicegui import ui
 
 from viewmodels.app_shell_vm import AppShellVM
-from viewmodels.review_writing.review_writing_vm import ReviewWritingVM, SKILL_LEVELS
+from viewmodels.review_writing.review_writing_vm import ReviewWritingVM
 from models.domain.llm import llm_label as _llm_label
+from models.schemas.skill_level import SKILL_LEVELS
 from views.theme.components import card, pill_button, section_header, bind_button_enabled
 
 

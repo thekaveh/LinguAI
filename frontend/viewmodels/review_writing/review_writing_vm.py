@@ -17,8 +17,6 @@ from models.schemas.review_writing import ReviewWritingReq
 from models.schemas.language import Language
 from models.schemas.user_content import UserContent
 
-SKILL_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"]
-
 _NEXT_LEVEL: dict[str, str] = {
     "A1": "A2",
     "A2": "B1",

@@ -5,9 +5,8 @@ from nicegui import ui
 from viewmodels.app_shell_vm import AppShellVM
 from viewmodels.rewrite_content.rewrite_content_vm import RewriteContentVM, STYLE_OPTIONS
 from models.domain.llm import llm_label as _llm_label
+from models.schemas.skill_level import SKILL_LEVELS
 from views.theme.components import card, pill_button, section_header, bind_button_enabled
-
-SKILL_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"]
 
 
 def render(shell: AppShellVM) -> None:
