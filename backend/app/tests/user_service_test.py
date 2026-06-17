@@ -120,11 +120,13 @@ def test_remove_topic_from_user(user_service, mock_db_session):
     mock_db_session.commit.assert_called_once()
 
 def test_get_user_topics(user_service, mock_db_session):
-    # Create a mock DBUser instance with a topics attribute
-    db_user = DBUser(user_id=1)
-    db_user.topics = ["topic1", "topic2"]
-    
-    # Mock the user_repo.find_by_id method to return the mock DBUser instance
+    # Use a MagicMock for the user so we can set the `user_topics` relationship
+    # to plain values without triggering SQLAlchemy's collection machinery; the
+    # service should return whatever `user_topics` holds, unchanged.
+    db_user = MagicMock()
+    db_user.user_topics = ["topic1", "topic2"]
+
+    # Mock the user_repo.find_by_id method to return the mock user
     user_service.user_repo.find_by_id = MagicMock(return_value=db_user)
 
     # Call the method and check the result

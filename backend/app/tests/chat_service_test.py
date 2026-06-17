@@ -1,4 +1,5 @@
 import pytest
+from fastapi import HTTPException
 from unittest.mock import AsyncMock, patch
 from sqlmodel import Session, SQLModel, create_engine
 from app.schema.chat import ChatRequest
@@ -57,9 +58,10 @@ class TestChatService:
             temperature=0.5
         )
 
-        # Act & Assert
-        with pytest.raises(ValueError):
+        # Act & Assert: an unknown persona surfaces as HTTP 404 (see achat docstring).
+        with pytest.raises(HTTPException) as exc_info:
             await chat_service.achat(request=chat_request)
+        assert exc_info.value.status_code == 404
 
     @patch('app.services.persona_service.PersonaService.get_by_name')
     @patch('app.services.llm_service.LLMService.get_chat_runnable')
@@ -81,6 +83,8 @@ class TestChatService:
             temperature=0.5
         )
 
-        # Act & Assert
-        with pytest.raises(AssertionError, match="messages must not be empty"):
+        # Act & Assert: an empty message list is rejected with HTTP 422 (assert was
+        # replaced with explicit validation so it survives `python -O`).
+        with pytest.raises(HTTPException) as exc_info:
             await chat_service.achat(request=chat_request)
+        assert exc_info.value.status_code == 422
