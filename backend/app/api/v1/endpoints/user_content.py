@@ -22,7 +22,7 @@ def create_user_content(user_content: UserContentBase, db: Session = Depends(get
     Returns:
         UserContent: The created user content.
     """
-    logger.info(f"Creating user content: {user_content}")
+    logger.info("Creating user content: %s", user_content)
     user_content_service = UserContentService(db)
     
     return user_content_service.create_user_content(user_content)
@@ -55,8 +55,8 @@ def delete_user_content(content_id: int, db: Session = Depends(get_db)):
         dict: A dictionary with a success message.
 
     """
-    logger.info(f"Deleting content with ID: {content_id}")
+    logger.info("Deleting content with ID: %s", content_id)
     user_content_service = UserContentService(db)
     user_content_service.delete_user_content(content_id)
-    logger.info(f"Content with ID: {content_id} deleted successfully")
+    logger.info("Content with ID: %s deleted successfully", content_id)
     return {"message": "Content deleted successfully"}

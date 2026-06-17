@@ -22,13 +22,13 @@ class UserContentService:
             UserContent: The created user content.
 
         """
-        self.logger.info(f"Creating user content: {user_content_data}")
+        self.logger.info("Creating user content: %s", user_content_data)
         user_content_dict = user_content_data.dict(exclude_none=True)
         user_content = UserContentModel(**user_content_dict)
         self.db.add(user_content)
         self.db.commit()
         self.db.refresh(user_content)
-        self.logger.info(f"User content created with ID: {user_content.id}")
+        self.logger.info("User content created with ID: %s", user_content.id)
         return UserContent.from_orm(user_content)
 
     def delete_user_content(self, content_id: int) -> None:
@@ -41,7 +41,7 @@ class UserContentService:
         Returns:
             None
         """
-        self.logger.info(f"Deleting content with ID: {content_id}")
+        self.logger.info("Deleting content with ID: %s", content_id)
         user_content = self.db.query(UserContentModel).filter(UserContentModel.id == content_id).first()
         if user_content:
             self.db.delete(user_content)
