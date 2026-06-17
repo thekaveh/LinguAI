@@ -8,7 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 nicegui = "^2.0"
-vmx = {path = "../external/vmx/langs/python", develop = true}
+vmx = "^2.6.0"
 httpx = "^0.27"
 pydantic = {extras = ["email"], version = "^2.6.3"}
 pydantic-settings = "^2.2"
