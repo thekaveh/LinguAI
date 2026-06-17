@@ -16,7 +16,7 @@ class PingService:
 
     async def ping(self) -> PingResult:
         try:
-            r = await self._http.get("/")
+            r = await self._http.get("/health")
             r.raise_for_status()
             payload = r.json()
             return PingResult(ok=True, message=str(payload.get("message", payload)))

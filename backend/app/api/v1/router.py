@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    health,
     chat,
     llm,
     persona,
@@ -21,6 +22,7 @@ from app.api.v1.endpoints import (
 
 router = APIRouter()
 
+router.include_router(health.router, prefix="/v1", tags=["v1"])
 router.include_router(llm.router, prefix="/v1", tags=["v1"])
 router.include_router(chat.router, prefix="/v1", tags=["v1"])
 router.include_router(persona.router, prefix="/v1", tags=["v1"])
@@ -43,9 +45,10 @@ This module defines the router for the API endpoints in the v1 version.
 
 The router includes various sub-routers for different endpoints, such as chat, llm, persona, user, content, topic, etc.
 
-Example usage:
+Example usage (as wired in app/main.py — no extra prefix; each sub-router
+already carries the "/v1" prefix):
     from app.api.v1.router import router
 
-    app.include_router(router, prefix="/api")
+    app.include_router(router)
 
 """

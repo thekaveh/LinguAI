@@ -169,7 +169,7 @@ def mock_backend() -> Any:
         )
 
         # ---- admin ping ----
-        router.get("http://test/v1/").mock(
+        router.get("http://test/v1/health").mock(
             return_value=httpx.Response(200, json={"message": "pong"})
         )
 
