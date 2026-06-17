@@ -75,9 +75,9 @@ def render(shell: AppShellVM) -> None:
             ).classes("text-sm")
             ui.label("This cannot be undone.").classes("text-xs text-[var(--danger)] mt-1")
             with ui.row().classes("justify-end gap-2 mt-4 w-full"):
-                pill_button("Cancel", on_click=_cancel_and_close(vm, dialog))
+                pill_button("Cancel", on_click=_cancel_and_close(vm))
                 pill_button("Delete", variant="primary",
-                            on_click=_execute_and_close(vm, dialog)).style("background:#EF4444")
+                            on_click=_execute_and_close(vm)).style("background:#EF4444")
 
     def _open_or_close_dialog(name: str) -> None:
         if name != "model":
@@ -95,13 +95,13 @@ def _make_request_delete(vm: AdminVM, username: str):  # type: ignore[no-untyped
     return _cb
 
 
-def _cancel_and_close(vm: AdminVM, dialog):  # type: ignore[no-untyped-def]
+def _cancel_and_close(vm: AdminVM):  # type: ignore[no-untyped-def]
     def _cb() -> None:
         vm.cancel_delete_command.execute()
     return _cb
 
 
-def _execute_and_close(vm: AdminVM, dialog):  # type: ignore[no-untyped-def]
+def _execute_and_close(vm: AdminVM):  # type: ignore[no-untyped-def]
     def _cb() -> None:
         vm.execute_delete_command.execute()
     return _cb

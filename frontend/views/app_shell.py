@@ -21,7 +21,7 @@ from views.review_writing.review_writing_view import render as _render_review
 from views.admin.admin_view import render as _render_admin
 
 
-# Page renderers register themselves here from Phase 2+ as routes come online.
+# Route -> page-renderer registry, populated via register_page_renderer().
 PAGE_RENDERERS: Dict[str, Callable[[AppShellVM], None]] = {}
 
 PAGE_RENDERERS["home"] = _render_home
@@ -81,8 +81,10 @@ def mount(shell: AppShellVM) -> None:
                 return
             renderer = PAGE_RENDERERS.get(shell.navigation.model.current)
             if renderer is None:
+                # Defensive: every NavigationVM route has a registered renderer,
+                # but guard against an unregistered route rather than crashing.
                 ui.label(
-                    f"(no renderer for '{shell.navigation.model.current}' — registered in Phase 2+)"
+                    f"(no renderer registered for '{shell.navigation.model.current}')"
                 ).classes("text-[var(--text-3)] text-sm italic")
                 return
             renderer(shell)
