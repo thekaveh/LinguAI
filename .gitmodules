@@ -1,3 +1,0 @@
-[submodule "external/vmx"]
-	path = external/vmx
-	url = https://github.com/thekaveh/VMx.git
