@@ -20,5 +20,9 @@ class PingService:
             r.raise_for_status()
             payload = r.json()
             return PingResult(ok=True, message=str(payload.get("message", payload)))
-        except httpx.HTTPError as e:
-            return PingResult(ok=False, message=f"http error: {e}")
+        except Exception as e:
+            # Broad on purpose: this is a health probe whose failure must always
+            # surface as ok=False, never propagate (e.g. a non-JSON 200 body would
+            # raise JSONDecodeError, which httpx.HTTPError would miss) and crash the
+            # admin ping background task.
+            return PingResult(ok=False, message=f"ping failed: {e}")
