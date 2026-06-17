@@ -23,8 +23,8 @@ into `develop`.
 
 ### 1.1.2. Changed
 - Rewrote `README.md` to reflect the post-Streamlit architecture: NiceGUI +
-  VMx frontend, SQLModel backend, Groq provider, submodule-init step,
-  pgAdmin dashboard, and hierarchical section numbering.
+  VMx frontend, SQLModel backend, Groq provider, pgAdmin dashboard, and
+  hierarchical section numbering.
 - Regenerated `architecture.py` to drop the never-implemented AWS Cognito
   edge, label the backend as `FastAPI + LangChain + SQLModel`, and the
   frontend as `NiceGUI + VMx`. Added explicit edges to the optional Ollama,
@@ -32,8 +32,8 @@ into `develop`.
   db-dashboard.
 - All four docker-compose files: dropped the obsolete `version: "3.8"` key.
 - The two `*.ollama-*.dev.yml` variants and `docker-compose-gpu-nvidia.prod.yml`
-  now match the NiceGUI build (port 8080, repo-root build context, vmx
-  submodule mount, `FRONTEND_PORT=8080` override).
+  now match the NiceGUI build (port 8080, repo-root build context,
+  `FRONTEND_PORT=8080` override).
 - `db/scripts/db-snapshot.sh` and `db/db-snapshot-win.ps1` both fail fast on
   missing required env vars and read role/password from the environment
   rather than hardcoding them.

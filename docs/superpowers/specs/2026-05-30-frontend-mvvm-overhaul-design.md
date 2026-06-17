@@ -23,7 +23,7 @@ Replace the LinguAI Streamlit frontend with a NiceGUI application built strictly
 | Decision | Choice | Rationale |
 |---|---|---|
 | UI framework | **NiceGUI** (FastAPI + Vue 3 + Quasar) | Only Python option where VMx is unambiguously the sole VM layer. Reflex's `rx.State` and Shiny's reactive decorators both compete with VMx; NiceGUI's binding model lets VMx VMs be the source of truth. |
-| VMx consumption | **PyPI library** (`vmx = "^2.1.0"`) | Cleanest dep graph, identical dev/prod. Editable install reserved as escape valve if VMx gaps surface during migration. |
+| VMx consumption | **PyPI library** (`vmx = "^2.6.0"`) | Cleanest dep graph, identical dev/prod. (Historical note: shipped first as a git submodule against vmx 2.1.0, then migrated to the PyPI `vmx = "^2.6.0"` dependency on 2026-06-16 — see [the migration plan](../plans/2026-06-16-vmx-submodule-to-pypi.md). The editable-install escape valve was not retained.) |
 | Folder topology | **Horizontal** — top-level `models/`, `viewmodels/`, `views/` | Matches the "strict M vs VM vs V" framing; makes layer-violation PRs visually obvious. |
 | Visual direction | **Dual-Mode Studio** — follows OS preference, brand orange as the constant accent across light + dark | Modern SaaS aesthetic; preserves brand identity; respects user preference. |
 | Migration strategy | **Big-bang on feature branch** | Single-developer project, no external users — coexistence infrastructure (nginx, dual auth) is overkill. Worktree already set up for this. |

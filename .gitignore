@@ -173,6 +173,6 @@ frontend/.nicegui/
 .import_linter_cache/
 
 # Claude Code workspace (worktrees, plugin caches, agent transcripts).
-# Per-developer; not committed.
+# Per-developer; not committed. (CLAUDE.md itself IS committed — it is project
+# guidance, not per-developer state — so it is intentionally not ignored here.)
 .claude/
-CLAUDE.md

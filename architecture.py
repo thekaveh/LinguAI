@@ -6,8 +6,8 @@ Regenerate after editing:
     # on macOS, `apt-get install graphviz` on Debian/Ubuntu).
     python architecture.py
 
-The script writes a `.png` next to itself; rename to .jpg to overwrite
-the asset referenced by README.md.
+The script writes `images/linguai_system_architecture.png`; rename it to
+`.jpg` to overwrite the asset referenced by `README.md`.
 """
 from diagrams import Diagram, Cluster, Edge
 from diagrams.onprem.client import Users

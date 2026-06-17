@@ -34,6 +34,10 @@ Step-by-step implementation plans associated with the specs above.
   completed (merged into `develop` via commit `67fa99c`). Hard-coded
   worktree paths in this document refer to the original implementation
   worktree; substitute your checkout root.
+- [VMx submodule → PyPI migration — plan](superpowers/plans/2026-06-16-vmx-submodule-to-pypi.md)
+  — Task-by-task plan that replaced the `external/vmx` git submodule with the
+  published `vmx` PyPI dependency. **Status:** completed (merged into `develop`
+  on 2026-06-16).
 
 ## 1.4. Notes
 
