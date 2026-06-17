@@ -52,7 +52,6 @@ services:
       - "${FRONTEND_PORT}:8080"
     volumes:
       - ./frontend:/app/frontend
-      - ./external/vmx:/app/external/vmx
       - ./logs/frontend:/app/logs
     depends_on:
       - backend
