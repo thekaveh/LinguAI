@@ -8,9 +8,9 @@ Each item lists: **what** (the issue), **observed in** (where I hit it during re
 
 ## A. Distribution / packaging
 
-### A1. `vmx` is not published to PyPI despite README/getting-started docs saying it is
+### A1. `vmx` was not published to PyPI despite README/getting-started docs saying it was *(Resolved)*
 
-- **What:** `pip install vmx` fails with "No matching distribution found for vmx". The package's `pyproject.toml` is configured for publication (`hatchling` backend, full metadata), but no release has been uploaded to PyPI.
+- **What:** `pip install vmx` previously failed with "No matching distribution found for vmx" — the package's `pyproject.toml` was configured for publication (`hatchling` backend, full metadata), but no release had been uploaded to PyPI.
 - **Observed in:** README §3.1 ("`pip install vmx`"), README §4.1 quickstart, `docs/getting-started/python.md` §1.
 - **Impact:** **High.** Any external consumer reading the docs will hit a wall in the first command. The compatibility-matrix table also implies stable releases.
 - **Suggested action:** **Resolved** — VMx is published to PyPI as of 2.6.0, so `pip install vmx` now works and the README/getting-started docs that reference it are accurate. LinguAI consumes it as `vmx = "^2.6.0"` in `frontend/pyproject.toml`.
