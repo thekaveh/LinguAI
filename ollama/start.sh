@@ -1,3 +1,7 @@
+# Fail fast: a non-zero exit (e.g. the psql model query below) should abort the
+# startup rather than silently pulling no models. Runs under bash (see ENTRYPOINT).
+set -eo pipefail
+
 ollama serve &
 
 check_ollama_running() {
