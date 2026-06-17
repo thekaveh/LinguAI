@@ -8,11 +8,6 @@ from app.services.rewrite_content_service import RewriteContentService
 
 
 @pytest.fixture
-def db():
-    return Mock(spec=Session)
-
-
-@pytest.fixture
 def sql_model_session():
     return Mock(spec=SqlModelSession)
 
@@ -31,8 +26,8 @@ def content_rewrite_req():
 
 
 @pytest.fixture
-def service(db, sql_model_session):
-    return RewriteContentService(db, sql_model_session)
+def service(sql_model_session):
+    return RewriteContentService(sql_model_session)
 
 
 @patch('app.services.rewrite_content_service.ChatPromptTemplate.from_messages')

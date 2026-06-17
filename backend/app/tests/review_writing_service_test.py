@@ -8,11 +8,6 @@ from app.services.review_writing_service import ReviewWritingService
 
 
 @pytest.fixture
-def db():
-    return Mock(spec=Session)
-
-
-@pytest.fixture
 def sql_model_session():
     return Mock(spec=SqlModelSession)
 
@@ -32,8 +27,8 @@ def review_writing_req():
 
 
 @pytest.fixture
-def service(db, sql_model_session):
-    return ReviewWritingService(db, sql_model_session)
+def service(sql_model_session):
+    return ReviewWritingService(sql_model_session)
 
 
 @patch('app.services.review_writing_service.ChatPromptTemplate.from_messages')

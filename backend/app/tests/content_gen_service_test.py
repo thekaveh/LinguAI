@@ -9,11 +9,6 @@ from app.services.llm_service import LLMService
 
 
 @pytest.fixture
-def db():
-    return Mock(spec=Session)
-
-
-@pytest.fixture
 def sql_model_session():
     return Mock(spec=SqlModelSession)
 
@@ -34,12 +29,11 @@ def content_gen_req():
 
 
 @pytest.fixture
-def service(db, sql_model_session):
-    return ContentGenService(db, sql_model_session)
+def service(sql_model_session):
+    return ContentGenService(sql_model_session)
 
 
-def test_init(service, db, sql_model_session):
-    assert service.db is db
+def test_init(service, sql_model_session):
     assert service.sql_model_session is sql_model_session
 
 

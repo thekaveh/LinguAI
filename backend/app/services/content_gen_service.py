@@ -1,6 +1,5 @@
 from typing import AsyncIterable
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
 from sqlmodel import Session as SqlModelSession
 from langchain.schema.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
@@ -13,8 +12,7 @@ from app.schema.content_gen import ContentGenReq
 
 class ContentGenService:
     @log_decorator
-    def __init__(self, db: Session, sql_model_session: SqlModelSession):
-        self.db = db
+    def __init__(self, sql_model_session: SqlModelSession):
         self.sql_model_session = sql_model_session
 
 
