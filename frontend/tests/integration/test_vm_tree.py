@@ -611,7 +611,7 @@ async def test_assessment_submit(shell: AppShellVM, mock_backend: Any) -> None:
         await asyncio.sleep(0)
 
     # Stub the assessment POST endpoint.
-    from datetime import datetime
+    from datetime import datetime, timezone
     mock_backend.post("http://test/v1/users/1/assessments/").mock(
         return_value=httpx.Response(
             200,
@@ -620,7 +620,7 @@ async def test_assessment_submit(shell: AppShellVM, mock_backend: Any) -> None:
                 "user_id": 1,
                 "skill_level": "B1",
                 "assessment_type": "placement",
-                "assessment_date": datetime.utcnow().isoformat(),
+                "assessment_date": datetime.now(timezone.utc).isoformat(),
                 "language": {"language_id": 2, "language_name": "Spanish"},
             },
         )

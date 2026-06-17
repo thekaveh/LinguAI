@@ -170,7 +170,7 @@ class ChatVM:
             default_persona = next((p for p in personas if getattr(p, "is_default", False)), personas[0])
             if self._settings.model.default_persona_id:
                 default_persona = next(
-                    (p for p in personas if getattr(p, "id", None) == self._settings.model.default_persona_id),
+                    (p for p in personas if getattr(p, "persona_id", None) == self._settings.model.default_persona_id),
                     default_persona,
                 )
 
@@ -242,7 +242,8 @@ class ChatVM:
                         text=assistant_vm.model.text,
                         lang=getattr(s.persona, "language", None) or "en",
                     ))
-                    data_url = f"data:audio/mp3;base64,{result.audio}"
+                    # Backend already returns a full data: URI (data:audio/mpeg;base64,...)
+                    data_url = result.audio
                     self.state.set_model(replace(self.state.model, last_audio_data_url=data_url))
                     self._notify.push_info("Audio ready.")
                 except Exception:

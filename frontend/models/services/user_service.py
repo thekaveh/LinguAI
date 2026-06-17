@@ -3,7 +3,6 @@ import httpx
 
 from models.schemas.user import User, UserCreate
 from models.schemas.user_topic import UserTopicBase
-from models.schemas.user_language import UserLanguage
 from models.schemas.user_assessment import UserAssessment, UserAssessmentCreate
 
 
@@ -46,13 +45,6 @@ class UserService:
 
     async def remove_topic(self, user_id: int, topic_name: str) -> None:
         r = await self._http.delete(f"/users/{user_id}/topics/{topic_name}")
-        r.raise_for_status()
-
-    async def set_languages(self, username: str, languages: list[UserLanguage]) -> None:
-        r = await self._http.post(
-            f"/users/{username}/languages",
-            json=[L.model_dump(mode="json") for L in languages],
-        )
         r.raise_for_status()
 
     async def add_assessment(

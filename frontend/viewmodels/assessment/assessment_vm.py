@@ -1,7 +1,7 @@
 from __future__ import annotations
 import asyncio
 from dataclasses import dataclass, replace
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from vmx import ComponentVMOf, RelayCommand, MessageHub, RxDispatcher
@@ -175,7 +175,7 @@ class AssessmentVM:
                     language=language,
                     skill_level=skill_level,
                     assessment_type="placement",
-                    assessment_date=datetime.utcnow(),
+                    assessment_date=datetime.now(timezone.utc),
                 ),
             )
             self._notify.push_success(f"Score: {score}% — level {skill_level}")

@@ -264,7 +264,8 @@ class ContentGenVM:
             if s.language is not None:
                 lang_code = getattr(s.language, "language_code", None) or "en"
             result = await self._tts.synthesize(TextToSpeechRequest(text=s.result, lang=lang_code))
-            data_url = f"data:audio/mp3;base64,{result.audio}"
+            # Backend already returns a full data: URI (data:audio/mpeg;base64,...)
+            data_url = result.audio
             self.state.set_model(replace(self.state.model, last_audio_data_url=data_url))
             self._notify.push_info("Audio ready.")
         except Exception as e:
