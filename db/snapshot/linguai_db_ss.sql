@@ -970,7 +970,7 @@ SELECT pg_catalog.setval('public.addresses_address_id_seq', 6, true);
 -- Name: content_content_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.content_content_id_seq', 8, true);
+SELECT pg_catalog.setval('public.content_content_id_seq', 9, true);
 
 
 --
@@ -984,7 +984,7 @@ SELECT pg_catalog.setval('public.language_id_seq', 5, true);
 -- Name: persona_persona_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.persona_persona_id_seq', 5, true);
+SELECT pg_catalog.setval('public.persona_persona_id_seq', 16, true);
 
 
 --
@@ -1186,6 +1186,12 @@ ALTER TABLE ONLY public.user_persona
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_username_key UNIQUE (username);
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
 
 
 --
