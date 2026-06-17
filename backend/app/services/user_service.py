@@ -1,6 +1,5 @@
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from typing import Sequence
 
 # from app.schema.topic import Topic
 from app.utils.logger import log_decorator
@@ -282,7 +281,11 @@ class UserService:
         """
         db_assessment = self.get_user_assessment(assessment_id)
         if db_assessment:
-            for key, value in assessment_data.dict().items():
+            # Exclude the nested `language` relationship (the scalar `language_id`
+            # FK carries the association) and `user_id` (ownership must not change
+            # on update). Writing the `language` dict onto the relationship would
+            # corrupt SQLAlchemy state at flush.
+            for key, value in assessment_data.model_dump(exclude={"language", "user_id"}).items():
                 setattr(db_assessment, key, value)
             self.db.commit()
             self.db.refresh(db_assessment)
