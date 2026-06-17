@@ -5,7 +5,7 @@ VMx frontend with a FastAPI + LangChain + SQLModel backend and ships
 optional in-container or host-side LLM runtimes (Ollama, OpenAI, Groq)
 backed by PostgreSQL.
 
-## 2. Architecture
+## 1.1. Architecture
 
 The application is orchestrated by Docker Compose and is composed of five
 services:
@@ -26,7 +26,7 @@ the source for the regeneration command.
 For deeper internal documentation, see the [docs index](docs/README.md),
 [backend README](backend/README.md), and [frontend README](frontend/README.md).
 
-## 3. Prerequisites
+## 1.2. Prerequisites
 
 Required:
 
@@ -38,9 +38,9 @@ Optional, for working outside the containers:
 - Python 3.10
 - Poetry (used by both services for dependency management)
 
-## 4. Setup
+## 1.3. Setup
 
-### 4.1. Clone
+### 1.3.1. Clone
 
 ```bash
 git clone https://github.com/thekaveh/LinguAI.git
@@ -51,7 +51,7 @@ VMx is a published PyPI dependency (`vmx`, pinned in
 `frontend/pyproject.toml`); Poetry resolves it during the frontend build, so
 there is no submodule to initialise.
 
-### 4.2. Configure environment
+### 1.3.2. Configure environment
 
 Copy the example and fill in any provider keys you intend to use. `.env`
 is gitignored.
@@ -69,7 +69,7 @@ The backend's LLM service hides any LLM row whose provider credentials
 are absent, so a missing key simply removes that provider's models from
 the UI listing.
 
-### 4.3. Pick a compose variant
+### 1.3.3. Pick a compose variant
 
 | Compose file                                  | Environment | Ollama source                | Notes                                  |
 | --------------------------------------------- | ----------- | ---------------------------- | -------------------------------------- |
@@ -81,7 +81,7 @@ the UI listing.
 The bare `docker-compose` / `docker compose` command will not find these
 non-default files automatically — pass `-f` explicitly.
 
-### 4.4. Bring the stack up
+### 1.3.4. Bring the stack up
 
 ```bash
 # Default dev stack
@@ -106,19 +106,19 @@ To tear down the stack while preserving the data volume:
 docker compose down --remove-orphans
 ```
 
-To drop the data volume too (required to re-apply a snapshot — see §5):
+To drop the data volume too (required to re-apply a snapshot — see §1.4):
 
 ```bash
 docker compose down -v --remove-orphans
 ```
 
-### 4.5. Default users
+### 1.3.5. Default users
 
 The seed snapshot ships a small set of users for local development. All
 seeded user passwords are `linguai`; pick any username from the snapshot
 to authenticate.
 
-## 5. Database
+## 1.4. Database
 
 The schema is managed without a migration framework — the file
 `db/snapshot/linguai_db_ss.sql` is the source of truth. Postgres' entry-
@@ -135,7 +135,7 @@ For collaborators to see your schema changes locally, they must drop the
 data volume first (`docker compose down -v --remove-orphans`) so the next
 `up` reloads the snapshot.
 
-## 6. Development
+## 1.5. Development
 
 Source trees are bind-mounted into the containers (`./backend` → `/app`,
 `./frontend` → `/app/frontend`).
@@ -147,7 +147,7 @@ VS Code's *Dev Containers* extension can attach directly to the running
 `backend` or `frontend` container if you want an in-container shell with
 the venv available.
 
-## 7. Running tests
+## 1.6. Running tests
 
 The stack must be up. From the host:
 
@@ -164,7 +164,7 @@ docker exec -it frontend python -m pytest --cov=models/services tests/
 Run a single file or test with the usual pytest argument syntax
 (e.g. `app/tests/user_service_test.py::test_create_user`).
 
-## 8. Dependency management
+## 1.7. Dependency management
 
 Both services use Poetry. Inside a container:
 
@@ -183,7 +183,7 @@ both. Rebuild the image afterwards:
 docker compose build
 ```
 
-## 9. Production deployment
+## 1.8. Production deployment
 
 The only currently supported production path is an EC2 instance using
 the Ubuntu-NVIDIA-PyTorch2 AMI:
@@ -197,7 +197,7 @@ In production the code is built into the images rather than bind-mounted.
 `PROD_ENV_CPUS` and `PROD_ENV_MEM_LIMIT` in `.env` cap the Ollama
 container's resources.
 
-## 10. Documentation
+## 1.9. Documentation
 
 - [`docs/README.md`](docs/README.md) — entry point to deeper docs: design
   specs, implementation plans, VMx API quickref, audit notes.
@@ -208,6 +208,6 @@ container's resources.
 - [`CHANGELOG.md`](CHANGELOG.md) — user-visible changes.
 - [`architecture.py`](architecture.py) — source for the diagram above.
 
-## 11. License
+## 1.10. License
 
 [MIT](LICENSE).
