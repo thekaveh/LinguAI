@@ -46,7 +46,7 @@ class UserBase(BaseModel):
     age: Optional[int] = None # age field
     gender: Optional[str] = None 
     discovery_method: Optional[str] = None # optional field for "how did you hear about us?"
-    motivation: Optional[str] = None # optional field for "what is your motivation to use the platform?"
+    motivation: Optional[str] = Field(default=None, max_length=100)  # matches the DB column width (varchar(100))
     mobile_phone: Optional[str] = None
     landline_phone: Optional[str] = None
     contact_preference: Optional[str] = None

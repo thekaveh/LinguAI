@@ -52,11 +52,10 @@ def delete_user_content(content_id: int, db: Session = Depends(get_db)):
         db (Session, optional): The database session. Defaults to Depends(get_db).
 
     Returns:
-        dict: A dictionary with a success message.
-
+        None — HTTP 204 No Content.
     """
     logger.info("Deleting content with ID: %s", content_id)
     user_content_service = UserContentService(db)
     user_content_service.delete_user_content(content_id)
     logger.info("Content with ID: %s deleted successfully", content_id)
-    return {"message": "Content deleted successfully"}
+    return None

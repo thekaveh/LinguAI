@@ -48,7 +48,7 @@ class User(Base):
     age = Column(Integer)
     gender = Column(String(50))
     discovery_method = Column(String(100))
-    motivation = Column(Text)
+    motivation = Column(String(100))  # matches the DB snapshot column (varchar(100))
     mobile_phone = Column(String(20))
     landline_phone = Column(String(20))
     contact_preference = Column(String(50))

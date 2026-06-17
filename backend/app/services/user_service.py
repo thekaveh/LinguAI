@@ -162,6 +162,7 @@ class UserService:
             _logger.info("UserTopics updated for user: %s", username)
         else:
             _logger.info("User not found with username: %s", username)
+            raise ValueError("user not found")
 
     @log_decorator
     def remove_topic_from_user(self, user_id: int, topic_name: str) -> None:

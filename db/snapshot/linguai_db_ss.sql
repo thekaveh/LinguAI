@@ -508,9 +508,12 @@ CREATE TABLE public.user_persona (
 --
 
 CREATE TABLE public.user_topics (
-    user_id integer,
-    topic_name character varying(255)
+    user_id integer NOT NULL,
+    topic_name character varying(255) NOT NULL
 );
+
+ALTER TABLE ONLY public.user_topics
+    ADD CONSTRAINT user_topics_pkey PRIMARY KEY (user_id, topic_name);
 
 
 --

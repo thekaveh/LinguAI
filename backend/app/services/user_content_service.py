@@ -1,7 +1,7 @@
 from typing import Optional, List
 from sqlalchemy import desc
 from sqlalchemy.orm import Session
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 import logging
 from app.core.config import Config
 from app.data_access.models.user_content import UserContent as UserContentModel
@@ -66,4 +66,4 @@ class UserContentService:
         query = query.order_by(desc(UserContentModel.created_date))
         
         user_contents = query.all()
-        return parse_obj_as(List[UserContent], user_contents)
+        return TypeAdapter(List[UserContent]).validate_python(user_contents)

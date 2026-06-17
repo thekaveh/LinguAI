@@ -122,14 +122,20 @@ def update_user_topics(
 
     Args:
         username (str): The username of the user.
-        new_topics (User): The updated topics for the user.
+        new_topics (list[UserTopicBase]): The user's new topic list.
         db (Session, optional): The database session. Defaults to Depends(get_db).
 
     Returns:
         None
+
+    Raises:
+        HTTPException: 404 if the user does not exist.
     """
     user_service = UserService(db)
-    user_service.update_user_topics(username, new_topics)
+    try:
+        user_service.update_user_topics(username, new_topics)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
     return None
 
 @log_decorator
