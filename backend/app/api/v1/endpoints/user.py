@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.schema.topic import Topic
 from app.utils.logger import log_decorator
 from app.data_access.session import get_db
-from app.schema.user import User, UserCreate
+from app.schema.user import User, UserBase, UserCreate
+from app.schema.user_topic import UserTopicBase
 from app.schema.password_change import PasswordChange
 from app.services.user_service import UserService
 from app.schema.user_assessment import UserAssessment, UserAssessmentCreate
@@ -114,7 +115,7 @@ def read_user_id_by_username(username:str, db: Session = Depends(get_db)):
 @log_decorator
 @router.post("/users/{username}/topics", response_model=None)
 def update_user_topics(
-    username: str, new_topics: User, db: Session = Depends(get_db)
+    username: str, new_topics: list[UserTopicBase], db: Session = Depends(get_db)
 ):
     """
     Update the topics of a user.
@@ -325,7 +326,7 @@ def update_user_languages(username: str, user: User, db: Session = Depends(get_d
     
 @log_decorator
 @router.post("/users/{username}/update", response_model=User)
-def update_user_profile(username: str, user_update: UserCreate, db: Session = Depends(get_db)):
+def update_user_profile(username: str, user_update: UserBase, db: Session = Depends(get_db)):
     """
     Update the profile of a user.
 

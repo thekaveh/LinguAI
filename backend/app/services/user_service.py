@@ -136,13 +136,13 @@ class UserService:
                 self.db.commit()
 
     @log_decorator
-    def update_user_topics(self, username: str, new_topics: User) -> None:
+    def update_user_topics(self, username: str, new_topics: list[UserTopicBase]) -> None:
         """
         Update the topics of a user in the database.
 
         Args:
             username (str): The username of the user.
-            new_topics (User): An instance of the User class containing the new topics.
+            new_topics (list[UserTopicBase]): The user's new topic list (replaces existing).
 
         Returns:
             None
@@ -153,7 +153,7 @@ class UserService:
         if user:
             # Deleting UserTopics associated with the found user_id
             self.db.query(UserTopic).filter(UserTopic.user_id == user.user_id).delete()
-            for topic_base in new_topics.user_topics:
+            for topic_base in new_topics:
                 topic = self.db.query(Topic).filter(Topic.topic_name == topic_base.topic_name).first()
                 if topic:
                     user_topic = UserTopic(user_id=user.user_id, topic_name=topic.topic_name)
@@ -354,13 +354,13 @@ class UserService:
             self.db.commit()
             
     @log_decorator
-    def update_user_profile(self, username: str, user_update: UserCreate) -> User:
+    def update_user_profile(self, username: str, user_update: UserBase) -> User:
         """
         Update the profile of a user in the database.
 
         Args:
             username (str): The username of the user to update.
-            user_update (UserCreate): An instance of the UserCreate class containing the updated user information.
+            user_update (UserBase): The updated profile fields (no password — see change_password).
 
         Returns:
             User: The updated user object.

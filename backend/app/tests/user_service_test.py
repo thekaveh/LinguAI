@@ -102,8 +102,7 @@ def test_add_topic_to_user(user_service, mock_db_session):
     mock_db_session.commit.assert_called_once()
 
 def test_update_user_topics(user_service, mock_db_session):
-    user = DBUser(user_id=1, username="username")
-    user_service.update_user_topics("username", user)
+    user_service.update_user_topics("username", [UserTopicBase(user_id=1, topic_name="topic1")])
     mock_db_session.commit.assert_called_once()
 
 def test_remove_topic_from_user(user_service, mock_db_session):
