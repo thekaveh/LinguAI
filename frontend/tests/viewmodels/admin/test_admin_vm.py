@@ -33,7 +33,6 @@ def test_request_delete_opens_dialog(vm) -> None:  # type: ignore[no-untyped-def
 def test_request_delete_self_blocks(vm) -> None:  # type: ignore[no-untyped-def]
     v, session = vm
     # Set session username so 'kaveh' is "self"
-    from viewmodels.shell.user_session_vm import UserSession
     session.model = replace(session.model, username="kaveh")
     v.request_delete("kaveh")
     assert v.state.model.pending_delete_username is None  # didn't set

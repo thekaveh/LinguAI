@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass, replace
-from typing import Literal, Optional, Tuple
+from typing import Literal, Tuple
 
 from vmx import ComponentVMOf, MessageHub, RxDispatcher
 

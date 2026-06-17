@@ -9,7 +9,6 @@ from viewmodels.shell.user_session_vm import build_user_session_vm
 from viewmodels.shell.notification_center_vm import build_notification_center
 from viewmodels.auth.login_vm import build_login_vm
 from models.services.auth_service import AuthResult
-from models.schemas.user import User
 
 
 @pytest.fixture

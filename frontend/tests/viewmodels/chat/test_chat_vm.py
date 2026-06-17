@@ -1,9 +1,8 @@
 from __future__ import annotations
 import pytest
 from unittest.mock import AsyncMock
-from dataclasses import replace
 
-from viewmodels.chat.chat_vm import build_chat_vm, ChatSession
+from viewmodels.chat.chat_vm import build_chat_vm
 from viewmodels.shell.notification_center_vm import build_notification_center
 from viewmodels.shell.settings_vm import build_settings_vm
 

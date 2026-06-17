@@ -48,7 +48,7 @@ def llm_label(llm: object) -> str:
     """
     dn = getattr(llm, "display_name", None)
     if callable(dn):
-        return dn()
+        return str(dn())
     if dn:
         return str(dn)
     model_name = getattr(llm, "model_name", None)

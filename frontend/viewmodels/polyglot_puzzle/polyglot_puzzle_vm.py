@@ -1,11 +1,10 @@
 from __future__ import annotations
 import asyncio
 from dataclasses import replace
-from typing import List
 
 from vmx import ComponentVMOf, RelayCommand, MessageHub, RxDispatcher
 
-from viewmodels.polyglot_puzzle.attempt_vm import AttemptVM, Attempt, build_attempt_vm
+from viewmodels.polyglot_puzzle.attempt_vm import AttemptVM, build_attempt_vm
 from viewmodels.polyglot_puzzle.embeddings_view_vm import EmbeddingsViewVM
 from viewmodels.shell.notification_center_vm import NotificationCenterVM
 
@@ -13,7 +12,6 @@ from models.domain.llm import llm_label
 from models.domain.polyglot_puzzle import (
     PolyglotPuzzleModel,
     PolyglotPuzzleRequest,
-    PolyglotPuzzleResponse,
 )
 from models.domain.embeddings import (
     EmbeddingsGetRequest,

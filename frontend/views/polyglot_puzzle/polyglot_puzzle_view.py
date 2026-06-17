@@ -70,7 +70,8 @@ def render(shell: AppShellVM) -> None:
                 return
             src.options = list(vm.state.model.src_langs)
             dst.options = list(vm.state.model.dst_langs)
-            src.update(); dst.update()
+            src.update()
+            dst.update()
             if vm.state.model.request:
                 src.value = vm.state.model.request.src_lang
                 dst.value = vm.state.model.request.dst_lang
