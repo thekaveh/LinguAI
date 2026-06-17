@@ -9,6 +9,7 @@ from viewmodels.polyglot_puzzle.attempt_vm import AttemptVM, Attempt, build_atte
 from viewmodels.polyglot_puzzle.embeddings_view_vm import EmbeddingsViewVM
 from viewmodels.shell.notification_center_vm import NotificationCenterVM
 
+from models.domain.llm import llm_label
 from models.domain.polyglot_puzzle import (
     PolyglotPuzzleModel,
     PolyglotPuzzleRequest,
@@ -156,15 +157,11 @@ class PolyglotPuzzleVM:
                 self._notify.push_error("Could not load languages or LLMs.")
                 return
 
-            def _llm_label(m: object) -> str:
-                dn = getattr(m, "display_name", None)
-                return dn() if callable(dn) else (str(dn) if dn else getattr(m, "name", str(m)))
-
             structured_pairs: tuple[tuple[int, str], ...] = tuple(
-                (int(getattr(L, "id", 0)), _llm_label(L)) for L in structured
+                (int(getattr(L, "id", 0)), llm_label(L)) for L in structured
             )
             embeddings_pairs: tuple[tuple[int, str], ...] = tuple(
-                (int(getattr(L, "id", 0)), _llm_label(L)) for L in embeddings
+                (int(getattr(L, "id", 0)), llm_label(L)) for L in embeddings
             )
 
             req = PolyglotPuzzleRequest(

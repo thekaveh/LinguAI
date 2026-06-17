@@ -15,7 +15,6 @@ from models.services.user_service import UserService
 from models.services.user_content_service import UserContentService
 from models.schemas.review_writing import ReviewWritingReq
 from models.schemas.language import Language
-from models.schemas.text_to_speech import TextToSpeechRequest
 from models.schemas.user_content import UserContent
 
 SKILL_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"]
