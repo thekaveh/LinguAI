@@ -9,7 +9,7 @@ router = APIRouter()
 
 @log_decorator
 @router.post("/text_to_speech")
-async def chat(request: TextToSpeechRequest) -> TextToSpeechResponse:
+async def text_to_speech(request: TextToSpeechRequest) -> TextToSpeechResponse:
     """
     Generate speech from text.
 

@@ -31,22 +31,6 @@ class UserContentService:
         self.logger.info(f"User content created with ID: {user_content.id}")
         return UserContent.from_orm(user_content)
 
-    def read_user_content_v0(self, search_params: UserContentSearch) -> List[UserContent]:
-        """
-        Reads user content based on the provided search parameters.
-
-        Args:
-            search_params (UserContentSearch): The search parameters to filter the user content.
-
-        Returns:
-            List[UserContent]: A list of UserContent objects that match the search criteria.
-        """
-        query = self.db.query(UserContentModel).filter(UserContentModel.user_id == search_params.user_id)
-        if search_params.content_type is not None:
-            query = query.filter(UserContentModel.type == search_params.content_type)
-        user_contents = query.all()
-        return parse_obj_as(List[UserContent], user_contents)
-    
     def delete_user_content(self, content_id: int) -> None:
         """
         Deletes user content with the specified ID.

@@ -29,14 +29,6 @@ def test_create_user_content(mock_user_content_model, mock_logging, mock_config)
     mock_session.commit.assert_called()
     mock_session.refresh.assert_called()
 
-@patch('app.services.user_content_service.Config')
-@patch('app.services.user_content_service.logging')
-def test_read_user_content_v0(mock_logging, mock_config):
-    mock_session = MagicMock(spec=Session)
-    service = UserContentService(mock_session)
-    search_params = UserContentSearch(user_id=1, content_type=1)
-    service.read_user_content_v0(search_params)
-    mock_session.query.assert_called_with(UserContentModel)
 
 @patch('app.services.user_content_service.Config')
 @patch('app.services.user_content_service.logging')
