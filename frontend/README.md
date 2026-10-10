@@ -88,7 +88,13 @@ Services in `models/services/` take the `httpx.AsyncClient` returned by
 
 ## 1.6. Running the tests
 
-From the host with the stack running:
+The images exclude development dependencies. From the host, install the
+locked development tools in your disposable running development container
+before executing tests:
+
+```bash
+docker exec -it frontend poetry install --no-root --with dev
+```
 
 ```bash
 # All frontend tests (unit + integration)
