@@ -83,7 +83,7 @@ schema is `db/snapshot/linguai_db_ss.sql`. To change schema:
 1. Edit the snapshot SQL, or let `SQLModel.metadata.create_all` add new
    SQLModel-defined tables on backend startup.
 2. Re-snapshot the running DB:
-   `docker exec db sh ./scripts/db-snapshot.sh`
+   `docker exec db bash ./scripts/db-snapshot.sh`
 3. For others to pick up the new schema, they must drop the data volume:
    `docker compose down -v --remove-orphans`
 
@@ -92,7 +92,13 @@ the data volume is empty.
 
 ## 1.7. Running the tests
 
-From the host with the stack running:
+The images exclude development dependencies. From the host, install the
+locked development tools in your disposable running development container
+before executing tests:
+
+```bash
+docker exec -it backend poetry install --no-root --with dev
+```
 
 ```bash
 # All backend tests
